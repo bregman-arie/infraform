@@ -1,26 +1,9 @@
 # InfraForm
 
-Terraform based project for managing OpenStack related resources
+Provision infrastructure and deploy apps with one command
 
 ## Usage
 
-To create one instance with reachable floating IP:
+To create a container with neutron project and run unit tests, run the following command:
 
-    infraform form --scenario one_instance_with_fip --name my_setup
-
-List managed resources:
-
-    infraform list
-
-Remove group of resources:
-
-    infraform delete --name my_setup
-
-Remove all resources:
-
-    infraform delete --all
-
-
-## Contributions
-
-To contribute, submit patches through review.gerrithub.io
+    infraform --project neutron --version 15 --tester unit
