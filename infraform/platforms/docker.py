@@ -11,29 +11,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import logging
-import sys
-
-import infraform.parser as app_parser
-
-LOG = logging.getLogger(__name__)
 
 
-def setup_logging(debug):
-    """Sets the logging."""
-    format = '%(message)s'
-    level = logging.DEBUG if debug else logging.INFO
-    logging.basicConfig(level=level, format=format)
+class Docker(object):
 
+    def prepare(self):
+        pass
 
-def main():
-    """Main Entry."""
-    # Parse arguments provided by the user
-    parser = app_parser.create_parser()
-    args = parser.parse_args()
-    setup_logging(args.debug)
-    args.func(args)
-
-
-if __name__ == '__main__':
-    sys.exit(main())
+    def run(self):
+        pass

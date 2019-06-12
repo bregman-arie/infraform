@@ -11,40 +11,44 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
 import argparse
 
+from infraform.create import cli as create_cli
 
-def add_create_parser(subparsers, pparser):
+
+def add_create_parser(subparsers):
     """The parser for sub command 'create'."""
-    create_parser = subparsers.add_parser("create", parents=[pparser])
+    create_parser = subparsers.add_parser("create")
+    create_parser.set_defaults(func=create_cli.main)
     create_parser.add_argument('--links', '-l',
                                dest="list_links",
                                help='List all available and chosen links.')
     create_parser.add_argument('--tester', '-t',
                                dest="tester",
-                               help='The name of the tester or tests env to use')
+                               help='The name of the tests env to use.')
     create_parser.add_argument('--branch', '-b',
                                dest="branch",
-                               help='The name of the branch to use')
+                               help='The name of the branch to use.')
     create_parser.add_argument('--project', '-p',
                                dest="project",
                                help="The name of the project to use.")
+    create_parser.add_argument(
+        '--platform',
+        dest="platform",
+        default="docker",
+        help="The platform to use for creating the infrastructure.")
 
 
 def create_parser():
     """Returns argument parser"""
 
     # Top level parser
-    parent_parser = argparse.ArgumentParser(add_help=False)
-    main_parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
 
-    main_parser.add_argument('--debug', '-d', action='store_true',
-                             dest="debug", help='Turn on debug')
+    parser.add_argument('--debug', '-d', action='store_true',
+                        dest="debug", help='Turn on debug')
 
-    action_subparsers = main_parser.add_subparsers(
-        title="sub-actions", dest="main_command")
+    add_create_parser(subparsers)
 
-    add_create_parser(action_subparsers, parent_parser)
-
-    return main_parser
+    return parser

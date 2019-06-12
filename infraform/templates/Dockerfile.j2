@@ -1,0 +1,3 @@
+FROM {{ image_name }}
+ENV TEST_ENV {{ tester }}
+RUN tox -e py $TEST_ENV
