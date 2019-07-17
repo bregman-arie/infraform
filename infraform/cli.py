@@ -33,9 +33,10 @@ def main():
     parser = app_parser.create_parser()
     args = parser.parse_args()
     setup_logging(args.debug)
-    try:
+
+    if hasattr(args, 'func'):
         args.func(args)
-    except AttributeError:
+    else:
         LOG.error(general_usage())
 
 

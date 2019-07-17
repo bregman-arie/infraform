@@ -1,4 +1,4 @@
-# Copyright 2019 Infuse Team
+# Copyright 2019 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,27 +12,24 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import logging
-import importlib
-import sys
+import podman
 
-from infraform.exceptions import usage
+from infraform.platforms.platform import Platform
 
 LOG = logging.getLogger(__name__)
 
 
-def validate_input(args):
-    """Verifies that enough data was passed in order to run successfully."""
-    if not args.scenario and not (args.project and args.tester):
-        LOG.error(usage.missing_required_args())
-        sys.exit(2)
+class Podman(Platform):
 
+    PACKAGE = 'podman'
 
-def main(args):
-    """Runner main entry."""
-    validate_input(args)
-    Platform = getattr(importlib.import_module(
-        "infraform.platforms.{}".format(args.platform)),
-        args.platform.capitalize())
-    platform = Platform()
-    platform.prepare()
-    platform.run()
+    def prepare(self):
+        pass
+
+    def run(self):
+        try:
+            with podman.Client() as client:
+                print(client.images.list())
+        except ConnectionError as exception:
+            LOG.error(exception)
+            LOG.error(self.raise_service_down())

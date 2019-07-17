@@ -36,5 +36,5 @@ def add_run_parser(subparsers):
     run_parser.add_argument(
         '--platform',
         dest="platform",
-        default="docker",
+        default="podman",
         help="The platform to use for creating the infrastructure.")

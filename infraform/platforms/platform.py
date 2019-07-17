@@ -11,12 +11,20 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 
 
-class Docker(object):
+class Platform(object):
 
-    def prepare(self):
-        pass
+    def raise_service_down(self):
+        """Notify user that service is down or package is not installed."""
+        message = """
+It looks like service is down or package is not installed.
 
-    def run(self):
-        pass
+To fix it, run the following commands:
+
+    $ {0}
+    $ {1}
+""".format(crayons.red("sudo dnf install %s" % self.PACKAGE),
+           crayons.red("sudo systemctl install %s" % self.PACKAGE),)
+        return message
