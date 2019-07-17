@@ -14,10 +14,20 @@
 import logging
 import importlib
 
+from infraform.exceptions import usage
+
 LOG = logging.getLogger(__name__)
 
 
+def validate_input(args):
+    """Verifies that enough data was passed in order to run successfully."""
+    print(args)
+    if not args.scenario and not (args.project and args.tester):
+        LOG.error(usage.missing_required_args())
+
+
 def main(args):
+    validate_input(args)
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())

@@ -15,6 +15,7 @@ import logging
 import sys
 
 import infraform.parser as app_parser
+from infraform.exceptions.usage import general_usage
 
 LOG = logging.getLogger(__name__)
 
@@ -32,7 +33,10 @@ def main():
     parser = app_parser.create_parser()
     args = parser.parse_args()
     setup_logging(args.debug)
-    args.func(args)
+    try:
+        args.func(args)
+    except AttributeError:
+        LOG.error(general_usage())
 
 
 if __name__ == '__main__':
