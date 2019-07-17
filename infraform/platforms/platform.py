@@ -16,6 +16,12 @@ import crayons
 
 class Platform(object):
 
+    def __init__(self, project=None, tester=None, branch=None):
+        self.project = project
+        self.tester = tester
+        self.branch = branch
+        self.image = "{}-{}".format(self.project, self.tester)
+
     def raise_service_down(self):
         """Notify user that service is down or package is not installed."""
         message = """

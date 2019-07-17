@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import logging
-import podman
+import subprocess
 
 from infraform.platforms.platform import Platform
 
@@ -23,13 +23,28 @@ class Podman(Platform):
 
     PACKAGE = 'podman'
 
+    def __init__(self, project=None, tester=None, branch=None):
+        super(Podman, self).__init__(project, tester, branch)
+
     def prepare(self):
-        pass
+        if self.image_not_exists():
+            LOG.warning("Couldn't find image: {}".format(self.image))
+            self.generate_Dockerfile()
 
     def run(self):
         try:
-            with podman.Client() as client:
-                print(client.images.list())
-        except ConnectionError as exception:
+            subprocess.run("podman run {}".format(self.image),
+                           shell=True)
+        except ConnectionError as exception:  # noqa
             LOG.error(exception)
             LOG.error(self.raise_service_down())
+
+    def image_not_exists(self):
+        """Returns true if image exists."""
+        res = subprocess.run("podman inspect {}".format(self.image),
+                             shell=True, stdout=subprocess.PIPE,
+                             stderr=subprocess.DEVNULL)
+        return res.returncode
+
+    def generate_Dockerfile(self):
+        pass

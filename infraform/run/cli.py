@@ -33,6 +33,6 @@ def main(args):
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())
-    platform = Platform()
+    platform = Platform(project=args.project, tester=args.tester)
     platform.prepare()
     platform.run()
