@@ -9,6 +9,7 @@ verify_ssl = true
 infraform = {editable = true,path = "."}
 crayons = "*"
 podman = "*"
+jinja2 = "*"
 
 [requires]
 python_version = "3.7"

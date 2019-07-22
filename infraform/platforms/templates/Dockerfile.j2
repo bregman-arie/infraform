@@ -1,3 +1,3 @@
-FROM {{ image_name }}
+FROM {{ image_name|default("rhel-8") }}
 ENV TEST_ENV {{ tester }}
 RUN tox -e py $TEST_ENV

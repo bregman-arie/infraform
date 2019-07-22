@@ -11,7 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from jinja2 import Environment
+from jinja2 import FunctionLoader
 import logging
+import os
 import subprocess
 
 from infraform.platforms.platform import Platform
@@ -22,6 +25,8 @@ LOG = logging.getLogger(__name__)
 class Podman(Platform):
 
     PACKAGE = 'podman'
+    DOCKERFILE_TEMPLATE = (os.path.dirname(__file__) +
+                           '/templates/Dockerfile.j2')
 
     def __init__(self, project=None, tester=None, branch=None):
         super(Podman, self).__init__(project, tester, branch)
@@ -29,7 +34,8 @@ class Podman(Platform):
     def prepare(self):
         if self.image_not_exists():
             LOG.warning("Couldn't find image: {}".format(self.image))
-            self.generate_Dockerfile()
+            dockerfile_path = self.write_dockerfile(self.generate_dockerfile())
+            self.build_image(dockerfile_path)
 
     def run(self):
         try:
@@ -46,5 +52,17 @@ class Podman(Platform):
                              stderr=subprocess.DEVNULL)
         return res.returncode
 
-    def generate_Dockerfile(self):
+    def get_template(self, name):
+        """Returns jinja2 Dockerfile template."""
+        with open(name, 'r+') as open_f:
+            template_content = open_f.read()
+        return template_content
+
+    def generate_dockerfile(self):
+        j2_env = Environment(loader=FunctionLoader(self.get_template))
+        template = j2_env.get_template(self.DOCKERFILE_TEMPLATE)
+        rendered_file = template.render()
+        return rendered_file
+
+    def write_dockerfile(self):
         pass
