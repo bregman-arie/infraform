@@ -16,6 +16,7 @@ from jinja2 import FunctionLoader
 import logging
 import os
 import subprocess
+import sys
 
 from infraform.platforms.platform import Platform
 
@@ -64,5 +65,15 @@ class Podman(Platform):
         rendered_file = template.render()
         return rendered_file
 
-    def write_dockerfile(self):
-        pass
+    def write_dockerfile(self, df_content, df_path="Dockerfile"):
+        with open(df_path, 'w+') as f:
+            f.write(df_content)
+        return df_path
+
+    def build_image(self, df_path):
+        """Builds image given df path."""
+        res = subprocess.run("podman build -f {}".format(df_path),
+                             shell=True)
+        if res.returncode != 0:
+            sys.exit(2)
+        return res

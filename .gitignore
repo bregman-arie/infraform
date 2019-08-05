@@ -108,3 +108,6 @@ venv.bak/
 
 # Pipenv
 Pipfile.lock
+
+# Docker
+Dockerfile
