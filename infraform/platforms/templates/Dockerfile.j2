@@ -1,3 +1,5 @@
-FROM {{ image_name|default("rhel-8") }}
+FROM {{ image_name|default("rhel7") }}
+RUN curl https://bootstrap.pypa.io/get-pip.py | python
+RUN pip install tox
 ENV TEST_ENV {{ tester }}
 RUN tox -e py $TEST_ENV

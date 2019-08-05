@@ -62,7 +62,7 @@ class Podman(Platform):
     def generate_dockerfile(self):
         j2_env = Environment(loader=FunctionLoader(self.get_template))
         template = j2_env.get_template(self.DOCKERFILE_TEMPLATE)
-        rendered_file = template.render()
+        rendered_file = template.render(tester=self.tester)
         return rendered_file
 
     def write_dockerfile(self, df_content, df_path="Dockerfile"):
