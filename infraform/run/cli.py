@@ -13,26 +13,15 @@
 #    under the License.
 import logging
 import importlib
-import sys
-
-from infraform.exceptions import usage
 
 LOG = logging.getLogger(__name__)
 
 
-def validate_input(args):
-    """Verifies that enough data was passed in order to run successfully."""
-    if not args.scenario and not (args.project and args.tester):
-        LOG.error(usage.missing_required_args())
-        sys.exit(2)
-
-
 def main(args):
     """Runner main entry."""
-    validate_input(args)
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())
-    platform = Platform(project=args.project, tester=args.tester)
+    platform = Platform(args=args)
     platform.prepare()
     platform.run()

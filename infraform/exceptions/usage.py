@@ -19,30 +19,18 @@ def general_usage():
     message = """
 Usage Examples:
 
-    Run pep8 tests for neutron project:
+    Run pep8 tests for neutron project from git:
     $ {0}
 
     Run unit tests for nova project:
     $ {1}
-
-""".format(crayons.red("ifr run --tester pep8 --project neutron"),
-           crayons.red("ifr run --tester unit --project nova"),)
+""".format(crayons.yellow("ifr run --tester pep8 --project neutron --git x.com"),
+           crayons.yellow("ifr run --tester unit --project nova --gerrit y.com"),)
     return message
 
 
-def missing_required_args():
-    """Help message format."""
+def missing_arg(arg):
+    """Missing arg message format."""
     message = """
-You have to specify either:
-
-    scenario name or path. This way:
-    $ {0}
-
-OR
-
-    project and tester. This way:
-    $ {1}
-
-""".format(crayons.red("ifr run --scenario neutron_pep8"),
-           crayons.red("ifr run --tester pep8 --project neutron"),)
+Please specify the argument: {0}""".format(crayons.red(arg))
     return message

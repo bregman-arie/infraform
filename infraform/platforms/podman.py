@@ -11,13 +11,14 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from jinja2 import Environment
-from jinja2 import FunctionLoader
+import jinja2 as j2
 import logging
 import os
+import re
 import subprocess
 import sys
 
+from infraform.exceptions import usage
 from infraform.platforms.platform import Platform
 
 LOG = logging.getLogger(__name__)
@@ -29,12 +30,12 @@ class Podman(Platform):
     DOCKERFILE_TEMPLATE = (os.path.dirname(__file__) +
                            '/templates/Dockerfile.j2')
 
-    def __init__(self, project=None, tester=None, branch=None):
-        super(Podman, self).__init__(project, tester, branch)
+    def __init__(self, args):
+        super(Podman, self).__init__(args)
 
     def prepare(self):
         if self.image_not_exists():
-            LOG.warning("Couldn't find image: {}".format(self.image))
+            LOG.warning("Couldn't find image: {}. Switching to image building".format(self.image))
             dockerfile_path = self.write_dockerfile(self.generate_dockerfile())
             self.build_image(dockerfile_path)
 
@@ -60,9 +61,16 @@ class Podman(Platform):
         return template_content
 
     def generate_dockerfile(self):
-        j2_env = Environment(loader=FunctionLoader(self.get_template))
+        j2_env = j2.Environment(loader=j2.FunctionLoader(
+            self.get_template), trim_blocks=True, undefined=j2.StrictUndefined)
         template = j2_env.get_template(self.DOCKERFILE_TEMPLATE)
-        rendered_file = template.render(tester=self.tester)
+        try:
+            rendered_file = template.render(args=self.args)
+        except j2.exceptions.UndefinedError as e:
+            missing_arg = re.findall(r"'([^']*)'", e.message)[0]
+            LOG.error(usage.missing_arg(missing_arg))
+            LOG.error(usage.general_usage())
+            sys.exit(2)
         return rendered_file
 
     def write_dockerfile(self, df_content, df_path="Dockerfile"):

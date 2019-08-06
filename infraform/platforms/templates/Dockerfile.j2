@@ -1,5 +1,10 @@
 FROM {{ image_name|default("rhel7") }}
 RUN curl https://bootstrap.pypa.io/get-pip.py | python
 RUN pip install tox
-ENV TEST_ENV {{ tester }}
+RUN yum install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+RUN rhos-release 15
+RUN yum-config-manager --enable rhelosp-15.0-unittest
+RUN yum install git -y
+RUN git clone {{ git }}/{{ project }}.git
+ENV TEST_ENV {{ args.blabla }}
 RUN tox -e py $TEST_ENV
