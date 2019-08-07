@@ -13,7 +13,6 @@
 #    under the License.
 import argparse
 
-from infraform.run import cli as run_cli
 from infraform.run import parser as run_parser
 
 

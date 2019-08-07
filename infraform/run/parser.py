@@ -30,6 +30,12 @@ def add_run_parser(subparsers):
     run_parser.add_argument('--scenario', '-s',
                             dest="scenario",
                             help='Predefined scenario YAML file to use for exection')
+    run_parser.add_argument('--gerrit', '-gr',
+                            dest="gerrit",
+                            help='Gerrit Server')
+    run_parser.add_argument('--git', '-g',
+                            dest="git",
+                            help='Git Server')
     run_parser.add_argument('--release', '-r',
                             dest="release",
                             default="master",

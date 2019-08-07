@@ -32,6 +32,9 @@ class Podman(Platform):
 
     def __init__(self, args):
         super(Podman, self).__init__(args)
+        self.image = "{}-{}-{}".format(self.args['project'],
+                                       self.args['tester'],
+                                       self.args['release'])
 
     def prepare(self):
         if self.image_not_exists():
@@ -67,7 +70,8 @@ class Podman(Platform):
         try:
             rendered_file = template.render(args=self.args)
         except j2.exceptions.UndefinedError as e:
-            missing_arg = re.findall(r"'([^']*)'", e.message)[0]
+            print(e)
+            missing_arg = re.findall(r"'([^']*)'", e.message)[1]
             LOG.error(usage.missing_arg(missing_arg))
             LOG.error(usage.general_usage())
             sys.exit(2)

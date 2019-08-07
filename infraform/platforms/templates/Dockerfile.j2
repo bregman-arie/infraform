@@ -5,6 +5,6 @@ RUN yum install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rh
 RUN rhos-release 15
 RUN yum-config-manager --enable rhelosp-15.0-unittest
 RUN yum install git -y
-RUN git clone {{ git }}/{{ project }}.git
-ENV TEST_ENV {{ args.blabla }}
+RUN git -c http.sslVerify=false clone {{ args['gerrit']|default(args['git']) }}/{{ args['project'] }}.git
+ENV TEST_ENV {{ args['tester'] }}
 RUN tox -e py $TEST_ENV
