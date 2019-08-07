@@ -32,9 +32,24 @@ class Podman(Platform):
 
     def __init__(self, args):
         super(Podman, self).__init__(args)
-        self.image = "{}-{}-{}".format(self.args['project'],
-                                       self.args['tester'],
-                                       self.args['release'])
+        self.bin = 'podman'
+        try:
+            self.image = "{}-{}-{}".format(self.args['project'],
+                                           self.args['tester'],
+                                           self.args['release'])
+        except KeyError as e:
+            LOG.error(usage.missing_arg(e))
+            LOG.error(usage.general_usage())
+            sys.exit(2)
+        self.adjust_args()
+
+    def adjust_args(self):
+        """Adjust args to allow comfortable and simple invocation."""
+        if 'gerrit' in self.args:
+            if not self.args['gerrit'].startswith('https://'):
+                self.args['gerrit'] = 'https://' + self.args['gerrit'] + '/gerrit'
+            else:
+                self.args['gerrit'] = self.args['gerrit'] + '/gerrit'
 
     def prepare(self):
         if self.image_not_exists():
@@ -44,7 +59,7 @@ class Podman(Platform):
 
     def run(self):
         try:
-            subprocess.run("podman run {}".format(self.image),
+            subprocess.run("{} run {}".format(self.bin, self.image),
                            shell=True)
         except ConnectionError as exception:  # noqa
             LOG.error(exception)
@@ -52,7 +67,7 @@ class Podman(Platform):
 
     def image_not_exists(self):
         """Returns true if image exists."""
-        res = subprocess.run("podman inspect {}".format(self.image),
+        res = subprocess.run("{} inspect {}".format(self.bin, self.image),
                              shell=True, stdout=subprocess.PIPE,
                              stderr=subprocess.DEVNULL)
         return res.returncode
@@ -70,7 +85,6 @@ class Podman(Platform):
         try:
             rendered_file = template.render(args=self.args)
         except j2.exceptions.UndefinedError as e:
-            print(e)
             missing_arg = re.findall(r"'([^']*)'", e.message)[1]
             LOG.error(usage.missing_arg(missing_arg))
             LOG.error(usage.general_usage())
@@ -84,8 +98,13 @@ class Podman(Platform):
 
     def build_image(self, df_path):
         """Builds image given df path."""
-        res = subprocess.run("podman build -f {}".format(df_path),
-                             shell=True)
+        try:
+            res = subprocess.run("{} build -f {}".format(self.bin, df_path),
+                                 shell=True)
+        except ConnectionError as exception:  # noqa
+            LOG.error(exception)
+            LOG.error(self.raise_service_down())
+            sys.exit(2)
         if res.returncode != 0:
             sys.exit(2)
         return res
