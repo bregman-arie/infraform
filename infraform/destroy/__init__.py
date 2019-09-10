@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2019 Infuse Team
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,23 +11,3 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import argparse
-
-from infraform.destroy import parser as destroy_parser
-from infraform.run import parser as run_parser
-
-
-def create_parser():
-    """Returns argument parser"""
-
-    # Top level parser
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
-
-    parser.add_argument('--debug', '-d', action='store_true',
-                        dest="debug", help='Turn on debug')
-
-    run_parser.add_run_parser(subparsers)
-    destroy_parser.add_destroy_parser(subparsers)
-
-    return parser

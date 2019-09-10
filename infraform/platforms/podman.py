@@ -98,6 +98,14 @@ class Podman(Platform):
             f.write(df_content)
         return df_path
 
+    def destroy(self):
+        """Removes the container from the system."""
+        res = subprocess.run("{} rm {}".format(self.binary,
+                                               self.args['name']))
+        if res.returncode != 0:
+            sys.exit(2)
+        return res
+
     def build_image(self, df_path):
         """Builds image given df path."""
         res = subprocess.run("{} build -f {}".format(self.binary, df_path),

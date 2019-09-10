@@ -24,8 +24,12 @@ Usage Examples:
 
     Run unit tests for nova project:
     $ {1}
+
+    Remove a container called my_container:
+    $ {2}
 """.format(crayons.yellow("ifr run --tester pep8 --project neutron --git x.com"),
-           crayons.yellow("ifr run --tester unit --project nova --gerrit y.com"),)
+           crayons.yellow("ifr run --tester unit --project nova --gerrit y.com"),
+           crayons.yellow("ifr rm --name my_container"),)
     return message
 
 

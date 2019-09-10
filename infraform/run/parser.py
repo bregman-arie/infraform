@@ -43,8 +43,6 @@ def add_run_parser(subparsers):
     run_parser.add_argument('--project', '-p',
                             dest="project",
                             help="The name of the project to use.")
-    run_parser.add_argument(
-        '--platform',
-        dest="platform",
-        default="podman",
-        help="The platform to use for creating the infrastructure.")
+    run_parser.add_argument('--platform', dest="platform",
+                            default="podman",
+                            help="The platform to use (podman, docker, etc.)")

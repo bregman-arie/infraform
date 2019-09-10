@@ -11,23 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import argparse
-
-from infraform.destroy import parser as destroy_parser
-from infraform.run import parser as run_parser
+from infraform.destroy import cli as destroy_cli
 
 
-def create_parser():
-    """Returns argument parser"""
-
-    # Top level parser
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
-
-    parser.add_argument('--debug', '-d', action='store_true',
-                        dest="debug", help='Turn on debug')
-
-    run_parser.add_run_parser(subparsers)
-    destroy_parser.add_destroy_parser(subparsers)
-
-    return parser
+def add_destroy_parser(subparsers):
+    """The parser for sub command 'destroy'."""
+    destroy_parser = subparsers.add_parser("destroy")
+    destroy_parser.set_defaults(func=destroy_cli.main)
+    destroy_parser.add_argument('--name', '-n',
+                                dest="name",
+                                help='Name of the resource to remove.')
+    destroy_parser.add_argument(
+        '--platform', dest="platform", default="podman",
+        help="The platform to use (podman, docker, etc.)")
