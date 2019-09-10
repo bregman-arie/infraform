@@ -41,7 +41,7 @@ class Podman(Platform):
                                            self.args['release'])
         except KeyError as e:
             LOG.error(usage.missing_arg(e))
-            LOG.error(usage.general_usage())
+            LOG.error(usage.run_usage())
             sys.exit(2)
         self.adjust_args()
 
@@ -52,6 +52,9 @@ class Podman(Platform):
                 self.args['gerrit'] = 'https://' + self.args['gerrit'] + '/gerrit'
             else:
                 self.args['gerrit'] = self.args['gerrit'] + '/gerrit'
+        if 'git' in self.args:
+            if not self.args['git'].startswith('https://'):
+                self.args['git'] = 'https://' + self.args['git']
 
     def prepare(self):
         if self.image_not_exists():
@@ -60,12 +63,13 @@ class Podman(Platform):
             self.build_image(dockerfile_path)
 
     def run(self):
-        try:
-            subprocess.run("{} run {}".format(self.binary, self.image),
-                           shell=True)
-        except ConnectionError as exception:  # noqa
-            LOG.error(exception)
-            LOG.error(self.raise_service_down())
+        # try:
+        #    subprocess.run("{} run {}".format(self.binary, self.image),
+        #                   shell=True)
+        # except ConnectionError as exception:  # noqa
+        #    LOG.error(exception)
+        #    LOG.error(self.raise_service_down())
+        pass
 
     def image_not_exists(self):
         """Returns true if image exists."""
@@ -89,7 +93,7 @@ class Podman(Platform):
         except j2.exceptions.UndefinedError as e:
             missing_arg = re.findall(r"'([^']*)'", e.message)[1]
             LOG.error(usage.missing_arg(missing_arg))
-            LOG.error(usage.general_usage())
+            LOG.error(usage.run_usage())
             sys.exit(2)
         return rendered_file
 

@@ -27,8 +27,8 @@ class Platform(object):
         self.check_platform_avaiable()
 
     def check_platform_avaiable(self):
-        res = subprocess.run("{}".format(self.binary), shell=True,
-                             stderr=subprocess.PIPE)
+        res = subprocess.run("{} --version".format(self.binary), shell=True,
+                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         if res.returncode != 0:
             LOG.error(requirements.raise_service_down(self.PACKAGE))
             sys.exit(2)

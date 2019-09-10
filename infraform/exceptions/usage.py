@@ -15,7 +15,7 @@ import crayons
 
 
 def general_usage():
-    """Help message format."""
+    """Returns general usage string."""
     message = """
 Usage Examples:
 
@@ -37,4 +37,19 @@ def missing_arg(arg):
     """Missing arg message format."""
     message = """
 Please specify the argument: {0}""".format(crayons.red(arg))
+    return message
+
+
+def run_usage():
+    """Returns run subcommand usage string."""
+    message = """
+Usage Examples:
+
+    Run pep8 tests for neutron project from git:
+    $ {0}
+
+    Run unit tests for nova project:
+    $ {1}
+""".format(crayons.yellow("ifr run --tester pep8 --project neutron --git x.com"),
+           crayons.yellow("ifr run --tester unit --project nova --gerrit y.com"))
     return message
