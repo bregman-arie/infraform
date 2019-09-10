@@ -27,12 +27,14 @@ LOG = logging.getLogger(__name__)
 class Podman(Platform):
 
     PACKAGE = 'podman'
+    BINARY = '/bin/podman'
     DOCKERFILE_TEMPLATE = (os.path.dirname(__file__) +
                            '/templates/Dockerfile.j2')
 
     def __init__(self, args):
+        self.binary = self.BINARY
+        self.package = self.PACKAGE
         super(Podman, self).__init__(args)
-        self.bin = 'podman'
         try:
             self.image = "{}-{}-{}".format(self.args['project'],
                                            self.args['tester'],
@@ -59,7 +61,7 @@ class Podman(Platform):
 
     def run(self):
         try:
-            subprocess.run("{} run {}".format(self.bin, self.image),
+            subprocess.run("{} run {}".format(self.binary, self.image),
                            shell=True)
         except ConnectionError as exception:  # noqa
             LOG.error(exception)
@@ -67,7 +69,7 @@ class Podman(Platform):
 
     def image_not_exists(self):
         """Returns true if image exists."""
-        res = subprocess.run("{} inspect {}".format(self.bin, self.image),
+        res = subprocess.run("{} inspect {}".format(self.binary, self.image),
                              shell=True, stdout=subprocess.PIPE,
                              stderr=subprocess.DEVNULL)
         return res.returncode
@@ -98,13 +100,8 @@ class Podman(Platform):
 
     def build_image(self, df_path):
         """Builds image given df path."""
-        try:
-            res = subprocess.run("{} build -f {}".format(self.bin, df_path),
-                                 shell=True)
-        except ConnectionError as exception:  # noqa
-            LOG.error(exception)
-            LOG.error(self.raise_service_down())
-            sys.exit(2)
+        res = subprocess.run("{} build -f {}".format(self.binary, df_path),
+                             shell=True)
         if res.returncode != 0:
             sys.exit(2)
         return res

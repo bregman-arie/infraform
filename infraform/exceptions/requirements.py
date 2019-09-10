@@ -11,24 +11,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import logging
-import subprocess
-import sys
-
-from infraform.exceptions import requirements
-
-LOG = logging.getLogger(__name__)
+import crayons
 
 
-class Platform(object):
+def raise_service_down(package):
+        """Notify user that service is down or the package is not installed."""
+        message = """
+It looks like the service is down or the package is not installed.
 
-    def __init__(self, args):
-        self.args = {k: v for k, v in vars(args).items() if v is not None}
-        self.check_platform_avaiable()
+To fix it, try running the following commands:
 
-    def check_platform_avaiable(self):
-        res = subprocess.run("{}".format(self.binary), shell=True,
-                             stderr=subprocess.PIPE)
-        if res.returncode != 0:
-            LOG.error(requirements.raise_service_down(self.PACKAGE))
-            sys.exit(2)
+    $ {0}
+    $ {1}
+""".format(crayons.red("sudo dnf install %s" % package),
+           crayons.red("sudo systemctl install %s" % package),)
+        return message

@@ -37,6 +37,7 @@ def add_run_parser(subparsers):
                             dest="git",
                             help='Git Server')
     run_parser.add_argument('--release', '-r',
+                            default="master",
                             dest="release",
                             help='Release number')
     run_parser.add_argument('--project', '-p',
