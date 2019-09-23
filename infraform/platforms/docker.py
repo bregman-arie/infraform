@@ -11,12 +11,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import logging
+
+from infraform.platforms.container import Container
 
 
-class Docker(object):
+LOG = logging.getLogger(__name__)
 
-    def prepare(self):
-        pass
 
-    def run(self):
-        pass
+class Podman(Container):
+
+    PACKAGE = 'docker'
+    BINARY = '/bin/docker'
+
+    def __init__(self, args):
+        super(Podman, self).__init__(args, self.BINARY, self.PACKAGE)

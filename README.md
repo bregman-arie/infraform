@@ -6,9 +6,13 @@ Default platform: Podman
 
 ## Usage
 
-To create a container with neutron project and run unit tests, run the following command:
+To run a container with neutron project and run unit tests, run the following command:
 
-    infraform --project neutron --version 15 --tester unit
+    infraform --project neutron --version 15 --tester py27
+
+To run a container with nova from git, run the following command:
+
+    infraform --project nova --tester py27 --git opendev.org/openstack
 
 To run neutron pep8 tests on master using docker, run the following command:
 
