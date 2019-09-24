@@ -37,9 +37,8 @@ class Container(Platform):
         super(Container, self).__init__(args)
         self.adjust_args()
         try:
-            self.image = "{}-{}-{}".format(self.args['project'],
-                                           self.args['tester'],
-                                           self.args['release'])
+            self.image = "{}-{}".format(self.args['project_name'],
+                                           self.args['tester'])
         except KeyError as e:
             LOG.error(usage.missing_arg(e))
             LOG.error(usage.run_usage())
@@ -52,12 +51,15 @@ class Container(Platform):
                 self.args['gerrit'] = 'https://' + self.args['gerrit'] + '/gerrit'
             else:
                 self.args['gerrit'] = self.args['gerrit'] + '/gerrit'
-        if 'git' in self.args:
-            if not self.args['git'].startswith('https://'):
-                self.args['git'] = 'https://' + self.args['git']
-        self.args['local'] = os.path.exists(self.args['project'])
+        if 'http' in self.args['project']:
+            self.args['clone'] = True
+        else:
+            self.args['clone'] = False
         self.args['project_name'] = os.path.basename(self.args['project'])
         self.args['project_path'] = os.path.expanduser(self.args['project'])
+        if self.args['project_name'].endswith('.git'):
+            self.args['project_name'] = self.args['project_name'][:-4]
+
 
     def prepare(self):
         if self.image_not_exists():
@@ -95,9 +97,6 @@ class Container(Platform):
             rendered_file = template.render(args=self.args)
         except j2.exceptions.UndefinedError as e:
             missing_arg = re.findall(r"'([^']*)'", e.message)[1]
-            if missing_arg == 'git':
-                missing_arg = (
-                    missing_arg + ' or provide a local path of the project')
             LOG.error(usage.missing_arg(missing_arg))
             LOG.error(usage.run_usage())
             sys.exit(2)
@@ -118,10 +117,16 @@ class Container(Platform):
 
     def build_image(self, df_path):
         """Builds image given df path."""
-        res = subprocess.run("{} build -f {} -t test {}".format(self.binary, df_path,
-                                                                self.args['project_path']),
-                             shell=True)
-        print(res)
+        if self.args['clone']:
+            res = subprocess.run("{} build -f {} -t test {}".format(
+                self.binary, df_path,
+                self.args['project_name']),
+                shell=True)
+        else:
+            res = subprocess.run("{} build -f {} -t test {}".format(
+                self.binary, df_path,
+                self.args['project_path']),
+                shell=True)
         if res.returncode != 0:
             sys.exit(2)
         return res

@@ -19,16 +19,16 @@ def general_usage():
     message = """
 Usage Examples:
 
-    Run pep8 tests for neutron project from git:
+    Run pep8 tests for neutron project from local path:
     $ {0}
 
-    Run unit tests for nova project:
+    Run unit tests for nova project from git:
     $ {1}
 
     Remove a container called my_container:
     $ {2}
-""".format(crayons.yellow("ifr run --tester pep8 --project neutron --git x.com"),
-           crayons.yellow("ifr run --tester unit --project nova --gerrit y.com"),
+""".format(crayons.yellow("ifr run --tester pep8 --project /home/user/neutron"),
+           crayons.yellow("ifr run --tester py27 --project https://opendev.org/openstack/nova.git"),
            crayons.yellow("ifr rm --name my_container"),)
     return message
 
@@ -45,11 +45,11 @@ def run_usage():
     message = """
 Usage Examples:
 
-    Run pep8 tests for neutron project from git:
+    Run pep8 tests for neutron project from local path:
     $ {0}
 
-    Run unit tests for nova project:
+    Run unit tests for nova project from git:
     $ {1}
-""".format(crayons.yellow("ifr run --tester pep8 --project neutron --git x.com"),
-           crayons.yellow("ifr run --tester unit --project nova --gerrit y.com"))
+""".format(crayons.yellow("ifr run --tester pep8 --project /home/user/neutron"),
+           crayons.yellow("ifr run --tester py27 --project https://opendev.org/openstack/nova.git"))
     return message

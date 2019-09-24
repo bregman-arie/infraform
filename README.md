@@ -6,17 +6,13 @@ Default platform: Podman
 
 ## Usage
 
-To run a container with neutron project and run unit tests, run the following command:
+To run a container with neutron project from a local path and run unit tests, run:
 
-    infraform --project neutron --version 15 --tester py27
+    infraform --project /home/user/neutron --version 15 --tester py27
 
-To run a container with nova from git, run the following command:
+To run a container with octavia from git, run:
 
-    infraform --project nova --tester py27 --git opendev.org/openstack
-
-To run neutron pep8 tests on master using docker, run the following command:
-
-    infraform --project neutron --tester pep8 --platform docker
+    infraform --project https://opendev.org/openstack/octavia.git --tester py27
 
 ## Supported platforms
 

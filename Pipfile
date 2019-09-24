@@ -4,9 +4,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+infraform = {path = ".",editable = true}
 
 [packages]
-infraform = {editable = true,path = "."}
+infraform = {path = ".",editable = true}
 crayons = "*"
 podman = "*"
 jinja2 = "*"
