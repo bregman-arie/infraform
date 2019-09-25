@@ -14,7 +14,7 @@
 import crayons
 
 
-def raise_service_down(package):
+def service_down(package):
         """Notify user that service is down or the package is not installed."""
         message = """
 It looks like the service is down or the package is not installed.

@@ -26,7 +26,7 @@ def add_run_parser(subparsers):
                             help='The name of the branch to use.')
     run_parser.add_argument('--scenario', '-s',
                             dest="scenario",
-                            help='Predefined scenario YAML file to use for exection')
+                            help='Predefined scenario to use for exection')
     run_parser.add_argument('--release', '-r',
                             dest="release",
                             help='Release number')

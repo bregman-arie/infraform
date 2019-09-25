@@ -30,19 +30,16 @@ class Container(Platform):
     BINARY = '/bin/podman'
     DOCKERFILE_TEMPLATE = (os.path.dirname(__file__) +
                            '/templates/Dockerfile.j2')
+    REQUIRED_ARGS = ['project']
 
     def __init__(self, args, binary, package):
         self.binary = binary
         self.package = package
-        super(Container, self).__init__(args)
+        super(Container, self).__init__(args, self.REQUIRED_ARGS)
         self.adjust_args()
-        try:
-            self.image = "{}-{}".format(self.args['project_name'],
-                                           self.args['tester'])
-        except KeyError as e:
-            LOG.error(usage.missing_arg(e))
-            LOG.error(usage.run_usage())
-            sys.exit(2)
+        if self.args['clone']:
+            self.clone_project()
+        self.image_name = self.args['project_name']
 
     def adjust_args(self):
         """Adjust args to allow comfortable and simple invocation."""
@@ -51,34 +48,46 @@ class Container(Platform):
                 self.args['gerrit'] = 'https://' + self.args['gerrit'] + '/gerrit'
             else:
                 self.args['gerrit'] = self.args['gerrit'] + '/gerrit'
-        if 'http' in self.args['project']:
-            self.args['clone'] = True
-        else:
-            self.args['clone'] = False
+        self.args['clone'] = 'http' in self.args['project']
+        # In case someone passed "~/project/" as project argument
+        self.args['project'] = self.args['project'].rstrip('/')
         self.args['project_name'] = os.path.basename(self.args['project'])
         self.args['project_path'] = os.path.expanduser(self.args['project'])
         if self.args['project_name'].endswith('.git'):
             self.args['project_name'] = self.args['project_name'][:-4]
 
+    def clone_project(self):
+        """Clones given project."""
+        # Change project to path since docker run mounts volume
+        # using the project argument
+        clone_cmd = "git clone {}".format(self.args['project'])
+        subprocess.run(clone_cmd, shell=True, stdout=subprocess.DEVNULL)
+        self.args['project'] = os.getcwd() + '/' + self.args['project_name']
 
     def prepare(self):
         if self.image_not_exists():
-            LOG.warning("Couldn't find image: {}. Switching to image building".format(self.image))
+            LOG.warning(
+                "Couldn't find image: {}. Switching to image building".format(
+                    self.image_name))
             dockerfile_path = self.write_dockerfile(self.generate_dockerfile())
             self.build_image(dockerfile_path)
 
     def run(self):
-        # try:
-        #    subprocess.run("{} run {}".format(self.binary, self.image),
-        #                   shell=True)
-        # except ConnectionError as exception:  # noqa
-        #    LOG.error(exception)
-        #    LOG.error(self.raise_service_down())
-        pass
+        """Run tests."""
+        print("run")
+        cmd = "{0} run -v {1}:/{2} {3} /bin/bash -c 'cd {2}; tox -e {4}'".format(
+            self.binary, self.args['project'],
+            self.args['project_name'],
+            self.image_name, self.args['tester'])
+        print(cmd)
+        res = subprocess.run(cmd, shell=True)
+        if res.returncode != 0:
+            sys.exit(2)
+        return res
 
     def image_not_exists(self):
         """Returns true if image exists."""
-        res = subprocess.run("{} inspect {}".format(self.binary, self.image),
+        res = subprocess.run("{} inspect {}".format(self.binary, self.image_name),
                              shell=True, stdout=subprocess.PIPE,
                              stderr=subprocess.DEVNULL)
         return res.returncode
@@ -117,16 +126,9 @@ class Container(Platform):
 
     def build_image(self, df_path):
         """Builds image given df path."""
-        if self.args['clone']:
-            res = subprocess.run("{} build -f {} -t test {}".format(
-                self.binary, df_path,
-                self.args['project_name']),
-                shell=True)
-        else:
-            res = subprocess.run("{} build -f {} -t test {}".format(
-                self.binary, df_path,
-                self.args['project_path']),
-                shell=True)
+        cmd = "{} build -f {} -t {} .".format(
+            self.binary, df_path, self.image_name)
+        res = subprocess.run(cmd, shell=True)
         if res.returncode != 0:
             sys.exit(2)
         return res

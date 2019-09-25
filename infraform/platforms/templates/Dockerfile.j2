@@ -9,18 +9,3 @@ RUN yum install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rh
 {% endif %}
 
 RUN yum install -y python-devel git gcc
-
-{% if args['clone']|default(False) %}
-    RUN git -c http.sslVerify=false clone {{ args['project'] }}
-{% else %}
-    COPY . {{ args['project_path'] }}
-    WORKDIR {{ args['project_path'] }}
-{% endif %}
-
-ENV TEST_ENV {{ args['tester'] }}
-
-{% if args['release']|default(False) %}
-    RUN cd {{ args['project_name'] }} && git checkout rhos-{{ args['release'] }}.0-patches && tox -e $TEST_ENV
-{% else %}
-    RUN cd {{ args['project_name'] }} && tox -e $TEST_ENV
-{% endif %}

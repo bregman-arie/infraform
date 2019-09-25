@@ -19,10 +19,10 @@ from infraform.platforms.container import Container
 LOG = logging.getLogger(__name__)
 
 
-class Podman(Container):
+class Docker(Container):
 
     PACKAGE = 'docker'
     BINARY = '/bin/docker'
 
     def __init__(self, args):
-        super(Podman, self).__init__(args, self.BINARY, self.PACKAGE)
+        super(Docker, self).__init__(args, self.BINARY, self.PACKAGE)
