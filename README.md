@@ -6,13 +6,17 @@ Default platform: Podman
 
 ## Usage
 
-To run a container with neutron project from a local path and run unit tests, run:
+To provision an instance with floating IP on OpenStack cloud using Terraform:
 
-    infraform --project /home/user/neutron --version 15 --tester py27
+    infraform provision --scenario os-1-vm-fip --platform terraform
+
+To create a container with neutron project from a local path and run unit tests, run:
+
+    infraform run --project /home/user/neutron --version 15 --tester py27
 
 To run a container with octavia from git, run:
 
-    infraform --project https://opendev.org/openstack/octavia.git --tester py27
+    ifr run --project https://opendev.org/openstack/octavia.git --tester py27
 
 ## Supported platforms
 
@@ -20,6 +24,7 @@ Name | Type | Comments
 :------ |:------:|:--------:
 Podman | Containers | 
 Docker | Containers | 
+Terraform | All | In Progress
 
 ## Contributions
 

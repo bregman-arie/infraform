@@ -74,8 +74,7 @@ class Container(Platform):
 
     def run(self):
         """Run tests."""
-        print("run")
-        cmd = "{0} run -v {1}:/{2} {3} /bin/bash -c 'cd {2}; tox -e {4}'".format(
+        cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; tox -e {4}'".format(
             self.binary, self.args['project'],
             self.args['project_name'],
             self.image_name, self.args['tester'])
