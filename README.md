@@ -24,7 +24,7 @@ Name | Type | Comments
 :------ |:------:|:--------:
 Podman | Containers | 
 Docker | Containers | 
-Terraform | All | In Progress
+Terraform | All |
 
 ## Contributions
 

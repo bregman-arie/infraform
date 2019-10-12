@@ -111,3 +111,6 @@ Pipfile.lock
 
 # Docker
 Dockerfile
+
+# Terraform
+*.terraform*

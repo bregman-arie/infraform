@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import logging
+import os
 import subprocess
 import sys
 
@@ -23,10 +24,14 @@ LOG = logging.getLogger(__name__)
 
 class Platform(object):
 
+    SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
+
     def __init__(self, args, required_args=[]):
         self.args = {k: v for k, v in vars(args).items() if v is not None}
         self.validate_required_args(required_args)
         self.check_platform_avaiable()
+        if 'scenario' in self.args:
+            self.verify_scenario_exists()
 
     def check_platform_avaiable(self):
         """Checks if the platform used (or its client) is installed
@@ -34,7 +39,7 @@ class Platform(object):
         terminate the program"""
         res = subprocess.run("{} --version".format(self.binary), shell=True,
                              stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        self.success_or_exit(res.returncode, req_exc.service_down(self.PACKAGE))
+        self.success_or_exit(res.returncode, req_exc.service_down(self.installation))
 
     @staticmethod
     def success_or_exit(rc, message=None):
@@ -47,3 +52,18 @@ class Platform(object):
         for req in required_args:
             if req not in self.args:
                 self.success_or_exit(1, usage_exc.missing_arg(req))
+
+    def verify_scenario_exists(self):
+        """Verifies scenario exists."""
+        for p, d, files in os.walk(self.SCENARIOS_PATH):
+            for f in files:
+                if os.path.splitext(f)[0] == self.args['scenario']:
+                    self.scenario_path = p
+                    self.scenario_name = os.path.splitext(f)[0]
+                    return
+        self.success_or_exit(1, usage_exc.missing_scenario(
+            self.args['scenario']))
+
+    @staticmethod
+    def execute_cmd(cmd, cwd=None):
+        subprocess.run(cmd, shell=True, cwd=cwd)

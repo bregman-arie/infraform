@@ -26,8 +26,6 @@ LOG = logging.getLogger(__name__)
 
 class Container(Platform):
 
-    PACKAGE = 'podman'
-    BINARY = '/bin/podman'
     DOCKERFILE_TEMPLATE = (os.path.dirname(__file__) +
                            '/templates/Dockerfile.j2')
     REQUIRED_ARGS = ['project']
@@ -35,6 +33,7 @@ class Container(Platform):
     def __init__(self, args, binary, package):
         self.binary = binary
         self.package = package
+        self.installation = "dnf install -y {0}\nsystemctl start {0}".format(self.binary)
         super(Container, self).__init__(args, self.REQUIRED_ARGS)
         self.adjust_args()
         if self.args['clone']:

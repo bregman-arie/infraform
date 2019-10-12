@@ -21,14 +21,21 @@ LOG = logging.getLogger(__name__)
 class Terraform(Platform):
 
     PACKAGE = 'terraform'
-    BINARY = '/bin/terraform'
+    BINARY = 'terraform'
+    INSTALLATION = (
+        "export version=0.12.10\nwget https://releases.hashicorp.com" +
+        "/terraform/${version}/terraform_${version}_linux_amd64.zip" +
+        "\nunzip terraform_${version}_linux_amd64.zip" +
+        "\nsudo mv terraform /usr/local/bin/")
 
     def __init__(self, args):
         self.binary = self.BINARY
         self.package = self.PACKAGE
+        self.installation = self.INSTALLATION
+        super(Terraform, self).__init__(args)
 
     def prepare(self):
-        pass
+        self.execute_cmd('terraform init', cwd=self.scenario_path)
 
     def provision(self):
-        pass
+        self.execute_cmd('terraform apply', cwd=self.scenario_path)

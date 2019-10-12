@@ -40,6 +40,16 @@ Please specify the argument: {0}""".format(crayons.red(arg))
     return message
 
 
+def missing_scenario(scenario):
+    """Missing scenario message format."""
+    message = """
+Couldn't find the the scenario: {0}
+
+New scenarios should be added here: https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios
+""".format(crayons.red(scenario))
+    return message
+
+
 def run_usage():
     """Returns run subcommand usage string."""
     message = """
