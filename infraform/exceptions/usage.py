@@ -35,8 +35,7 @@ Usage Examples:
 
 def missing_arg(arg):
     """Missing arg message format."""
-    message = """
-Please specify the argument: {0}""".format(crayons.red(arg))
+    message = """Please specify the argument {0} this way: infraform --vars '{0}=...'""".format(crayons.red(arg))
     return message
 
 

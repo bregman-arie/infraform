@@ -35,7 +35,8 @@ class Terraform(Platform):
         super(Terraform, self).__init__(args)
 
     def prepare(self):
-        self.execute_cmd('terraform init', cwd=self.scenario_path)
+        self.render_scenario()
+        self.execute_cmd('terraform init')
 
     def provision(self):
-        self.execute_cmd('terraform apply', cwd=self.scenario_path)
+        self.execute_cmd('terraform apply')

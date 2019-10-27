@@ -1,5 +1,5 @@
 provider "openstack" {
-  cloud = "upshift-component-ci"
+  cloud = "{{ vars['cloud'] }}"
 }
 
 resource "openstack_compute_instance_v2" "test-server" {

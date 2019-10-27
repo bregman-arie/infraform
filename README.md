@@ -26,6 +26,16 @@ Podman | Containers |
 Docker | Containers | 
 Terraform | All |
 
+## Terminology
+
+* Operation - infraform supports several operations when it comes to infra and apps:
+    * provision - the creation of infrastructure
+    * run - executing instructions on existing infrastructure
+
+* Platform - an platform or tool to use for operations like provision, run, etc. See [#Supported platforms](#supported-platforms)
+
+* Scenario - a predefined instructions file. This is a platform file (e.g. Terraform file) and not Infraform file. It can be fixed or an Jinja2 template which will be then rendered by Infraform
+
 ## Contributions
 
 To contribute to the project use GitHub pull requests.

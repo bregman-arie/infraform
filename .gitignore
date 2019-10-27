@@ -114,3 +114,4 @@ Dockerfile
 
 # Terraform
 *.terraform*
+*.tf

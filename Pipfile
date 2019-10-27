@@ -11,6 +11,7 @@ infraform = {path = ".",editable = true}
 crayons = "*"
 podman = "*"
 jinja2 = "*"
+ansible = "*"
 
 [requires]
 python_version = "3.7"
