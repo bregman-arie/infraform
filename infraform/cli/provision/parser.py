@@ -25,4 +25,5 @@ def add_provision_parser(subparsers):
                                   default="podman",
                                   help="The platform to use (podman, docker, etc.)")
     provision_parser.add_argument('--vars', dest="vars",
+                                  default="",
                                   help="extra variables")

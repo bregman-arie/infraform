@@ -99,7 +99,7 @@ class Platform(object):
         try:
             rendered_scenario = template.render(vars=self.vars)
         except j2.exceptions.UndefinedError as e:
-            missing_arg = re.findall(r'(.*) is undefined', e.message)[0].strip("'")
+            missing_arg = re.findall(r'no attribute (.*)', e.message)[0].strip("'")
             LOG.error(usage_exc.missing_arg(missing_arg))
             sys.exit(2)
         self.write_rendered_scenario(rendered_scenario)

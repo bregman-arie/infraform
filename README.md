@@ -8,7 +8,9 @@ Default platform: Podman
 
 To provision an instance with floating IP on OpenStack cloud using Terraform:
 
-    infraform provision --scenario os-1-vm-fip --platform terraform
+    infraform provision --scenario os-1-vm-fip --platform terraform --vars "cloud=myCloud"
+    OR
+    infraform provision --scenario os-1-vm-fip --platform terraform --vars "auth_url='https://.../v3' password=... username=... tenant_name=... domain_name=..."
 
 To create a container with neutron project from a local path and run unit tests, run:
 
@@ -25,6 +27,12 @@ Name | Type | Comments
 Podman | Containers | 
 Docker | Containers | 
 Terraform | All |
+
+## Scenarios
+
+Name | Platform | Description
+:------ |:------:|:--------:
+os-1-vm-fip | Terraform | One instance with floating IP
 
 ## Terminology
 
