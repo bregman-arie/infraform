@@ -19,3 +19,7 @@ network {
     name = "{{ vars['network_name'] }}"
   }
 }
+
+output "ip" {
+  value = openstack_compute_instance_v2.test_server.network.fixed_ip_v4
+}

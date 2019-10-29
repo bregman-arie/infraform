@@ -77,7 +77,6 @@ class Container(Platform):
             self.binary, self.args['project'],
             self.args['project_name'],
             self.image_name, self.args['tester'])
-        print(cmd)
         res = subprocess.run(cmd, shell=True)
         if res.returncode != 0:
             sys.exit(2)

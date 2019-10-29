@@ -32,7 +32,8 @@ class Platform(object):
     def __init__(self, args, required_args=[]):
         self.args = {k: v for k, v in vars(args).items() if v is not None}
         # vars are used for feeding scenario templates (jinja2)
-        self.vars = self.get_vars(self.args['vars'])
+        if 'vars' in self.args:
+            self.vars = self.get_vars(self.args['vars'])
         self.validate_required_args(required_args)
         self.check_platform_avaiable()
 
