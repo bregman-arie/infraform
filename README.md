@@ -2,21 +2,21 @@
 
 Provision infrastructure and deploy apps with one liners
 
-Default platform: Podman
-
 ## Usage
 
-To provision an instance with floating IP on OpenStack cloud using Terraform:
+### Provision OpenStack instance
 
     infraform provision --scenario os-1-vm-fip --platform terraform --vars "cloud=myCloud"
-    OR
-    infraform provision --scenario os-1-vm-fip --platform terraform --vars "auth_url='https://.../v3' password=... username=... tenant_name=... domain_name=..."
 
-To create a container with neutron project from a local path and run unit tests, run:
+    OR if you already have set environment variables for authentication then simply run:
+
+    infraform provision --scenario os-1-vm-fip --platform terraform
+
+### Create a container and run neutron tests in it
 
     infraform run --project /home/user/neutron --version 15 --tester py27
 
-To run a container with octavia from git, run:
+    To run a container with octavia from git, run:
 
     ifr run --project https://opendev.org/openstack/octavia.git --tester py27
 
@@ -24,7 +24,7 @@ To run a container with octavia from git, run:
 
 Name | Type | Comments
 :------ |:------:|:--------:
-Podman | Containers | 
+Podman | Containers |
 Docker | Containers | 
 Terraform | All |
 
@@ -33,12 +33,14 @@ Terraform | All |
 Name | Platform | Description
 :------ |:------:|:--------:
 os-1-vm-fip | Terraform | One instance with floating IP
+jenkins_slave | - | Configures host as Jenkins slave
 
 ## Terminology
 
 * Operation - infraform supports several operations when it comes to infra and apps:
     * provision - the creation of infrastructure
-    * run - executing instructions on existing infrastructure
+    * run - executing instructions, apps and tools on existing infrastructure
+    * deploy - install and configure apps on existing infrastructure
 
 * Platform - an platform or tool to use for operations like provision, run, etc. See [#Supported platforms](#supported-platforms)
 

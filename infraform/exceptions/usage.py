@@ -17,19 +17,25 @@ import crayons
 def general_usage():
     """Returns general usage string."""
     message = """
+Choose one of the following infraform commands: {}
 Usage Examples:
 
+    Provision an OpenStack instance with floating IP:
+    $ {}
+
     Run pep8 tests for neutron project from local path:
-    $ {0}
+    $ {}
 
     Run unit tests for nova project from git:
-    $ {1}
+    $ {}
 
     Remove a container called my_container:
-    $ {2}
-""".format(crayons.yellow("ifr run --tester pep8 --project /home/user/neutron"),
+    $ {}
+""".format(crayons.red("provision, deploy, run, destroy"),
+           crayons.yellow("infraform provision --scenario os-1-vm-fip --platform terraform --vars 'network_name=...'"),
+           crayons.yellow("ifr run --tester pep8 --project /home/user/neutron"),
            crayons.yellow("ifr run --tester py27 --project https://opendev.org/openstack/nova.git"),
-           crayons.yellow("ifr rm --name my_container"),)
+           crayons.yellow("ifr destroy --name my_container"),)
     return message
 
 

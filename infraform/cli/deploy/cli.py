@@ -18,9 +18,10 @@ LOG = logging.getLogger(__name__)
 
 
 def main(args):
-    """Runner main entry."""
+    """Deploy main entry."""
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())
     platform = Platform(args=args)
-    platform.destroy()
+    platform.prepare()
+    platform.run()

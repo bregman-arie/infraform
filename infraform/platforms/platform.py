@@ -22,6 +22,7 @@ import sys
 from infraform import filters
 from infraform.exceptions import requirements as req_exc
 from infraform.exceptions import usage as usage_exc
+from infraform.exceptions.utils import success_or_exit
 
 LOG = logging.getLogger(__name__)
 
@@ -40,7 +41,8 @@ class Platform(object):
 
         # If user specific scenario, make sure it exists
         if 'scenario' in self.args:
-            self.verify_scenario_exists()
+            self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
+                self.SCENARIOS_PATH, self.args['scenario'])
 
     def get_vars(self, args):
         variables = {}
@@ -53,34 +55,29 @@ class Platform(object):
         """Validates the platform specified is ready for use."""
         res = subprocess.run("{} --version".format(self.binary), shell=True,
                              stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        self.success_or_exit(res.returncode, req_exc.service_down(self.installation))
-
-    @staticmethod
-    def success_or_exit(rc, message=None):
-        if rc != 0:
-            LOG.error(message)
-            sys.exit(2)
+        success_or_exit(res.returncode, req_exc.service_down(self.installation))
 
     def validate_required_args(self, required_args):
         """Validates all required args were passed by the user."""
         for req in required_args:
             if req not in self.args:
-                self.success_or_exit(1, usage_exc.missing_arg(req))
+                success_or_exit(1, usage_exc.missing_arg(req))
 
-    def verify_scenario_exists(self):
+    @staticmethod
+    def verify_scenario_exists(scenarios_dir, scenario):
         """Verifies scenario exists."""
-        for p, d, files in os.walk(self.SCENARIOS_PATH):
+        for p, d, files in os.walk(scenarios_dir):
             for f in files:
                 until_dot_pattern = re.compile(r"^[^.]*")
-                file_name = re.search(until_dot_pattern, f).group(0)
-                if file_name == self.args['scenario']:
-                    self.scenario_path = p
-                    self.scenario_name = os.path.splitext(f)[0]
-                    self.scenario_file_path = p + '/' + f
-                    self.scenario_file = f
-                    return
-        self.success_or_exit(1, usage_exc.missing_scenario(
-            self.args['scenario']))
+                file_without_suffix = re.search(until_dot_pattern, f).group(0)
+                file_name = f
+                if f.endswith('.j2'):
+                    file_name = f[:-3]
+                if file_without_suffix == scenario:
+                    scenario_file_path = p + '/' + f
+                    scenario_file = file_name
+                    return scenario_file_path, scenario_file
+        success_or_exit(1, usage_exc.missing_scenario(scenario))
 
     @staticmethod
     def execute_cmd(cmd, cwd=None):
@@ -93,14 +90,14 @@ class Platform(object):
         return template_content
 
     def write_rendered_scenario(self, scenario):
-        with open(self.scenario_file, 'w+') as f:
+        with open(self.scenario_f, 'w+') as f:
             f.write(scenario)
 
     def render_scenario(self):
         j2_env = j2.Environment(loader=j2.FunctionLoader(
             self.get_template), trim_blocks=True, undefined=j2.StrictUndefined)
         j2_env.filters['env_override'] = filters.env_override
-        template = j2_env.get_template(self.scenario_file_path)
+        template = j2_env.get_template(self.scenario_fpath)
         try:
             rendered_scenario = template.render(vars=self.vars)
         except j2.exceptions.UndefinedError as e:

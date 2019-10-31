@@ -13,9 +13,10 @@
 #    under the License.
 import argparse
 
+from infraform.cli.deploy import parser as deploy_parser
 from infraform.destroy import parser as destroy_parser
-from infraform.cli.run import parser as run_parser
 from infraform.cli.provision import parser as provision_parser
+from infraform.cli.run import parser as run_parser
 
 
 def create_parser():
@@ -28,8 +29,9 @@ def create_parser():
     parser.add_argument('--debug', '-d', action='store_true',
                         dest="debug", help='Turn on debug')
 
-    run_parser.add_run_parser(subparsers)
+    deploy_parser.add_deploy_parser(subparsers)
     destroy_parser.add_destroy_parser(subparsers)
     provision_parser.add_provision_parser(subparsers)
+    run_parser.add_run_parser(subparsers)
 
     return parser

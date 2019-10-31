@@ -12,15 +12,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import logging
-import importlib
+import sys
 
 LOG = logging.getLogger(__name__)
 
-
-def main(args):
-    """Runner main entry."""
-    Platform = getattr(importlib.import_module(
-        "infraform.platforms.{}".format(args.platform)),
-        args.platform.capitalize())
-    platform = Platform(args=args)
-    platform.destroy()
+def success_or_exit(rc, message=None):
+    if rc != 0:
+        LOG.error(message)
+        sys.exit(2)

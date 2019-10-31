@@ -1,4 +1,4 @@
-# Copyright 2019 Infuse Team
+# Copyright 2019 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -14,11 +14,15 @@
 import logging
 import importlib
 
+from infraform.cli import utils
+
 LOG = logging.getLogger(__name__)
 
 
 def main(args):
     """Runner main entry."""
+    if args.scenario and not args.platform:
+        args.platform = utils.guess_platform(args.scenario)
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())

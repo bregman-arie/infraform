@@ -22,7 +22,6 @@ def add_provision_parser(subparsers):
                                   dest="scenario",
                                   help='Predefined scenario to use for exection')
     provision_parser.add_argument('--platform', dest="platform",
-                                  default="podman",
                                   help="The platform to use (podman, docker, etc.)")
     provision_parser.add_argument('--vars', dest="vars",
                                   default="",

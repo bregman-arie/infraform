@@ -11,16 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import logging
-import importlib
+import os
 
-LOG = logging.getLogger(__name__)
+from infraform.platforms.platform import Platform
+from infraform.exceptions.utils import success_or_exit
 
+SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
 
-def main(args):
-    """Runner main entry."""
-    Platform = getattr(importlib.import_module(
-        "infraform.platforms.{}".format(args.platform)),
-        args.platform.capitalize())
-    platform = Platform(args=args)
-    platform.destroy()
+def guess_platform(scenario):
+    """Try to figure out which platform the user should use or fail."""
+    scenario_path, scenario_file = Platform.verify_scenario_exists(SCENARIOS_PATH, scenario)
+    if scenario_file.endswith(".tf"):
+        return "terraform"
+    success_or_exit(1, "Couldn't figure out which platform to use. Please specify --platform")
