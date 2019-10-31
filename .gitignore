@@ -116,3 +116,6 @@ Dockerfile
 *.terraform*
 *.tf
 terraform.tfstate*
+
+# Pycharm
+*.idea

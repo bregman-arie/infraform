@@ -19,6 +19,7 @@ import re
 import subprocess
 import sys
 
+from infraform import filters
 from infraform.exceptions import requirements as req_exc
 from infraform.exceptions import usage as usage_exc
 
@@ -70,7 +71,9 @@ class Platform(object):
         """Verifies scenario exists."""
         for p, d, files in os.walk(self.SCENARIOS_PATH):
             for f in files:
-                if os.path.splitext(f)[0] == self.args['scenario']:
+                until_dot_pattern = re.compile(r"^[^.]*")
+                file_name = re.search(until_dot_pattern, f).group(0)
+                if file_name == self.args['scenario']:
                     self.scenario_path = p
                     self.scenario_name = os.path.splitext(f)[0]
                     self.scenario_file_path = p + '/' + f
@@ -96,6 +99,7 @@ class Platform(object):
     def render_scenario(self):
         j2_env = j2.Environment(loader=j2.FunctionLoader(
             self.get_template), trim_blocks=True, undefined=j2.StrictUndefined)
+        j2_env.filters['env_override'] = filters.env_override
         template = j2_env.get_template(self.scenario_file_path)
         try:
             rendered_scenario = template.render(vars=self.vars)
