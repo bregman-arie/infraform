@@ -14,11 +14,11 @@ Provision infrastructure and deploy apps with one liners
 
 ### Create a container and run neutron tests in it
 
-    infraform run --project /home/user/neutron --version 15 --tester py27
+    infraform run --vars "project=/home/user/neutron tester=py27"
 
     To run a container with octavia from git, run:
 
-    ifr run --project https://opendev.org/openstack/octavia.git --tester py27
+    ifr run --vars "project='https://opendev.org/openstack/octavia.git' tester=py27"
 
 ## Supported platforms
 
@@ -45,6 +45,12 @@ jenkins_slave | - | Configures host as Jenkins slave
 * Platform - an platform or tool to use for operations like provision, run, etc. See [#Supported platforms](#supported-platforms)
 
 * Scenario - a predefined instructions file. This is a platform file (e.g. Terraform file) and not Infraform file. It can be fixed or an Jinja2 template which will be then rendered by Infraform
+
+## Containers - Supported Variables
+
+Name | Description
+:------ |:--------:
+override_image | If there is an existing image, remove it and build the image from scratch
 
 ## Contributions
 

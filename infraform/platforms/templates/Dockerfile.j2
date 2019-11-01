@@ -8,4 +8,4 @@ RUN yum install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rh
     RUN yum-config-manager --enable rhelosp-{{ args['release'] }}.0-unittest
 {% endif %}
 
-RUN yum install -y python-devel git gcc
+RUN yum install -y python-devel git gcc openssl-devel

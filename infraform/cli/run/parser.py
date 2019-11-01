@@ -18,21 +18,12 @@ def add_run_parser(subparsers):
     """The parser for sub command 'run'."""
     run_parser = subparsers.add_parser("run")
     run_parser.set_defaults(func=run_cli.main)
-    run_parser.add_argument('--tester', '-t',
-                            dest="tester",
-                            help='The name of the tests env to use.')
-    run_parser.add_argument('--branch', '-b',
-                            dest="branch",
-                            help='The name of the branch to use.')
     run_parser.add_argument('--scenario', '-s',
                             dest="scenario",
                             help='Predefined scenario to use for exection')
-    run_parser.add_argument('--release', '-r',
-                            dest="release",
-                            help='Release number')
-    run_parser.add_argument('--project', '-p',
-                            dest="project",
-                            help="The path or URL of the project to use.")
     run_parser.add_argument('--platform', dest="platform",
                             default="podman",
                             help="The platform to use (podman, docker, etc.)")
+    run_parser.add_argument('--vars', dest="vars",
+                            default="",
+                            help="extra variables")

@@ -31,12 +31,11 @@ class Platform(object):
 
     SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
 
-    def __init__(self, args, required_args=[]):
+    def __init__(self, args):
         self.args = {k: v for k, v in vars(args).items() if v is not None}
         # vars are used for feeding scenario templates (jinja2)
         if 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
-        self.validate_required_args(required_args)
         self.check_platform_avaiable()
 
         # If user specific scenario, make sure it exists
@@ -56,12 +55,6 @@ class Platform(object):
         res = subprocess.run("{} --version".format(self.binary), shell=True,
                              stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         success_or_exit(res.returncode, req_exc.service_down(self.installation))
-
-    def validate_required_args(self, required_args):
-        """Validates all required args were passed by the user."""
-        for req in required_args:
-            if req not in self.args:
-                success_or_exit(1, usage_exc.missing_arg(req))
 
     @staticmethod
     def verify_scenario_exists(scenarios_dir, scenario):

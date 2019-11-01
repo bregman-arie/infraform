@@ -22,5 +22,7 @@ def add_deploy_parser(subparsers):
                                dest="scenario",
                                help='Predefined scenario to use for exection')
     deploy_parser.add_argument('--platform', dest="platform",
-                               default="podman",
                                help="The platform to use (podman, docker, etc.)")
+    deploy_parser.add_argument('--vars', dest="vars",
+                               default="",
+                               help="extra variables")

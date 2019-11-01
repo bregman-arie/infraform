@@ -33,9 +33,25 @@ Usage Examples:
     $ {}
 """.format(crayons.red("provision, deploy, run, destroy"),
            crayons.yellow("infraform provision --scenario os-1-vm-fip --platform terraform --vars 'network_name=...'"),
-           crayons.yellow("ifr run --tester pep8 --project /home/user/neutron"),
-           crayons.yellow("ifr run --tester py27 --project https://opendev.org/openstack/nova.git"),
-           crayons.yellow("ifr destroy --name my_container"),)
+           crayons.yellow('ifr run --vars="tester=pep8 project=/home/user/neutron"'),
+           crayons.yellow("ifr run --vars=\"tester=py27 project=\'https://opendev.org/openstack/nova.git\'\""),
+           crayons.yellow("ifr destroy --vars=\"name=my_container\""),)
+    return message
+
+def deploy_usage():
+    """Returns deploy usage string."""
+    message = """
+I have no idea what do you want to deploy...
+Usage Examples:
+
+    Make an existing host a Jenkins slave:
+    $ {}
+
+    Deploy Apache web server on an existing server:
+    $ {}
+
+""".format(crayons.yellow("ifr deploy --scenario jenkins_slave --host x.x.x.x"),
+           crayons.yellow("ifr deploy --scenario web --host x.x.x.x"))
     return message
 
 
@@ -65,6 +81,6 @@ Usage Examples:
 
     Run unit tests for nova project from git:
     $ {1}
-""".format(crayons.yellow("ifr run --tester pep8 --project /home/user/neutron"),
-           crayons.yellow("ifr run --tester py27 --project https://opendev.org/openstack/nova.git"))
+""".format(crayons.yellow("ifr run --vars=\"tester=pep8 project=/home/user/neutron\""),
+           crayons.yellow("ifr run --vars=\"tester=py27 project='https://opendev.org/openstack/nova.git'\""))
     return message

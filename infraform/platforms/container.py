@@ -20,6 +20,7 @@ import sys
 
 from infraform.exceptions import usage
 from infraform.platforms.platform import Platform
+from infraform.exceptions.utils import success_or_exit
 
 LOG = logging.getLogger(__name__)
 
@@ -28,17 +29,17 @@ class Container(Platform):
 
     DOCKERFILE_TEMPLATE = (os.path.dirname(__file__) +
                            '/templates/Dockerfile.j2')
-    REQUIRED_ARGS = ['project']
 
     def __init__(self, args, binary, package):
         self.binary = binary
         self.package = package
         self.installation = "dnf install -y {0}\nsystemctl start {0}".format(self.binary)
-        super(Container, self).__init__(args, self.REQUIRED_ARGS)
+
+        super(Container, self).__init__(args)
+
         self.adjust_args()
         if self.args['clone']:
             self.clone_project()
-        self.image_name = self.args['project_name']
 
     def adjust_args(self):
         """Adjust args to allow comfortable and simple invocation."""
@@ -47,39 +48,46 @@ class Container(Platform):
                 self.args['gerrit'] = 'https://' + self.args['gerrit'] + '/gerrit'
             else:
                 self.args['gerrit'] = self.args['gerrit'] + '/gerrit'
-        self.args['clone'] = 'http' in self.args['project']
+        self.args['clone'] = 'http' in self.vars['project']
         # In case someone passed "~/project/" as project argument
-        self.args['project'] = self.args['project'].rstrip('/')
-        self.args['project_name'] = os.path.basename(self.args['project'])
-        self.args['project_path'] = os.path.expanduser(self.args['project'])
-        if self.args['project_name'].endswith('.git'):
-            self.args['project_name'] = self.args['project_name'][:-4]
+        self.vars['project'] = self.vars['project'].rstrip('/')
+        self.vars['project_name'] = os.path.basename(self.vars['project'])
+        self.vars['project_path'] = os.path.expanduser(self.vars['project'])
+        if self.vars['project_name'].endswith('.git'):
+            self.vars['project_name'] = self.vars['project_name'][:-4]
+        self.image_name = self.vars['project_name']
 
     def clone_project(self):
         """Clones given project."""
         # Change project to path since docker run mounts volume
         # using the project argument
-        clone_cmd = "git clone {}".format(self.args['project'])
+        clone_cmd = "git clone {}".format(self.vars['project'])
         subprocess.run(clone_cmd, shell=True, stdout=subprocess.DEVNULL)
-        self.args['project'] = os.getcwd() + '/' + self.args['project_name']
+        self.vars['project'] = os.getcwd() + '/' + self.vars['project_name']
+
+    def verify_project_exists(self):
+        if not os.path.isdir(self.vars['project']):
+            success_or_exit(2, "Couldn't find project: {}".format(self.vars[
+                'project']))
 
     def prepare(self):
-        if self.image_not_exists():
+        if self.image_not_exists() or (self.vars.get('override_image')):
             LOG.warning(
                 "Couldn't find image: {}. Switching to image building".format(
                     self.image_name))
             dockerfile_path = self.write_dockerfile(self.generate_dockerfile())
             self.build_image(dockerfile_path)
+        if 'project' in self.vars:
+            self.verify_project_exists()
 
     def run(self):
         """Run tests."""
         cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; tox -e {4}'".format(
-            self.binary, self.args['project'],
-            self.args['project_name'],
-            self.image_name, self.args['tester'])
+            self.binary, self.vars['project'],
+            self.vars['project_name'],
+            self.image_name, self.vars['tester'])
         res = subprocess.run(cmd, shell=True)
-        if res.returncode != 0:
-            sys.exit(2)
+        success_or_exit(res.returncode)
         return res
 
     def image_not_exists(self):
