@@ -82,10 +82,16 @@ class Container(Platform):
 
     def run(self):
         """Run tests."""
-        cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; tox -e {4}'".format(
-            self.binary, self.vars['project'],
-            self.vars['project_name'],
-            self.image_name, self.vars['tester'])
+        if 'execute' in self.vars:
+            cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c '{4}'".format(
+                self.binary, self.vars['project'], self.vars['project_name'],
+                self.image_name,
+                self.vars['execute'])
+        else:
+            cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; tox -e {4}'".format(
+                self.binary, self.vars['project'],
+                self.vars['project_name'],
+                self.image_name, self.vars['tester'])
         res = subprocess.run(cmd, shell=True)
         success_or_exit(res.returncode)
         return res

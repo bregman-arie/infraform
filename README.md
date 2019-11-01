@@ -20,20 +20,25 @@ Provision infrastructure and deploy apps with one liners
 
     ifr run --vars "project='https://opendev.org/openstack/octavia.git' tester=py27"
 
-## Supported platforms
+    You can also use the following command to run anything you would like:
 
-Name | Type | Comments
+    ifr run --vars="project=/neutron execute='cd neutron; git checkout origin/rhos-14.0-patches; tox -e pep8'"
+
+## Supported platforms & tools
+
+Name | Comments
 :------ |:------:|:--------:
-Podman | Containers |
-Docker | Containers | 
-Terraform | All |
+Podman |
+Docker |
+Terraform |
+Python |
 
 ## Scenarios
 
 Name | Platform | Description
 :------ |:------:|:--------:
 os-1-vm-fip | Terraform | One instance with floating IP
-jenkins_slave | - | Configures host as Jenkins slave
+jenkins_slave | Python | Configures host as Jenkins slave
 
 ## Terminology
 
