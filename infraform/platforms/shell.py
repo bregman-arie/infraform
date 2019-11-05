@@ -11,20 +11,26 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import os
+import logging
 
 from infraform.platforms.platform import Platform
-from infraform.exceptions.utils import success_or_exit
 
-SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
+LOG = logging.getLogger(__name__)
 
-def guess_platform(scenario):
-    """Try to figure out which platform the user should use or fail."""
-    scenario_path, scenario_file = Platform.verify_scenario_exists(SCENARIOS_PATH, scenario)
-    if scenario_file.endswith(".tf"):
-        return "terraform"
-    if scenario_file.endswith(".py"):
-        return "python"
-    if scenario_file.endswith(".sh"):
-        return "shell"
-    success_or_exit(1, "Couldn't figure out which platform to use. Please specify --platform")
+
+class Shell(Platform):
+
+    PACKAGE = 'bash'
+    BINARY = 'bash'
+
+    def __init__(self, args):
+        self.binary = self.BINARY
+        self.package = self.PACKAGE
+        self.installation = "yum install bash"
+        super(Shell, self).__init__(args)
+
+    def prepare(self):
+        self.render_scenario()
+
+    def run(self):
+        self.execute_cmd("chmod +x {0}; ./{0}".format(self.scenario_f))

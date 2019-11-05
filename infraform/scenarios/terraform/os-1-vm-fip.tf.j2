@@ -39,11 +39,30 @@ resource "openstack_networking_router_interface_v2" "test-router-interface" {
   subnet_id = "${openstack_networking_subnet_v2.test-subnet.id}"
 }
 
+resource "openstack_compute_secgroup_v2" "test-sg" {
+  name        = "test-sg"
+  description = "test-sg"
+  rule {
+    from_port   = 22
+    ip_protocol = "tcp"
+    to_port     = 22
+    cidr        = "0.0.0.0/0"
+  }
+
+  rule {
+    from_port   = 80
+    ip_protocol = "tcp"
+    to_port     = 80
+    cidr        = "0.0.0.0/0"
+  }
+}
+
 resource "openstack_compute_instance_v2" "test-server" {
   name = "{{ vars['instance_name']|default('test-server') }}"
   image_name = "{{ vars['image_name']|default('rhel-7.6-server-x86_64-latest') }}"
   flavor_name = "{{ vars['flavor_name']|default('m1.small') }}"
   key_pair = "${openstack_compute_keypair_v2.keypair1.name}"
+  security_groups = formatlist("%s", openstack_compute_secgroup_v2.test-sg.name)
 
 network {
     name = "test-network"
