@@ -26,19 +26,21 @@ Provision infrastructure and deploy apps with one liners
 
 ## Supported platforms & tools
 
-Name | Comments
+Name | Comments | 
 :------ |:------:|:--------:
 Podman |
 Docker |
 Terraform |
 Python |
+Shell |
 
 ## Scenarios
 
-Name | Platform | Description
-:------ |:------:|:--------:
-os-1-vm-fip | Terraform | One instance with floating IP
-jenkins_slave | Python | Configures host as Jenkins slave
+Name | Platform | Description | Example
+:------ |:------:|:--------:|:---------:
+os-1-vm-fip | Terraform | One instance with floating IP | `
+jenkins_slave | Python | Configures host as Jenkins slave |
+usage_patterns | Shell | Deploys Usage Patterns server |
 
 ## Terminology
 

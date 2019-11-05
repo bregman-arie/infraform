@@ -14,7 +14,7 @@
 import argparse
 
 from infraform.cli.deploy import parser as deploy_parser
-from infraform.destroy import parser as destroy_parser
+from infraform.cli.destroy import parser as destroy_parser
 from infraform.cli.provision import parser as provision_parser
 from infraform.cli.run import parser as run_parser
 

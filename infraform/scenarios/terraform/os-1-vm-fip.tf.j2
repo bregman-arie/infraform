@@ -10,13 +10,43 @@ provider "openstack" {
   {% endif %}
 }
 
+data "openstack_networking_network_v2" "provider-network" {
+  name = "{{ vars['provider_network'] }}"
+}
+
+resource "openstack_networking_network_v2" "test-network" {
+  name = "test-network"
+}
+
+resource "openstack_networking_subnet_v2" "test-subnet" {
+  network_id = "${openstack_networking_network_v2.test-network.id}"
+  cidr       = "10.0.0.0/24"
+}
+
+resource "openstack_compute_keypair_v2" "keypair1" {
+  name = "keypair1"
+  public_key = "${file("~/.ssh/id_rsa.pub")}"
+}
+
+resource "openstack_networking_router_v2" "test-router" {
+  name                = "test-router"
+  admin_state_up      = true
+  external_network_id = "${data.openstack_networking_network_v2.provider-network.id}"
+}
+
+resource "openstack_networking_router_interface_v2" "test-router-interface" {
+  router_id = "${openstack_networking_router_v2.test-router.id}"
+  subnet_id = "${openstack_networking_subnet_v2.test-subnet.id}"
+}
+
 resource "openstack_compute_instance_v2" "test-server" {
   name = "{{ vars['instance_name']|default('test-server') }}"
   image_name = "{{ vars['image_name']|default('rhel-7.6-server-x86_64-latest') }}"
   flavor_name = "{{ vars['flavor_name']|default('m1.small') }}"
+  key_pair = "${openstack_compute_keypair_v2.keypair1.name}"
 
 network {
-    name = "{{ vars['network_name'] }}"
+    name = "test-network"
   }
 }
 

@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from infraform.destroy import cli as destroy_cli
+from infraform.cli.destroy import cli as destroy_cli
 
 
 def add_destroy_parser(subparsers):
