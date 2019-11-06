@@ -38,5 +38,5 @@ class Terraform(Platform):
         self.render_scenario()
         self.execute_cmd('terraform init')
 
-    def provision(self):
+    def run(self):
         self.execute_cmd('terraform apply')

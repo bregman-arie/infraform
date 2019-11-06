@@ -21,6 +21,11 @@ def add_destroy_parser(subparsers):
     destroy_parser.add_argument('--name', '-n',
                                 dest="name",
                                 help='Name of the resource to remove.')
-    destroy_parser.add_argument(
-        '--platform', dest="platform", default="podman",
-        help="The platform to use (podman, docker, etc.)")
+    destroy_parser.add_argument('--scenario', '-s',
+                                  dest="scenario",
+                                  help='Predefined scenario to use for exection')
+    destroy_parser.add_argument('--platform', dest="platform",
+                                  help="The platform to use (podman, docker, etc.)")
+    destroy_parser.add_argument('--vars', dest="vars",
+                                  default="",
+                                  help="extra variables")

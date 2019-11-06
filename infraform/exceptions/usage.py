@@ -31,29 +31,12 @@ Usage Examples:
 
     Remove a container called my_container:
     $ {}
-""".format(crayons.red("provision, deploy, run, destroy"),
-           crayons.yellow("infraform provision --scenario os-1-vm-fip --platform terraform --vars 'network_name=...'"),
+""".format(crayons.red("run, destroy"),
+           crayons.yellow("infraform run --scenario os-1-vm-fip --vars 'provider_network=...'"),
            crayons.yellow('ifr run --vars="tester=pep8 project=/home/user/neutron"'),
            crayons.yellow("ifr run --vars=\"tester=py27 project=\'https://opendev.org/openstack/nova.git\'\""),
            crayons.yellow("ifr destroy --vars=\"name=my_container\""),)
     return message
-
-def deploy_usage():
-    """Returns deploy usage string."""
-    message = """
-I have no idea what do you want to deploy...
-Usage Examples:
-
-    Make an existing host a Jenkins slave:
-    $ {}
-
-    Deploy Apache web server on an existing server:
-    $ {}
-
-""".format(crayons.yellow("ifr deploy --scenario jenkins_slave --host x.x.x.x"),
-           crayons.yellow("ifr deploy --scenario web --host x.x.x.x"))
-    return message
-
 
 def missing_arg(arg):
     """Missing arg message format."""
@@ -68,19 +51,4 @@ Couldn't find the the scenario: {0}
 
 New scenarios should be added here: https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios
 """.format(crayons.red(scenario))
-    return message
-
-
-def run_usage():
-    """Returns run subcommand usage string."""
-    message = """
-Usage Examples:
-
-    Run pep8 tests for neutron project from local path:
-    $ {0}
-
-    Run unit tests for nova project from git:
-    $ {1}
-""".format(crayons.yellow("ifr run --vars=\"tester=pep8 project=/home/user/neutron\""),
-           crayons.yellow("ifr run --vars=\"tester=py27 project='https://opendev.org/openstack/nova.git'\""))
     return message

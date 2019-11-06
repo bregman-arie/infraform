@@ -6,7 +6,7 @@ Unified interface for provisioning infrastructure and deploy apps using differen
 
 ### Provision OpenStack instance
 
-    infraform provision --scenario os-1-vm-fip --vars="network_provider=..."
+    infraform run --scenario os-1-vm-fip --vars="network_provider=..."
 
 ### Create a container and run neutron tests in it
 
@@ -22,7 +22,6 @@ Name | Platform | Description | Example
 :------ |:------:|:--------:|:---------:
 os-1-vm-fip | Terraform | One OpenStack instance with a floating IP | `
 jenkins_slave | Python | Configures host as a Jenkins slave |
-usage_patterns | Shell | Deploys Usage Patterns UI server |
 
 ## Supported platforms and tools
 

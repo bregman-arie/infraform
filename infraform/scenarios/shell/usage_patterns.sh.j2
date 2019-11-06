@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -e
-
-git clone {{ vars['project_url'] }}
-cd os-dataminer-jupyter-ansible
-ansible-playbook main-devel-env.yml \
-                 -i inventory-devel \
-                 --extra-vars="hash_salt=12345"

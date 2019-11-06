@@ -13,12 +13,21 @@
 #    under the License.
 import logging
 import importlib
+import sys
+
+from infraform.cli import utils
+from infraform.exceptions.usage import general_usage
 
 LOG = logging.getLogger(__name__)
 
 
 def main(args):
     """Runner main entry."""
+    if not args.scenario and not args.vars:
+        LOG.error(general_usage())
+        sys.exit(2)
+    if args.scenario and not args.platform:
+        args.platform = utils.guess_platform(args.scenario)
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())
