@@ -2,7 +2,7 @@
 
 Unified interface for provisioning infrastructure and deploy apps using different platforms and tools
 
-## Usage
+## Usage Examples
 
 ### Provision OpenStack instance
 
@@ -14,14 +14,18 @@ Unified interface for provisioning infrastructure and deploy apps using differen
 
 You can also use more specific approach where you choose exactly what to execute once the container is ready
 
-    ifr run --vars="project=/neutron execute='cd neutron; git checkout origin/rhos-14.0-patches; tox -e pep8'"
+    ifr run --platform=podman --vars="project=/neutron execute='cd neutron; git checkout origin/rhos-14.0-patches; tox -e pep8'"
+
+### Configure host as Jenkins node
+
+    infraform run --scenario jenkins_node
 
 ## Scenarios
 
 Name | Platform | Description | Example
 :------ |:------:|:--------:|:---------:
 os-1-vm-fip | Terraform | One OpenStack instance with a floating IP | `
-jenkins_slave | Python | Configures host as a Jenkins slave |
+jenkins_node | Shell | Configures host as a Jenkins node |
 
 ## Supported platforms and tools
 

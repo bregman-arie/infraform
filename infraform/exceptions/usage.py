@@ -32,15 +32,15 @@ Usage Examples:
     Remove a container called my_container:
     $ {}
 """.format(crayons.red("run, destroy"),
-           crayons.yellow("infraform run --scenario os-1-vm-fip --vars 'provider_network=...'"),
-           crayons.yellow('ifr run --vars="tester=pep8 project=/home/user/neutron"'),
-           crayons.yellow("ifr run --vars=\"tester=py27 project=\'https://opendev.org/openstack/nova.git\'\""),
-           crayons.yellow("ifr destroy --vars=\"name=my_container\""),)
+           crayons.yellow("infraform run --scenario os-1-vm-fip --vars \"provider_network=...\""),
+           crayons.yellow('ifr run --vars "tester=pep8 project=/home/user/neutron"'),
+           crayons.yellow("ifr run --vars \"tester=py27 project=\'https://opendev.org/openstack/nova.git\'\""),
+           crayons.yellow("ifr destroy --vars \"name=my_container\""),)
     return message
 
 def missing_arg(arg):
     """Missing arg message format."""
-    message = """Please specify the argument {0} this way: infraform --vars '{0}=...'""".format(crayons.red(arg))
+    message = """Please specify the argument {0} this way: infraform --vars \"{0}=...\"""".format(crayons.red(arg))
     return message
 
 

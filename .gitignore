@@ -120,4 +120,7 @@ terraform.tfstate*
 # Pycharm
 *.idea
 
+# Any rendered scenarios created by infraform
+*.py
 *ansible
+*.sh

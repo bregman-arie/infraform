@@ -33,4 +33,4 @@ class Python(Platform):
         self.render_scenario()
 
     def run(self):
-        pass
+        self.execute_cmd("chmod +x {0}; python {0}".format(self.scenario_f))
