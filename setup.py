@@ -20,6 +20,7 @@ setuptools.setup(
     author='Arie Bregman',
     author_email='abregman@redhat.com',
     packages=setuptools.find_packages(),
+    python_requires='>3.0.0',
     include_package_data=True,
     entry_points={
         'console_scripts': ['infraform = infraform.cli.main:main',
