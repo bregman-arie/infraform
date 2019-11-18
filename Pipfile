@@ -12,7 +12,6 @@ crayons = "*"
 podman = "*"
 jinja2 = "*"
 ansible = "*"
-jenkinsapi = "*"
 
 [requires]
 python_version = "3.7"

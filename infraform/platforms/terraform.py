@@ -35,7 +35,6 @@ class Terraform(Platform):
         super(Terraform, self).__init__(args)
 
     def prepare(self):
-        self.render_scenario()
         self.execute_cmd('terraform init')
 
     def run(self):

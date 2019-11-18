@@ -8,13 +8,13 @@ Unified interface for provisioning infrastructure and deploy apps using differen
 
     infraform run --scenario os-1-vm-fip --vars="network_provider=..."
 
-### Create a container and run neutron tests in it
+### Run Python PEP8 inside a Podman container:
 
-    infraform run --vars "project=/home/user/neutron tester=py27"
+    ifr run --scenario pep8-tests --vars 'project=/my/project'
 
 You can also use more specific approach where you choose exactly what to execute once the container is ready
 
-    ifr run --platform=podman --vars="project=/neutron execute='cd neutron; git checkout origin/rhos-14.0-patches; tox -e pep8'"
+    ifr run --scenario pep8-tests --vars 'project=/my/project execute="git checkout origin/some-branch; tox -e pep8"
 
 ### Configure host as Jenkins node
 

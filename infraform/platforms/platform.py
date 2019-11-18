@@ -18,6 +18,7 @@ import os
 import re
 import subprocess
 import sys
+import yaml
 
 from infraform import filters
 from infraform.exceptions import requirements as req_exc
@@ -38,10 +39,36 @@ class Platform(object):
             self.vars = self.get_vars(self.args['vars'])
         self.check_platform_avaiable()
 
-        # If user specific scenario, make sure it exists
+        # If user specified scenario, make sure it exists
         if 'scenario' in self.args:
             self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
                 self.SCENARIOS_PATH, self.args['scenario'])
+             
+            self.render_scenario()
+
+            _, suffix = os.path.splitext(self.scenario_f)
+            os.path.splitext('/path/to/somefile.ext')
+            if suffix == ".yml" or suffix == ".yaml":
+                self.load_yaml_to_vars()
+
+        self.create_new_vars()
+
+    def load_yaml_to_vars(self):
+        with open(self.scenario_f, 'r') as stream:
+            try:
+                scenario_yaml = yaml.safe_load(stream)
+                self.vars['scenario_vars'] = {k: v for k, v in scenario_yaml.items() if v is not None}
+                for k, v in scenario_yaml.items():
+                    if k not in self.vars:
+                        self.vars.update({k: v})
+            except yaml.YAMLError as exc:
+                print(exc)
+
+    def create_new_vars(self):
+        if self.vars['project'].startswith('/'):
+            self.vars['project_name'] = os.path.basename(self.vars['project'])
+        else:
+           self.vars['project_name'] = self.vars['project']
 
     def get_vars(self, args):
         variables = {}

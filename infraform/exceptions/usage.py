@@ -23,19 +23,16 @@ Usage Examples:
     Provision an OpenStack instance with floating IP:
     $ {}
 
-    Run pep8 tests for neutron project from local path:
+    Run Python PEP8 tests inside a Podman container:
     $ {}
 
     Run unit tests for nova project from git:
     $ {}
 
-    Remove a container called my_container:
-    $ {}
 """.format(crayons.red("run, destroy"),
            crayons.yellow("infraform run --scenario os-1-vm-fip --vars \"provider_network=...\""),
-           crayons.yellow('ifr run --vars "tester=pep8 project=/home/user/neutron"'),
-           crayons.yellow("ifr run --vars \"tester=py27 project=\'https://opendev.org/openstack/nova.git\'\""),
-           crayons.yellow("ifr destroy --vars \"name=my_container\""),)
+           crayons.yellow('ifr run --scenario pep8-tests --vars "project=/home/user/neutron"'),
+           crayons.yellow("ifr run --scenario pep8-tests --vars 'project=/my/project execute=\"git checkout origin/some-branch; tox -e pep8\"'"))
     return message
 
 def missing_arg(arg):

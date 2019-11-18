@@ -11,10 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import jinja2 as j2
 import logging
 import os
-import re
 import subprocess
 import sys
 
@@ -27,43 +25,21 @@ LOG = logging.getLogger(__name__)
 
 class Container(Platform):
 
-    DOCKERFILE_TEMPLATE = (os.path.dirname(__file__) +
-                           '/templates/Dockerfile.j2')
-
     def __init__(self, args, binary, package):
         self.binary = binary
         self.package = package
-        self.installation = "dnf install -y {0}\nsystemctl start {0}".format(self.binary)
+        self.installation = "dnf install -y {0}\nsystemctl start {0}".format(
+            self.binary)
 
         super(Container, self).__init__(args)
 
-        self.adjust_args()
-        if self.args['clone']:
-            self.clone_project()
-
-    def adjust_args(self):
-        """Adjust args to allow comfortable and simple invocation."""
-        if 'gerrit' in self.args:
-            if not self.args['gerrit'].startswith('https://'):
-                self.args['gerrit'] = 'https://' + self.args['gerrit'] + '/gerrit'
-            else:
-                self.args['gerrit'] = self.args['gerrit'] + '/gerrit'
-        self.args['clone'] = 'http' in self.vars['project']
-        # In case someone passed "~/project/" as project argument
-        self.vars['project'] = self.vars['project'].rstrip('/')
-        self.vars['project_name'] = os.path.basename(self.vars['project'])
-        self.vars['project_path'] = os.path.expanduser(self.vars['project'])
-        if self.vars['project_name'].endswith('.git'):
-            self.vars['project_name'] = self.vars['project_name'][:-4]
-        self.image_name = self.vars['project_name']
-
-    def clone_project(self):
-        """Clones given project."""
-        # Change project to path since docker run mounts volume
-        # using the project argument
-        clone_cmd = "git clone {}".format(self.vars['project'])
-        subprocess.run(clone_cmd, shell=True, stdout=subprocess.DEVNULL)
-        self.vars['project'] = os.getcwd() + '/' + self.vars['project_name']
+    # def clone_project(self):
+    #    """Clones given project."""
+    #    # Change project to path since docker run mounts volume
+    #    # using the project argument
+    #    clone_cmd = "git clone {}".format(self.vars['project'])
+    #    subprocess.run(clone_cmd, shell=True, stdout=subprocess.DEVNULL)
+    #    self.vars['project'] = os.getcwd() + '/' + self.vars['project_name']
 
     def verify_project_exists(self):
         if not os.path.isdir(self.vars['project']):
@@ -74,31 +50,30 @@ class Container(Platform):
         if self.image_not_exists() or (self.vars.get('override_image')):
             LOG.warning(
                 "Couldn't find image: {}. Switching to image building".format(
-                    self.image_name))
-            dockerfile_path = self.write_dockerfile(self.generate_dockerfile())
+                    self.vars['image']))
+            dockerfile_path = self.write_dockerfile()
             self.build_image(dockerfile_path)
         if 'project' in self.vars:
             self.verify_project_exists()
 
     def run(self):
         """Run tests."""
-        if 'execute' in self.vars:
-            cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c '{4}'".format(
+        try:
+            cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; {4}'".format(
                 self.binary, self.vars['project'], self.vars['project_name'],
-                self.image_name,
+                self.vars['image'],
                 self.vars['execute'])
-        else:
-            cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; tox -e {4}'".format(
-                self.binary, self.vars['project'],
-                self.vars['project_name'],
-                self.image_name, self.vars['tester'])
+        except KeyError as e:
+            LOG.error(usage.missing_arg(e.args[0]))
+            sys.exit(2)
+        print(cmd)
         res = subprocess.run(cmd, shell=True)
         success_or_exit(res.returncode)
         return res
 
     def image_not_exists(self):
         """Returns true if image exists."""
-        res = subprocess.run("{} inspect {}".format(self.binary, self.image_name),
+        res = subprocess.run("{} inspect {}".format(self.binary, self.vars['image']),
                              shell=True, stdout=subprocess.PIPE,
                              stderr=subprocess.DEVNULL)
         return res.returncode
@@ -109,22 +84,9 @@ class Container(Platform):
             template_content = open_f.read()
         return template_content
 
-    def generate_dockerfile(self):
-        j2_env = j2.Environment(loader=j2.FunctionLoader(
-            self.get_template), trim_blocks=True, undefined=j2.StrictUndefined)
-        template = j2_env.get_template(self.DOCKERFILE_TEMPLATE)
-        try:
-            rendered_file = template.render(args=self.args)
-        except j2.exceptions.UndefinedError as e:
-            missing_arg = re.findall(r"'([^']*)'", e.message)[1]
-            LOG.error(usage.missing_arg(missing_arg))
-            LOG.error(usage.run_usage())
-            sys.exit(2)
-        return rendered_file
-
-    def write_dockerfile(self, df_content, df_path="Dockerfile"):
+    def write_dockerfile(self, df_path="Dockerfile"):
         with open(df_path, 'w+') as f:
-            f.write(df_content)
+            f.write(self.vars['dockerfile'])
         return df_path
 
     def destroy(self):
@@ -138,7 +100,7 @@ class Container(Platform):
     def build_image(self, df_path):
         """Builds image given df path."""
         cmd = "{} build -f {} -t {} .".format(
-            self.binary, df_path, self.image_name)
+            self.binary, df_path, self.vars['image'])
         res = subprocess.run(cmd, shell=True)
         if res.returncode != 0:
             sys.exit(2)

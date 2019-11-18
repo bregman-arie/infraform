@@ -27,4 +27,6 @@ def guess_platform(scenario):
         return "python"
     if scenario_file.endswith(".sh"):
         return "shell"
+    if os.path.dirname(scenario_path).split('/')[-1] == "podman":
+        return "podman"
     success_or_exit(1, "Couldn't figure out which platform to use. Please specify --platform")

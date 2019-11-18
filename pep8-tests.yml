@@ -1,0 +1,10 @@
+execute: "tox -e pep8"
+image: pep8-tests
+dockerfile: |
+  FROM centos
+  RUN curl https://bootstrap.pypa.io/get-pip.py | python
+  RUN pip install tox
+  RUN yum install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+
+   
+  RUN yum install -y python-devel git gcc openssl-devel gettext

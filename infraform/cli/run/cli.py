@@ -17,6 +17,7 @@ import sys
 
 from infraform.cli import utils
 from infraform.exceptions.usage import general_usage
+from infraform.exceptions.utils import success_or_exit
 
 LOG = logging.getLogger(__name__)
 
@@ -28,6 +29,8 @@ def main(args):
         sys.exit(2)
     if args.scenario and not args.platform:
         args.platform = utils.guess_platform(args.scenario)
+    if not args.scenario and not args.platform:
+        success_or_exit(1, "Couldn't figure out which platform to use. Please specify --platform")
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())
