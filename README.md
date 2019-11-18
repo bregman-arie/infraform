@@ -2,6 +2,13 @@
 
 Unified interface for provisioning infrastructure and deploy apps using different platforms and tools
 
+## Installation
+
+In order to use infraform you need to use Python3 and run the following commands:
+
+    pipenv shell
+    pipenv install -e .
+
 ## Usage Examples
 
 ### Provision OpenStack instance

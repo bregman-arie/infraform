@@ -65,10 +65,11 @@ class Platform(object):
                 print(exc)
 
     def create_new_vars(self):
-        if self.vars['project'].startswith('/'):
-            self.vars['project_name'] = os.path.basename(self.vars['project'])
-        else:
-           self.vars['project_name'] = self.vars['project']
+        if 'project' in self.vars:
+            if self.vars['project'].startswith('/'):
+                self.vars['project_name'] = os.path.basename(self.vars['project'])
+            else:
+               self.vars['project_name'] = self.vars['project']
 
     def get_vars(self, args):
         variables = {}

@@ -1,14 +1,14 @@
 execute: "tox -e pep8"
 image: pep8-tests
 dockerfile: |
-  FROM {{ image_name|default("centos") }}
-  RUN curl https://bootstrap.pypa.io/get-pip.py | python
-  RUN pip install tox
-  RUN yum install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+  FROM {{ image_name|default("centos:8") }}
+  RUN dnf install -y python36
+  RUN pip3 install tox
+  RUN dnf install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
 
   {% if vars['release']|default(False) %}
       RUN rhos-release {{ vars['release'] }}
       RUN yum-config-manager --enable rhelosp-{{ vars['release'] }}.0-unittest
   {% endif %}
  
-  RUN yum install -y python-devel git gcc openssl-devel gettext
+  RUN dnf install -y python3-devel git gcc openssl-devel gettext
