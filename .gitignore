@@ -123,4 +123,5 @@ terraform.tfstate*
 # Any rendered scenarios created by infraform
 *.py
 *ansible
+*.yml
 *.sh
