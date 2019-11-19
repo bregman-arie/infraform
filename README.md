@@ -25,14 +25,17 @@ You can also use more specific approach where you choose exactly what to execute
 
 ### Configure host as Jenkins node
 
-    infraform run --scenario jenkins_node
+    infraform run --scenario jenkins_node --vars="jenkins_url=https://my.jenkins.com node_name=name-in-jenkins jenkins_user=abregman jenkins_password=my-API-token labels=my-hosts host=my.host.com credsid=xxx-xxx-xxx-xxx"
 
 ## Scenarios
 
 Name | Platform | Description | Example
 :------ |:------:|:--------:|:---------:
-os-1-vm-fip | Terraform | One OpenStack instance with a floating IP | `
+os-1-vm-fip | Terraform | One OpenStack instance with a floating IP | 
 jenkins_node | Shell | Configures host as a Jenkins node |
+pep8-tests | Podman, Docker | Run PEP8 tests in a container
+unit-tests | Podman, Docker | Run unit tests in a container
+functional-tests | Podman, Docker | Run functional tests in a container
 
 ## Supported platforms and tools
 
@@ -55,6 +58,11 @@ Shell | Run Bash shell scripts
 Name | Description
 :------ |:--------:
 override_image | If there is an existing image, remove it and build the image from scratch
+
+## Create your own Scenario
+
+Add new scenarios in `infraform/scenarios`.
+Scenario format depends on the platform. Any Scenario can be jinja2 template in order to get certain input from the user and not use fixed values.
 
 ## Contributions
 

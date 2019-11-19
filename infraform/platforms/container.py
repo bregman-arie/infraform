@@ -61,7 +61,9 @@ class Container(Platform):
         """Run tests."""
         try:
             cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; {4}'".format(
-                self.binary, self.vars['project'], self.vars['project_name'],
+                self.binary,
+                self.vars['project'],
+                self.vars['project_name'],
                 self.vars['image'],
                 self.vars['execute'])
         except KeyError as e:
