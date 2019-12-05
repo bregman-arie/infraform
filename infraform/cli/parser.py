@@ -15,6 +15,7 @@ import argparse
 
 from infraform.cli.destroy import parser as destroy_parser
 from infraform.cli.run import parser as run_parser
+from infraform.cli.list import parser as list_parser
 
 
 def create_parser():
@@ -29,5 +30,6 @@ def create_parser():
 
     destroy_parser.add_destroy_parser(subparsers)
     run_parser.add_run_parser(subparsers)
+    list_parser.add_list_parser(subparsers)
 
     return parser

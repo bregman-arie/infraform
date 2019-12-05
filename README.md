@@ -32,10 +32,13 @@ You can also use more specific approach where you choose exactly what to execute
 Name | Platform | Description | Example
 :------ |:------:|:--------:|:---------:
 os-1-vm-fip | Terraform | One OpenStack instance with a floating IP | 
-jenkins_node | Shell | Configures host as a Jenkins node |
-pep8-tests | Podman, Docker | Run PEP8 tests in a container
-unit-tests | Podman, Docker | Run unit tests in a container
-functional-tests | Podman, Docker | Run functional tests in a container
+register-jenkins-node | Shell | Registers host as Jenkins node |
+setup-jenkins-node | Shell | Configures clean host as Jenkins node |
+pep8-tests | Podman, Docker | Run PEP8 tests in a container |
+unit-tests | Podman, Docker | Run unit tests in a container | 
+functional-tests | Podman, Docker | Run functional tests in a container |
+elastic_stack_host | shell | Install and run Elastic Stack directly on the host
+elastic_stack_container | shell | Install and run Elastic Stack inside a container
 
 ## Supported platforms and tools
 

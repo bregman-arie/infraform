@@ -33,4 +33,7 @@ class Shell(Platform):
         self.render_scenario()
 
     def run(self):
-        self.execute_cmd("chmod +x {0}; ./{0}".format(self.scenario_f))
+        if 'host' in self.vars:
+            self.execute_script_remotely()
+        else:
+            self.execute_cmd("chmod +x {0}; ./{0}".format(self.scenario_f))
