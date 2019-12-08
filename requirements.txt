@@ -2,3 +2,4 @@ ansible
 crayons
 jinja2
 podman
+elasticsearch
