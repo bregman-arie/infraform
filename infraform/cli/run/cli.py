@@ -16,7 +16,7 @@ import importlib
 import sys
 
 from infraform.cli import utils
-from infraform.exceptions.usage import general_usage
+from infraform.exceptions.usage import missing_scenario_arg
 from infraform.exceptions.utils import success_or_exit
 
 LOG = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ LOG = logging.getLogger(__name__)
 def main(args):
     """Runner main entry."""
     if not args.scenario and not args.vars:
-        LOG.error(general_usage())
+        LOG.error(missing_scenario_arg())
         sys.exit(2)
     if args.scenario and not args.platform:
         args.platform = utils.guess_platform(args.scenario)

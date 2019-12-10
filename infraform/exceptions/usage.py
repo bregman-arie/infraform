@@ -26,12 +26,16 @@ Usage Examples:
     Run Python PEP8 tests inside a Podman container:
     $ {}
 
+    List available scenarios:
+    $ {}
+
     Run unit tests for nova project from git:
     $ {}
 
-""".format(crayons.red("run, destroy"),
+""".format(crayons.red("run, list, destroy"),
            crayons.yellow("infraform run --scenario os-1-vm-fip --vars \"provider_network=...\""),
            crayons.yellow('ifr run --scenario pep8-tests --vars "project=/home/user/neutron"'),
+           crayons.yellow('ifr list --scenarios'),
            crayons.yellow("ifr run --scenario pep8-tests --vars 'project=/my/project execute=\"git checkout origin/some-branch; tox -e pep8\"'"))
     return message
 
@@ -48,4 +52,9 @@ Couldn't find the the scenario: {0}
 
 New scenarios should be added here: https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios
 """.format(crayons.red(scenario))
+    return message
+
+def missing_scenario_arg():
+    """Missing scenario arg message format."""
+    message = "Please specify which scenario to run with {}".format(crayons.red("--scenario <SCENARIO_NAME>"))
     return message

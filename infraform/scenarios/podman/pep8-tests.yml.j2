@@ -1,4 +1,8 @@
+{% if "release" in vars %}
 execute: "git checkout origin/rhos-{{ vars['release'] }}.0-patches; tox -e pep8"
+{% else %}
+execute: "tox -e pep8"
+{% endif %}
 image: pep8-tests
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
