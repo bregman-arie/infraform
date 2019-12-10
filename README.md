@@ -1,6 +1,8 @@
 # InfraForm
 
-Unified interface for provisioning infrastructure and deploy apps using different platforms and tools
+Unified interface for infrastructure related operations using predefined templates
+
+The idea is to quickly run common operations and yet, keep it dynamic enough so it can be done with different properties and on different locations.
 
 ## Installation
 
@@ -23,11 +25,17 @@ You can also use more specific approach where you choose exactly what to execute
 
     ifr run --scenario pep8-tests --vars 'project=/my/project execute="git checkout origin/some-branch; tox -e pep8"
 
-### Configure host as Jenkins node
+### Regiser host as a Jenkins node
 
     infraform run --scenario jenkins_node --vars="jenkins_url=https://my.jenkins.com node_name=name-in-jenkins jenkins_user=abregman jenkins_password=my-API-token labels=my-hosts host=my.host.com credsid=xxx-xxx-xxx-xxx"
 
+### Elasticsearch summary + perform a query
+
+ifr run --scenario elastic_summary --vars "es_server='"http://<es_server>:9200"' index=my_index query='{\"someKey\": \"someValue\"}'"
+
 ## Scenarios
+
+Scenario is a predefined instructions file or template. This is a platform dependent file (e.g. Terraform file) and not Infraform file. 
 
 Name | Platform | Description | Arguments
 :------ |:------:|:--------:|:---------:
@@ -48,25 +56,15 @@ You can list scenarios with `ifr list --scenarios`
 
 ## Supported platforms and tools
 
+InfraForm is able to execute the following types of platforms and tools
+
 Name | Comments 
 :------ |:------:
-Podman | Create container images and run apps/tests inside Podman containers
-Docker | Same as Podman but using Docker instead
+Podman | Run containers using Podman
+Docker | Run containers using Docker
 Terraform | Provision infrastucture using Terraform HCL files
 Python | Run Python programs
 Shell | Run Bash shell scripts
-
-## Terminology
-
-* Platform - an platform or tool to use for operations like provision, run, etc. See [#Supported platforms](#supported-platforms-and-tools)
-
-* Scenario - a predefined instructions file. This is a platform file (e.g. Terraform file) and not Infraform file. It can be fixed or a Jinja2 template which will be then rendered by Infraform
-
-## Containers - Extra Supported Variables
-
-Name | Description
-:------ |:--------:
-override_image | If there is an existing image, remove it and build the image from scratch
 
 ## Create your own Scenario
 
