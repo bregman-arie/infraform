@@ -15,4 +15,4 @@ dockerfile: |
       RUN yum-config-manager --enable rhelosp-{{ vars['release'] }}.0-unittest
   {% endif %}
  
-  RUN dnf install -y python3-devel git gcc openssl-devel gettext
+  RUN dnf install -y python3-devel git gcc openssl-devel gettext procps
