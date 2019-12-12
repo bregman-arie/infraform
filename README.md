@@ -46,9 +46,7 @@ setup-jenkins-node | Shell | Configures clean host as Jenkins node |
 pep8-tests | Podman, Docker | Run PEP8 tests in a container | override_image
 unit-tests | Podman, Docker | Run unit tests in a container | override_image
 functional-tests | Podman, Docker | Run functional tests in a container |
-elastic_stack_host | shell | Install and run Elastic Stack directly on the host
-elastic_stack_container | shell | Install and run Elastic Stack inside a container
-elastic_summary | python | Print information on Elasticsearch server and indices and perform query (optional) | es_server
+elastic_summary | python | Print information on Elasticsearch server and indices and performs query (optional) | es_server
 
 ### List Scenarios
 

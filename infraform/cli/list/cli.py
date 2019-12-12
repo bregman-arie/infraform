@@ -19,6 +19,5 @@ LOG = logging.getLogger(__name__)
 
 def main(args):
     """Runner main entry."""
-    if args.scenarios:
-        LOG.info("Listing scenarios...")
-        list_scenarios()
+    LOG.info("Listing scenarios...\n")
+    list_scenarios()

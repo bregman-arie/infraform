@@ -57,7 +57,8 @@ class Platform(object):
         with open(self.scenario_f, 'r') as stream:
             try:
                 scenario_yaml = yaml.safe_load(stream)
-                self.vars['scenario_vars'] = {k: v for k, v in scenario_yaml.items() if v is not None}
+                self.vars['scenario_vars'] = {
+                    k: v for k, v in scenario_yaml.items() if v is not None}
                 for k, v in scenario_yaml.items():
                     if k not in self.vars:
                         self.vars.update({k: v})

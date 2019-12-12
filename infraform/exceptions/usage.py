@@ -36,12 +36,15 @@ Usage Examples:
            crayons.yellow("infraform run --scenario os-1-vm-fip --vars \"provider_network=...\""),
            crayons.yellow('ifr run --scenario pep8-tests --vars "project=/home/user/neutron"'),
            crayons.yellow('ifr list --scenarios'),
-           crayons.yellow("ifr run --scenario pep8-tests --vars 'project=/my/project execute=\"git checkout origin/some-branch; tox -e pep8\"'"))
+           crayons.yellow("ifr run --scenario pep8-tests --vars \
+'project=/my/project execute=\"git \
+checkout origin/some-branch; tox -e pep8\"'"))
     return message
 
 def missing_arg(arg):
     """Missing arg message format."""
-    message = """Please specify the argument {0} this way: infraform --vars \"{0}=...\"""".format(crayons.red(arg))
+    message = """Please specify the argument {0} this way: infraform \
+--vars \"{0}=...\"""".format(crayons.red(arg))
     return message
 
 
@@ -50,7 +53,8 @@ def missing_scenario(scenario):
     message = """
 Couldn't find the the scenario: {0}
 
-New scenarios should be added here: https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios
+New scenarios should be added here: \
+https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios
 """.format(crayons.red(scenario))
     return message
 

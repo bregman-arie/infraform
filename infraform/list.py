@@ -13,15 +13,18 @@
 #    under the License.
 import logging
 import os
-import re
+
+from infraform.utils import get_match_until_first_dot
 
 LOG = logging.getLogger(__name__)
 
 SCENARIOS_PATH = os.path.dirname(__file__) + '/../infraform/scenarios'
 
+
 def list_scenarios():
     for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
         for f in filenames:
-            until_dot_pattern = re.compile(r"^[^.]*")
-            file_without_suffix = re.search(until_dot_pattern, f).group(0)
-            LOG.info(file_without_suffix)
+            LOG.info(get_match_until_first_dot(f))
+            f_path = dirpath + '/' + f
+            with open(f_path, 'r') as f:
+                pass

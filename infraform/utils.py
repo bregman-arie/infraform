@@ -11,14 +11,13 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from infraform.cli.list import cli as list_cli
+import re
 
 
-def add_list_parser(subparsers):
-    """The parser for sub command 'list'."""
-    list_parser = subparsers.add_parser("list")
-    list_parser.set_defaults(func=list_cli.main)
-    list_parser.add_argument('--scenarios', '-s',
-                             dest="scenarios",
-                             action='store_true',
-                             help='List Scenarios')
+def get_match_until_first_dot(string):
+    """Returns the matched pattern until first dot.
+
+    For example: 'scenario1.py.j2' -> 'scenario'
+    """
+    until_dot_pattern = re.compile(r"^[^.]*")
+    return re.search(until_dot_pattern, string).group(0)
