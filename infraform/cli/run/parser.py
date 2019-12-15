@@ -22,7 +22,8 @@ def add_run_parser(subparsers):
                             dest="scenario",
                             help='Predefined scenario to use for exection')
     run_parser.add_argument('--platform', dest="platform",
-                            help="The platform to use (podman, docker, terraform, shell, python)")
+                            help="The platform to use \
+(podman, docker, terraform, shell, python)")
     run_parser.add_argument('--vars', dest="vars",
                             default="",
                             help="extra variables")

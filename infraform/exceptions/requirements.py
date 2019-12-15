@@ -15,12 +15,12 @@ import crayons
 
 
 def service_down(inst):
-        """Notify user that service is down or the package is not installed."""
-        message = """
+    """Notify user that service is down or the package is not installed."""
+    message = """
 It looks like the service is down or the package is not installed.
 
 To fix it, try the following:
 
 {0}
 """.format(crayons.red(inst))
-        return message
+    return message

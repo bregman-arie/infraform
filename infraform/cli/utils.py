@@ -18,9 +18,11 @@ from infraform.exceptions.utils import success_or_exit
 
 SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
 
+
 def guess_platform(scenario):
     """Try to figure out which platform the user should use or fail."""
-    scenario_path, scenario_file = Platform.verify_scenario_exists(SCENARIOS_PATH, scenario)
+    scenario_path, scenario_file = Platform.verify_scenario_exists(
+        SCENARIOS_PATH, scenario)
     if scenario_file.endswith(".tf"):
         return "terraform"
     if scenario_file.endswith(".py"):
@@ -29,4 +31,6 @@ def guess_platform(scenario):
         return "shell"
     if os.path.dirname(scenario_path).split('/')[-1] == "podman":
         return "podman"
-    success_or_exit(1, "Couldn't figure out which platform to use. Please specify --platform")
+    success_or_exit(
+        1,
+        "Couldn't figure out which platform to use. Please specify --platform")

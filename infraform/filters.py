@@ -15,4 +15,4 @@ import os
 
 
 def env_override(value, key):
-  return os.getenv(key, value)
+    return os.getenv(key, value)

@@ -60,7 +60,8 @@ class Container(Platform):
     def run(self):
         """Run tests."""
         try:
-            cmd = "{0} run -v {1}:/{2}:z {3} /bin/bash -c 'cd {2}; {4}'".format(
+            cmd = "{0} run -v {1}:/{2}:z {3} \
+/bin/bash -c 'cd {2}; {4}'".format(
                 self.binary,
                 self.vars['project'],
                 self.vars['project_name'],
@@ -76,9 +77,9 @@ class Container(Platform):
 
     def image_not_exists(self):
         """Returns true if image exists."""
-        res = subprocess.run("{} inspect {}".format(self.binary, self.vars['image']),
-                             shell=True, stdout=subprocess.PIPE,
-                             stderr=subprocess.DEVNULL)
+        res = subprocess.run(
+            "{} inspect {}".format(self.binary, self.vars['image']),
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         return res.returncode
 
     def get_template(self, name):

@@ -22,6 +22,7 @@ def get_match_until_first_dot(string):
     until_dot_pattern = re.compile(r"^[^.]*")
     return re.search(until_dot_pattern, string).group(0)
 
+
 def get_description(f):
     desc = re.findall("description:(.*)", f.read())
     if desc:

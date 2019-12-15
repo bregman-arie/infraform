@@ -17,6 +17,7 @@ from infraform.list import list_scenarios
 
 LOG = logging.getLogger(__name__)
 
+
 def main(args):
     """Runner main entry."""
     LOG.info("Listing scenarios...\n")

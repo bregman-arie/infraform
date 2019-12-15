@@ -16,6 +16,7 @@ import sys
 
 LOG = logging.getLogger(__name__)
 
+
 def success_or_exit(rc, message=None):
     if rc != 0:
         LOG.error(message)

@@ -33,13 +33,16 @@ Usage Examples:
     $ {}
 
 """.format(crayons.red("run, list, destroy"),
-           crayons.yellow("infraform run --scenario os-1-vm-fip --vars \"provider_network=...\""),
-           crayons.yellow('ifr run --scenario pep8-tests --vars "project=/home/user/neutron"'),
+           crayons.yellow("infraform run --scenario \
+os-1-vm-fip --vars \"provider_network=...\""),
+           crayons.yellow('ifr run --scenario pep8-tests \
+--vars "project=/home/user/neutron"'),
            crayons.yellow('ifr list --scenarios'),
            crayons.yellow("ifr run --scenario pep8-tests --vars \
 'project=/my/project execute=\"git \
 checkout origin/some-branch; tox -e pep8\"'"))
     return message
+
 
 def missing_arg(arg):
     """Missing arg message format."""
@@ -58,7 +61,9 @@ https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios
 """.format(crayons.red(scenario))
     return message
 
+
 def missing_scenario_arg():
     """Missing scenario arg message format."""
-    message = "Please specify which scenario to run with {}".format(crayons.red("--scenario <SCENARIO_NAME>"))
+    message = "Please specify which scenario to run with \
+{}".format(crayons.red("--scenario <SCENARIO_NAME>"))
     return message

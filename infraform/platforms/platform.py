@@ -43,7 +43,7 @@ class Platform(object):
         if 'scenario' in self.args:
             self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
                 self.SCENARIOS_PATH, self.args['scenario'])
-             
+
             self.render_scenario()
 
             _, suffix = os.path.splitext(self.scenario_f)
@@ -68,9 +68,10 @@ class Platform(object):
     def create_new_vars(self):
         if 'project' in self.vars:
             if '/' in self.vars['project']:
-                self.vars['project_name'] = os.path.basename(self.vars['project'])
+                self.vars['project_name'] = os.path.basename(
+                    self.vars['project'])
             else:
-               self.vars['project_name'] = self.vars['project']
+                self.vars['project_name'] = self.vars['project']
 
     def get_vars(self, args):
         variables = {}
@@ -83,7 +84,8 @@ class Platform(object):
         """Validates the platform specified is ready for use."""
         res = subprocess.run("{} --version".format(self.binary), shell=True,
                              stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        success_or_exit(res.returncode, req_exc.service_down(self.installation))
+        success_or_exit(res.returncode,
+                        req_exc.service_down(self.installation))
 
     @staticmethod
     def verify_scenario_exists(scenarios_dir, scenario):
@@ -124,7 +126,8 @@ class Platform(object):
             rendered_scenario = template.render(vars=self.vars)
         except j2.exceptions.UndefinedError as e:
             LOG.error(e)
-            missing_arg = re.findall(r'no attribute (.*)', e.message)[0].strip("'")
+            missing_arg = re.findall(
+                r'no attribute (.*)', e.message)[0].strip("'")
             LOG.error(usage_exc.missing_arg(missing_arg))
             sys.exit(2)
         self.write_rendered_scenario(rendered_scenario)

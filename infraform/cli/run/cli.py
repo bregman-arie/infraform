@@ -30,7 +30,8 @@ def main(args):
     if args.scenario and not args.platform:
         args.platform = utils.guess_platform(args.scenario)
     if not args.scenario and not args.platform:
-        success_or_exit(1, "Couldn't figure out which platform to use. Please specify --platform")
+        success_or_exit(1, "Couldn't figure out which platform to use. \
+Please specify --platform")
     Platform = getattr(importlib.import_module(
         "infraform.platforms.{}".format(args.platform)),
         args.platform.capitalize())
