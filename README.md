@@ -1,5 +1,7 @@
 # InfraForm
 
+[![Build Status](https://travis-ci.org/bregman-arie/infraform.svg?branch=master)
+
 Unified interface for infrastructure related operations using predefined templates
 
 The idea is to quickly run common operations and yet, keep it dynamic enough so it can be done with different properties and on different locations.
@@ -51,6 +53,10 @@ elastic_summary | python | Print information on Elasticsearch server and indices
 ### List Scenarios
 
 You can list scenarios with `ifr list`
+
+### Show Scenario
+
+You can show scenario content with `ifr show <scenario_name>`
 
 ## Supported platforms and tools
 

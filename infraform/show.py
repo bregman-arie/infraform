@@ -11,25 +11,21 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import argparse
+import logging
+import os
 
-from infraform.cli.show import parser as show_parser
-from infraform.cli.run import parser as run_parser
-from infraform.cli.list import parser as list_parser
+from infraform.utils import get_match_until_first_dot
+
+LOG = logging.getLogger(__name__)
+
+SCENARIOS_PATH = os.path.dirname(__file__) + '/../infraform/scenarios'
 
 
-def create_parser():
-    """Returns argument parser"""
-
-    # Top level parser
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers()
-
-    parser.add_argument('--debug', '-d', action='store_true',
-                        dest="debug", help='Turn on debug')
-
-    run_parser.add_run_parser(subparsers)
-    list_parser.add_list_parser(subparsers)
-    show_parser.add_show_parser(subparsers)
-
-    return parser
+def show_scenario(scenario):
+    for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
+        for f in filenames:
+            name = get_match_until_first_dot(f)
+            if name == scenario:
+                scenario_path = dirpath + '/' + f
+                with open(scenario_path, 'r') as f:
+                    LOG.info(f.read())

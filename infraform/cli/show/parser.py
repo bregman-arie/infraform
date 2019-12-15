@@ -11,20 +11,13 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import logging
-import importlib
-
-from infraform.cli import utils
-
-LOG = logging.getLogger(__name__)
+from infraform.cli.show import cli as show_cli
 
 
-def main(args):
-    """Runner main entry."""
-    if args.scenario and not args.platform:
-        args.platform = utils.guess_platform(args.scenario)
-    Platform = getattr(importlib.import_module(
-        "infraform.platforms.{}".format(args.platform)),
-        args.platform.capitalize())
-    platform = Platform(args=args)
-    platform.destroy()
+def add_show_parser(subparsers):
+    """The parser for sub command 'show'."""
+    show_parser = subparsers.add_parser("show")
+    show_parser.set_defaults(func=show_cli.main)
+    show_parser.add_argument('scenario',
+                             type=str,
+                             help='scenario name')

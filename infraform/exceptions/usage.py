@@ -29,15 +29,19 @@ Usage Examples:
     List available scenarios:
     $ {}
 
+    Show scenario:
+    $ {}
+
     Run unit tests for nova project from git:
     $ {}
 
-""".format(crayons.red("run, list, destroy"),
+""".format(crayons.red("run, list, show"),
            crayons.yellow("infraform run --scenario \
 os-1-vm-fip --vars \"provider_network=...\""),
            crayons.yellow('ifr run --scenario pep8-tests \
 --vars "project=/home/user/neutron"'),
-           crayons.yellow('ifr list --scenarios'),
+           crayons.yellow('ifr list'),
+           crayons.yellow('ifr show <scenario_name>'),
            crayons.yellow("ifr run --scenario pep8-tests --vars \
 'project=/my/project execute=\"git \
 checkout origin/some-branch; tox -e pep8\"'"))
