@@ -13,6 +13,8 @@ podman = "*"
 jinja2 = "*"
 ansible = "*"
 elasticsearch = "*"
+tabluate = "*"
+tabulate = "*"
 
 [requires]
 python_version = "3.7"

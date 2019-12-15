@@ -4,6 +4,7 @@ execute: "git checkout origin/rhos-{{ vars['release'] }}.0-patches; tox -e py36"
 execute: "tox -e py36"
 {% endif %}
 image: unit-tests
+description: OpenStack Unit Tests (py36)
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
   RUN dnf install -y python36

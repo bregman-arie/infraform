@@ -50,7 +50,7 @@ elastic_summary | python | Print information on Elasticsearch server and indices
 
 ### List Scenarios
 
-You can list scenarios with `ifr list --scenarios`
+You can list scenarios with `ifr list`
 
 ## Supported platforms and tools
 

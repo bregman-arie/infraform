@@ -13,8 +13,10 @@
 #    under the License.
 import logging
 import os
+from tabulate import tabulate
 
 from infraform.utils import get_match_until_first_dot
+from infraform.utils import get_description
 
 LOG = logging.getLogger(__name__)
 
@@ -22,9 +24,13 @@ SCENARIOS_PATH = os.path.dirname(__file__) + '/../infraform/scenarios'
 
 
 def list_scenarios():
+    scenarios = []
+    headers = ["Scenario Name", "Path", "Description"]
     for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
         for f in filenames:
-            LOG.info(get_match_until_first_dot(f))
-            f_path = dirpath + '/' + f
-            with open(f_path, 'r') as f:
-                pass
+            name = get_match_until_first_dot(f)
+            scenario_path = dirpath + '/' + f
+            with open(scenario_path, 'r') as f:
+                description = get_description(f)
+            scenarios.append([name, scenario_path, description])
+    LOG.info(tabulate(scenarios, headers=headers))

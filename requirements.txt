@@ -1,5 +1,6 @@
 ansible
 crayons
+tabulate
 jinja2
 podman
 elasticsearch
