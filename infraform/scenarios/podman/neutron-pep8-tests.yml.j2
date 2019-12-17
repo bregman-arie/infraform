@@ -3,7 +3,7 @@ execute: "git checkout origin/rhos-{{ vars['release'] }}.0-patches; tox -e pep8"
 {% else %}
 execute: "tox -e pep8"
 {% endif %}
-image: octavia-pep8-tests
+image: neutron-pep8-tests
 dockerfile: |
   FROM {{ image_name|default("ubi7") }}
   RUN yum install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -14,4 +14,4 @@ dockerfile: |
   {% endif %}
  
   RUN yum install -y python-pip python-devel git gcc openssl-devel gettext gcc
-  RUN pip install tox==1.8
+  RUN pip install tox==2.3.2
