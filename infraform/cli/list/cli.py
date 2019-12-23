@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 import logging
 
 from infraform.list import list_scenarios
@@ -22,3 +23,6 @@ def main(args):
     """Runner main entry."""
     LOG.info("Listing scenarios...\n")
     list_scenarios()
+    LOG.info("\nTo display a scenario use {}\nTo run a scenario use {}".format(
+        crayons.yellow("ifr show <scenario_name>"),
+        crayons.yellow("ifr run --scenario <scenario_name>")))

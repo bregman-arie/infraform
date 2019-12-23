@@ -1,6 +1,6 @@
 # InfraForm
 
-[![Build Status](https://travis-ci.org/bregman-arie/infraform.svg?branch=master)
+[![Build Status](https://travis-ci.org/bregman-arie/infraform.svg?branch=master)](https://travis-ci.org/bregman-arie/infraform)
 
 Unified interface for infrastructure related operations using predefined templates
 
