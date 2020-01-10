@@ -121,7 +121,4 @@ terraform.tfstate*
 *.idea
 
 # Any rendered scenarios created by infraform
-*ansible
-*.yml
-*.sh
-.*.py
+/*.sh
