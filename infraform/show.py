@@ -23,7 +23,7 @@ SCENARIOS_PATH = os.path.dirname(__file__) + '/../infraform/scenarios'
 
 
 def show_scenario(scenario):
-    found=False
+    found = False
     for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
         for f in filenames:
             name = get_match_until_first_dot(f)
@@ -31,6 +31,6 @@ def show_scenario(scenario):
                 scenario_path = dirpath + '/' + f
                 with open(scenario_path, 'r') as f:
                     LOG.info(f.read())
-                    found=True
+                    found = True
     if not found:
         LOG.warning("Scenario not found: {}".format(crayons.red(scenario)))

@@ -1,0 +1,7 @@
+filebeat.inputs:
+  - type: log
+    paths:
+      - /usr/share/jenkins/jobs/*/builds/*/*log
+
+output.logstash:
+  hosts: ["logstash:5044"]

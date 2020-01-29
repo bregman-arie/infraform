@@ -1,3 +1,5 @@
+# description: Terraform single OpenStack instance with floating IP
+
 provider "openstack" {
   {% if "cloud" in vars %}
      cloud = "{{ vars['cloud'] }}"
@@ -24,7 +26,7 @@ resource "openstack_networking_subnet_v2" "test-subnet" {
 }
 
 resource "openstack_compute_keypair_v2" "keypair1" {
-  name = "keypair1"
+  name = "keypair2"
   public_key = "${file("~/.ssh/id_rsa.pub")}"
 }
 
@@ -68,7 +70,7 @@ resource "openstack_compute_secgroup_v2" "test-sg" {
 resource "openstack_compute_instance_v2" "test-server" {
   name = "{{ vars['instance_name']|default('test-server') }}"
   image_name = "{{ vars['image_name']|default('rhel-7.6-server-x86_64-latest') }}"
-  flavor_name = "{{ vars['flavor_name']|default('m1.large') }}"
+  flavor_name = "{{ vars['flavor']|default('m1.large') }}"
   key_pair = "${openstack_compute_keypair_v2.keypair1.name}"
   security_groups = formatlist("%s", openstack_compute_secgroup_v2.test-sg.name)
 

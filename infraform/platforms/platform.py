@@ -47,11 +47,15 @@ class Platform(object):
             self.render_scenario()
 
             _, suffix = os.path.splitext(self.scenario_f)
-            os.path.splitext('/path/to/somefile.ext')
             if suffix == ".yml" or suffix == ".yaml":
                 self.load_yaml_to_vars()
 
         self.create_new_vars()
+        self.create_workspace_dir()
+
+    def create_workspace_dir(self):
+        if not os.path.exists('.infraform'):
+            os.mkdir('.infraform')
 
     def load_yaml_to_vars(self):
         with open(self.scenario_f, 'r') as stream:

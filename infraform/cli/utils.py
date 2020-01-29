@@ -31,6 +31,8 @@ def guess_platform(scenario):
         return "shell"
     if os.path.dirname(scenario_path).split('/')[-1] == "podman":
         return "podman"
+    if "docker-compose" in os.path.dirname(scenario_path).split('/'):
+        return "docker_compose"
     success_or_exit(
         1,
         "Couldn't figure out which platform to use. Please specify --platform")
