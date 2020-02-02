@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 from ansible.parsing.splitter import split_args, parse_kv
+from difflib import SequenceMatcher
 import jinja2 as j2
 import logging
 import os
@@ -43,6 +44,7 @@ class Platform(object):
         if 'scenario' in self.args:
             self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
                 self.SCENARIOS_PATH, self.args['scenario'])
+            self.scenario_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
 
             self.render_scenario()
 
@@ -94,6 +96,7 @@ class Platform(object):
     @staticmethod
     def verify_scenario_exists(scenarios_dir, scenario):
         """Verifies scenario exists."""
+        similar = []
         for p, d, files in os.walk(scenarios_dir):
             for f in files:
                 until_dot_pattern = re.compile(r"^[^.]*")
@@ -105,6 +108,10 @@ class Platform(object):
                     scenario_file_path = p + '/' + f
                     scenario_file = file_name
                     return scenario_file_path, scenario_file
+                elif SequenceMatcher(None, file_without_suffix, scenario).ratio() >= 0.25:
+                    similar.append(file_without_suffix)
+        if similar:
+            LOG.info("Maybe you meant:\n\n{}".format("\n".join(similar)))
         success_or_exit(1, usage_exc.missing_scenario(scenario))
 
     @staticmethod

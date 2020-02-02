@@ -58,7 +58,7 @@ def missing_arg(arg):
 def missing_scenario(scenario):
     """Missing scenario message format."""
     message = """
-Couldn't find the the scenario: {0}
+Couldn't find the scenario: {0}
 
 New scenarios should be added here: \
 https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios

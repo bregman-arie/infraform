@@ -11,7 +11,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import shutil
 import logging
 import os
 import subprocess
@@ -35,8 +34,9 @@ class Docker_compose(Platform):
         super(Docker_compose, self).__init__(args)
 
     def prepare(self):
-        shutil.copytree(os.path.dirname(self.scenario_fpath),
-                        ".infraform/{}".format(self.scenario_fpath))
+        print(os.path.basename((self.scenario_fpath)))
+        import pdb
+        pdb.set_trace()
 
     def run(self):
         cmd = self.vars['execute']
