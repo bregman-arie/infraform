@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 from ansible.parsing.splitter import split_args, parse_kv
+import crayons
 from difflib import SequenceMatcher
 import jinja2 as j2
 import logging
@@ -111,7 +112,7 @@ class Platform(object):
                 elif SequenceMatcher(None, file_without_suffix, scenario).ratio() >= 0.25:
                     similar.append(file_without_suffix)
         if similar:
-            LOG.info("Maybe you meant:\n\n{}".format("\n".join(similar)))
+            LOG.info("Maybe you meant:\n\n{}".format(crayons.yellow("\n".join(similar))))
         success_or_exit(1, usage_exc.missing_scenario(scenario))
 
     @staticmethod

@@ -13,6 +13,7 @@
 #    under the License.
 import logging
 import os
+import shutil
 import subprocess
 
 from infraform.platforms.platform import Platform
@@ -34,12 +35,18 @@ class Docker_compose(Platform):
         super(Docker_compose, self).__init__(args)
 
     def prepare(self):
-        print(os.path.basename((self.scenario_fpath)))
-        import pdb
-        pdb.set_trace()
+        """Prepare environment for docker-compose execution."""
+        new_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
+        infraform_dir = os.path.expanduser('~') + '/.infraform/'
+        self.execution_dir = infraform_dir + new_dir
+        if os.path.isdir(self.execution_dir):
+            shutil.rmtree(self.execution_dir)
+        subprocess.call(['cp', '-r', os.path.dirname(self.scenario_fpath),
+                         infraform_dir])
 
     def run(self):
+        """Execution docker-compose."""
         cmd = self.vars['execute']
-        res = subprocess.run(cmd, shell=True)
+        res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
         success_or_exit(res.returncode)
         return res

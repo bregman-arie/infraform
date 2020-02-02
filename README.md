@@ -49,6 +49,7 @@ pep8-tests | Podman, Docker | Run PEP8 tests in a container | override_image
 unit-tests | Podman, Docker | Run unit tests in a container | override_image
 functional-tests | Podman, Docker | Run functional tests in a container |
 elastic_summary | python | Print information on Elasticsearch server and indices and performs query (optional) | es_server
+elk_filebeat_jenkins | Docker Compose | Create containerized ELK + Filbeat + Jenkins
 
 ### List Scenarios
 
