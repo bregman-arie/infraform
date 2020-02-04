@@ -1,1 +1,1 @@
-execute: docker-compose up -d
+execute: "mkdir jenkins;chown 1000 jenkins; docker-compose up -d"

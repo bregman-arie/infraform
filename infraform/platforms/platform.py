@@ -11,15 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from ansible.parsing.splitter import split_args, parse_kv
-import crayons
-from difflib import SequenceMatcher
-import jinja2 as j2
-import logging
 import os
 import re
+
+from difflib import SequenceMatcher
+import logging
 import subprocess
 import sys
+from ansible.parsing.splitter import split_args, parse_kv
+import crayons
+import jinja2 as j2
 import yaml
 
 from infraform import filters
@@ -45,7 +46,8 @@ class Platform(object):
         if 'scenario' in self.args:
             self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
                 self.SCENARIOS_PATH, self.args['scenario'])
-            self.scenario_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
+            self.scenario_dir = os.path.dirname(
+                self.scenario_fpath).split('/')[-1]
 
             self.render_scenario()
 
@@ -57,10 +59,12 @@ class Platform(object):
         self.create_workspace_dir()
 
     def create_workspace_dir(self):
+        """Create infraform workspace."""
         if not os.path.exists('.infraform'):
             os.mkdir('.infraform')
 
     def load_yaml_to_vars(self):
+        """Load any scenario YAML directives to variables."""
         with open(self.scenario_f, 'r') as stream:
             try:
                 scenario_yaml = yaml.safe_load(stream)
@@ -73,6 +77,7 @@ class Platform(object):
                 print(exc)
 
     def create_new_vars(self):
+        """Create additional variables out of existing variables."""
         if 'project' in self.vars:
             if '/' in self.vars['project']:
                 self.vars['project_name'] = os.path.basename(
@@ -81,6 +86,7 @@ class Platform(object):
                 self.vars['project_name'] = self.vars['project']
 
     def get_vars(self, args):
+        """Updates variables based on given arguments from CLI."""
         variables = {}
         args_split = split_args(args)
         for arg in args_split:
@@ -109,14 +115,17 @@ class Platform(object):
                     scenario_file_path = p + '/' + f
                     scenario_file = file_name
                     return scenario_file_path, scenario_file
-                elif SequenceMatcher(None, file_without_suffix, scenario).ratio() >= 0.25:
+                elif SequenceMatcher(None, file_without_suffix,
+                                     scenario).ratio() >= 0.25:
                     similar.append(file_without_suffix)
         if similar:
-            LOG.info("Maybe you meant:\n\n{}".format(crayons.yellow("\n".join(similar))))
+            LOG.info("Maybe you meant:\n\n{}".format(
+                crayons.yellow("\n".join(similar))))
         success_or_exit(1, usage_exc.missing_scenario(scenario))
 
     @staticmethod
     def execute_cmd(cmd, cwd=None):
+        """Executes a given command in the specified path."""
         subprocess.run(cmd, shell=True, cwd=cwd)
 
     def get_template(self, name):
@@ -126,10 +135,12 @@ class Platform(object):
         return template_content
 
     def write_rendered_scenario(self, scenario):
-        with open(self.scenario_f, 'w+') as f:
+        """Save the rendered scenario."""
+        with open('./' + self.scenario_f, 'w+') as f:
             f.write(scenario)
 
     def render_scenario(self):
+        """Render a scenario and save to disk."""
         j2_env = j2.Environment(loader=j2.FunctionLoader(
             self.get_template), trim_blocks=True, undefined=j2.StrictUndefined)
         j2_env.filters['env_override'] = filters.env_override
