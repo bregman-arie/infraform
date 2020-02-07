@@ -32,16 +32,20 @@ Usage Examples:
     Show scenario:
     $ {}
 
+    Remove elk stack
+    $ {}
+
     Run unit tests for nova project from git:
     $ {}
 
-""".format(crayons.red("run, list, show"),
+""".format(crayons.red("run, rm, list, show"),
            crayons.yellow("infraform run --scenario \
 os-1-vm-fip --vars \"provider_network=...\""),
            crayons.yellow('ifr run --scenario pep8-tests \
 --vars "project=/home/user/neutron"'),
            crayons.yellow('ifr list'),
            crayons.yellow('ifr show <scenario_name>'),
+           crayons.yellow('ifr rm --scenario elk_filebeat_jenkins'),
            crayons.yellow("ifr run --scenario pep8-tests --vars \
 'project=/my/project execute=\"git \
 checkout origin/some-branch; tox -e pep8\"'"))

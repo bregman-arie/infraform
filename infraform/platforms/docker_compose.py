@@ -50,3 +50,10 @@ class Docker_compose(Platform):
         res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
         success_or_exit(res.returncode)
         return res
+
+    def rm(self):
+        LOG.info("Removing")
+        cmd = self.vars['remove']
+        res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
+        success_or_exit(res.returncode)
+        return res

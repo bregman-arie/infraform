@@ -14,6 +14,7 @@
 import argparse
 
 from infraform.cli.show import parser as show_parser
+from infraform.cli.rm import parser as rm_parser
 from infraform.cli.run import parser as run_parser
 from infraform.cli.list import parser as list_parser
 
@@ -29,6 +30,7 @@ def create_parser():
                         dest="debug", help='Turn on debug')
 
     run_parser.add_run_parser(subparsers)
+    rm_parser.add_rm_parser(subparsers)
     list_parser.add_list_parser(subparsers)
     show_parser.add_show_parser(subparsers)
 
