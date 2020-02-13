@@ -1,0 +1,133 @@
+| db1aca88-67c7-441e-89bd-3712ae686e4d | 3c60f20f-3da0-4d06-9a2d-7ac8c92dcfcd | SUCCESS | None       | 2020-02-11 01:07:28 | 2020-02-11 01:07:29 |
++--------------------------------------+--------------------------------------+-----------------------------------------------------------------+--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------+--------------------------------------+---------+------------+---------------------+---------------------+
+FIN
+
+META: ran handlers
+META: ran handlers
+
+PLAY [Update Inventory from OSPD] **********************************************
+
+TASK [Gathering Facts] *********************************************************
+task path: /home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/update_inventory.yml:2
+Tuesday 11 February 2020  01:08:18 +0000 (0:00:46.417)       1:00:18.735 ****** 
+ok: [undercloud-0]
+META: ran handlers
+
+TASK [fetch the private key file from the undercloud] **************************
+task path: /home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/update_inventory.yml:11
+Tuesday 11 February 2020  01:08:21 +0000 (0:00:02.944)       1:00:21.680 ****** 
+changed: [undercloud-0] => {
+    "changed": true, 
+    "checksum": "9ad00b4db9c180a48ef6347d55b931204f89e950", 
+    "dest": "/home/rhos-ci/jenkins/workspace/x-job/infrared/.workspaces/workspace_2020-02-10_23-01-34/id_rsa_overcloud", 
+    "md5sum": "852e3575667815dce21577896b04e943", 
+    "remote_checksum": "9ad00b4db9c180a48ef6347d55b931204f89e950", 
+    "remote_md5sum": null
+}
+
+TASK [update file permissions] *************************************************
+task path: /home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/update_inventory.yml:17
+Tuesday 11 February 2020  01:08:22 +0000 (0:00:01.141)       1:00:22.821 ****** 
+ok: [undercloud-0 -> localhost] => {
+    "changed": false, 
+    "gid": 1001, 
+    "group": "rhos-ci", 
+    "mode": "0600", 
+    "owner": "rhos-ci", 
+    "path": "/home/rhos-ci/jenkins/workspace/x-job/infrared/.workspaces/workspace_2020-02-10_23-01-34/id_rsa_overcloud", 
+    "secontext": "unconfined_u:object_r:user_home_t:s0", 
+    "size": 1675, 
+    "state": "file", 
+    "uid": 1001
+}
+
+TASK [Refresh the overcloud node facts] ****************************************
+task path: /home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/update_inventory.yml:24
+Tuesday 11 February 2020  01:08:22 +0000 (0:00:00.402)       1:00:23.224 ****** 
+fatal: [undercloud-0 -> 172.16.0.94]: FAILED! => {
+    "changed": false
+}
+
+MSG:
+
+openstacksdk is required for this module
+
+
+NO MORE HOSTS LEFT *************************************************************
+	to retry, use: --limit @/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/main.retry
+
+PLAY RECAP *********************************************************************
+hypervisor                 : ok=2    changed=0    unreachable=0    failed=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0   
+undercloud-0               : ok=123  changed=52   unreachable=0    failed=1   
+
+Tuesday 11 February 2020  01:08:24 +0000 (0:00:01.753)       1:00:24.977 ****** 
+=============================================================================== 
+Execute the overcloud deploy script ---------------------------------- 3233.69s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/deploy.yml:80 
+containers/prepare-templates : Run *tripleo* container image prepare (OSP >= 14) - 156.52s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/roles/containers/prepare-templates/tasks/build/build_images.yml:114 
+Prepare Execute the deployment summary script -------------------------- 46.42s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/deploy.yml:122 
+Copy deployment folder ------------------------------------------------- 17.61s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/build_templates.yml:63 
+containers/prepare-templates : Reload SSHd ------------------------------ 6.01s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/roles/containers/prepare-templates/tasks/pre.yml:39 
+append all custom templates provided by the user in /home/stack/virt ---- 3.75s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/tasks/append_script.yml:109 
+Gathering Facts --------------------------------------------------------- 3.50s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/deploy.yml:49 
+Gathering Facts --------------------------------------------------------- 3.46s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/tls_everywhere.yml:6 
+read all flavors -------------------------------------------------------- 3.19s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/build_templates.yml:42 
+Gathering Facts --------------------------------------------------------- 3.16s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/hypervisor.yml:1 
+Gathering Facts --------------------------------------------------------- 2.94s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/update_inventory.yml:2 
+Gathering Facts --------------------------------------------------------- 2.86s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/install.yml:34 
+Ensure deployment folder nested structure exists ------------------------ 2.73s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/build_templates.yml:55 
+Gathering Facts --------------------------------------------------------- 2.51s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/pre.yml:1 
+Gathering Facts --------------------------------------------------------- 2.47s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/delete.yml:1 
+Gathering Facts --------------------------------------------------------- 2.47s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/deploy.yml:1 
+Gathering Facts --------------------------------------------------------- 2.47s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/build_templates.yml:32 
+append all custom templates provided by the user in /home/stack/virt ---- 2.37s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/tasks/append_script.yml:109 
+Gathering Facts --------------------------------------------------------- 2.36s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/fetchfiles.yml:1 
+containers/prepare-templates : Create one variable with all the environment yamls --- 2.36s
+/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/roles/containers/prepare-templates/tasks/env_files.yml:8 
+Playbook run took 0 days, 1 hours, 0 minutes, 24 seconds
+ERROR   Playbook "/home/rhos-ci/jenkins/workspace/x-job/infrared/plugins/tripleo-overcloud/main.yml" failed!
+[Pipeline] dir
+Running in /home/rhos-ci/jenkins/workspace/x-job
+[Pipeline] {
+[Pipeline] step
+Archiving artifacts
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] echo
+INFO: [sh2] ╰────────────────────────────────────────────────────────────
+[Pipeline] echo
+ERROR: [sh2] hudson.AbortException: script returned exit code 1
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] echo
+TEST_CASE choosen 
+[Pipeline] echo
+Error. The test case wasn't initialized.
+[Pipeline] echo
+TEST_CASE choosen 
+[Pipeline] dir
+Running in /home/rhos-ci/jenkins/workspace/blablabla
+[Pipeline] {
+[Pipeline] git
+Cloning the remote Git repository
