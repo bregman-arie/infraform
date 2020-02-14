@@ -48,8 +48,8 @@ setup-jenkins-node | Shell | Configures clean host as Jenkins node |
 pep8-tests | Podman, Docker | Run PEP8 tests in a container | override_image
 unit-tests | Podman, Docker | Run unit tests in a container | override_image
 functional-tests | Podman, Docker | Run functional tests in a container |
-elastic_summary | python | Print information on Elasticsearch server and indices and performs query (optional) | es_server
-elk_filebeat_jenkins | Docker Compose | Create containerized ELK + Filbeat + Jenkins
+elk_filebeat_jenkins | Docker Compose | Containerized ELK + Filbeat + Jenkins and process Jenkins build log
+elk_apache | Docker Compose | Containerized ELK and process Apache log
 
 ### List Scenarios
 
