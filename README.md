@@ -6,20 +6,25 @@ Unified interface for infrastructure related operations using predefined templat
 
 The idea is to quickly run common operations and yet, keep it dynamic enough so it can be done with different properties and on different locations.
 
+## Requirements
+
+* Linux
+* Python3
+
 ## Installation
 
-In order to use infraform you need to use Python3 and run the following commands:
-
-    pipenv shell
+    git clone https://github.com/bregman-arie/infraform
+    cd infraform
+    pipenv shell # Or virtualenv ~/ifr_venv && source ~/ifr_venv/bin/activate
     pipenv install -e .
 
-## Usage Examples
+## Usage
 
-### Provision OpenStack instance
+### Provision OpenStack instance with a floating IP
 
     infraform run --scenario os-1-vm-fip --vars="network_provider=..."
 
-### Run Python PEP8 inside a Podman container:
+### Run Python PEP8 test inside a Podman container:
 
     ifr run --scenario pep8-tests --vars 'project=/my/project'
 
@@ -31,9 +36,13 @@ You can also use more specific approach where you choose exactly what to execute
 
     infraform run --scenario jenkins_node --vars="jenkins_url=https://my.jenkins.com node_name=name-in-jenkins jenkins_user=abregman jenkins_password=my-API-token labels=my-hosts host=my.host.com credsid=xxx-xxx-xxx-xxx"
 
-### Elasticsearch summary + perform a query
+### Run ELK stack + Jenkins + Filebeat. Once running it will automatically process a build log and will also index it
 
-ifr run --scenario elastic_summary --vars "es_server='"http://<es_server>:9200"' index=my_index query='{\"someKey\": \"someValue\"}'"
+    ifr run --scenario elk_filebeat_jenkins
+
+### Run ELK stack and process an apache log
+
+    ifr run --scenario elk_apache
 
 ## Scenarios
 
@@ -67,6 +76,7 @@ Name | Comments
 :------ |:------:
 Podman | Run containers using Podman
 Docker | Run containers using Docker
+docker-compose | Run containers using Docker
 Terraform | Provision infrastucture using Terraform HCL files
 Python | Run Python programs
 Shell | Run Bash shell scripts
