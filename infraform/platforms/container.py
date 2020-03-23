@@ -49,9 +49,7 @@ class Container(Platform):
 
     def prepare(self):
         if self.image_not_exists() or (self.vars.get('override_image')):
-            LOG.warning(
-                "Couldn't find image: {}. Switching to image building".format(
-                    self.vars['image']))
+            LOG.warning("Building image: {}".format(self.vars['image']))
             dockerfile_path = self.write_dockerfile()
             self.build_image(dockerfile_path)
         if 'project' in self.vars:
@@ -105,6 +103,7 @@ class Container(Platform):
         """Builds image given df path."""
         cmd = "{} build -f {} -t {} .".format(
             self.binary, df_path, self.vars['image'])
+        LOG.info("Running: {}".format(cmd))
         res = subprocess.run(cmd, shell=True)
         if res.returncode != 0:
             sys.exit(2)
