@@ -27,3 +27,6 @@ def add_run_parser(subparsers):
     run_parser.add_argument('--vars', dest="vars",
                             default="",
                             help="extra variables")
+    run_parser.add_argument('--skip-check', dest="skip_check",
+                            action="store_true",
+                            help="Skip requirements check")

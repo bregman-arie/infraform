@@ -16,6 +16,7 @@ import re
 
 from difflib import SequenceMatcher
 import logging
+from pathlib import Path
 import subprocess
 import sys
 from ansible.parsing.splitter import split_args, parse_kv
@@ -40,7 +41,8 @@ class Platform(object):
         # vars are used for feeding scenario templates (jinja2)
         if 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
-        self.check_platform_avaiable()
+        if 'skip_check' not in self.args:
+            self.check_platform_avaiable()
 
         # If user specified scenario, make sure it exists
         if 'scenario' in self.args:
@@ -60,8 +62,9 @@ class Platform(object):
 
     def create_workspace_dir(self):
         """Create infraform workspace."""
-        if not os.path.exists('.infraform'):
-            os.mkdir('.infraform')
+        ifr_dir = str(Path.home()) + '/.infraform'
+        if not os.path.exists(ifr_dir):
+            os.mkdir(ifr_dir)
 
     def load_yaml_to_vars(self):
         """Load any scenario YAML directives to variables."""

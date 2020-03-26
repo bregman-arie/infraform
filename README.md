@@ -15,8 +15,8 @@ The idea is to quickly run common operations and yet, keep it dynamic enough so 
 
     git clone https://github.com/bregman-arie/infraform
     cd infraform
-    pipenv shell # Or virtualenv ~/ifr_venv && source ~/ifr_venv/bin/activate
-    pipenv install -e .
+    virtualenv ~/ifr_venv && source ~/ifr_venv/bin/activate
+    pipenv install .
 
 ## Usage
 
