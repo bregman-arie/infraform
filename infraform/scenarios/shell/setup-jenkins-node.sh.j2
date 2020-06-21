@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# TODD:
-# Create user
-# Create authorized keys directory
-# Add key to authorized keys
-# Install java
-
-sudo dnf install -y git
-
+useradd rhos-ci
+ssh-keygen
+# Add key to /home/rhos-ci/.ssh/authorized_keys
+chmod 644 /home/rhos-ci/.ssh/authorized_keys
+sudo dnf install -y git java python3-virtualenv gcc podman
 # certs
+cp -r /all_certs/* /etc/pki/ca-trust/source/anchors/
+update-ca-trust

@@ -10,3 +10,4 @@ network.host: 0.0.0.0
 #
 xpack.security.enabled: false
 http.max_content_length: "2147483647b"
+index.mapping.total_fields.limit: 2000

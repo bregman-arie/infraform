@@ -15,7 +15,7 @@ services:
       - "9200:9200"
       - "9300:9300"
     environment:
-      ES_JAVA_OPTS: "-Xmx8192m -Xms8192m"
+      ES_JAVA_OPTS: "-Xmx13g -Xms13g"
       discovery.type: single-node
     networks:
       - elk
