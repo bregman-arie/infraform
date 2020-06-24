@@ -10,7 +10,7 @@ dockerfile: |
 
   {% if "release" in vars %}
       RUN rhos-release {{ vars['release'] }}
-      RUN yum-config-manager --enable rhelosp-{{ vars['release'] }}.0-unittest
+      RUN yum-config-manager --enable rhelosp-{{ vars['release'] }}-unittest
   {% endif %}
  
   RUN yum install -y python-pip python-devel git gcc openssl-devel gettext gcc
