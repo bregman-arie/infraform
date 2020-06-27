@@ -54,7 +54,7 @@ class Platform(object):
             self.render_scenario()
 
             _, suffix = os.path.splitext(self.scenario_f)
-            if suffix == ".yml" or suffix == ".yaml":
+            if suffix == ".yml" or suffix == ".yaml" or suffix == ".ifr":
                 self.load_yaml_to_vars()
 
         self.create_new_vars()

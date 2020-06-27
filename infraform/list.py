@@ -25,12 +25,16 @@ SCENARIOS_PATH = os.path.dirname(__file__) + '/../infraform/scenarios'
 
 def list_scenarios():
     scenarios = []
+    # The headers of the table that will be displayed to the user
     headers = ["Scenario Name", "Path", "Description"]
     for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
         for f in filenames:
-            name = get_match_until_first_dot(f)
-            scenario_path = dirpath + '/' + f
-            with open(scenario_path, 'r') as f:
-                description = get_description(f)
-            scenarios.append([name, scenario_path, description])
+            if "." in f:
+                suffix = f.split('.')[1]
+                if suffix == "ifr":
+                    name = get_match_until_first_dot(f)
+                    scenario_path = dirpath + '/' + f
+                    with open(scenario_path, 'r') as f:
+                        description = get_description(f)
+                    scenarios.append([name, scenario_path, description])
     LOG.info(tabulate(scenarios, headers=headers))
