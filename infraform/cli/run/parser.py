@@ -30,3 +30,7 @@ def add_run_parser(subparsers):
     run_parser.add_argument('--skip-check', dest="skip_check",
                             action="store_true",
                             help="Skip requirements check")
+    run_parser.add_argument('--remote', dest="remote",
+                            default="",
+                            help="Execute the scenario on remote host \
+by specifying user@host")

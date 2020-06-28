@@ -119,10 +119,10 @@ class Platform(object):
                     scenario_file = file_name
                     return scenario_file_path, scenario_file
                 elif SequenceMatcher(None, file_without_suffix,
-                                     scenario).ratio() >= 0.25:
+                                     scenario).ratio() >= 0.25 and ".ifr" in f:
                     similar.append(file_without_suffix)
         if similar:
-            LOG.info("Maybe you meant:\n\n{}".format(
+            LOG.info("Perhaps you meant:\n\n{}".format(
                 crayons.yellow("\n".join(similar))))
         success_or_exit(1, usage_exc.missing_scenario(scenario))
 
