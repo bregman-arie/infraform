@@ -17,7 +17,7 @@ import crayons
 def general_usage():
     """Returns general usage string."""
     message = """
-Choose one of the following infraform commands: {}
+Choose one of the following infraform actions: {}
 Usage Examples:
 
     Provision an OpenStack instance with floating IP:
@@ -74,4 +74,16 @@ def missing_scenario_arg():
     """Missing scenario arg message format."""
     message = "Please specify which scenario to run with \
 {}".format(crayons.red("--scenario <SCENARIO_NAME>"))
+    return message
+
+
+def scenario_example(key):
+    """Template for a valid scenario"""
+    message = crayons.red("""Alfred: Sir, this is how a valid scenario looks like:
+
+---
+execute: <command_to_execute>
+
+It seems you forgot to provide the {} key
+""".format(key))
     return message

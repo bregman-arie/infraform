@@ -54,7 +54,7 @@ class Platform(object):
             self.render_scenario()
 
             _, suffix = os.path.splitext(self.scenario_f)
-            if suffix == ".yml" or suffix == ".yaml":
+            if suffix == ".yml" or suffix == ".yaml" or suffix == ".ifr":
                 self.load_yaml_to_vars()
 
         self.create_new_vars()
@@ -71,8 +71,14 @@ class Platform(object):
         with open(self.scenario_f, 'r') as stream:
             try:
                 scenario_yaml = yaml.safe_load(stream)
-                self.vars['scenario_vars'] = {
-                    k: v for k, v in scenario_yaml.items() if v is not None}
+                try:
+                    self.vars['scenario_vars'] = {
+                        k: v for k, v \
+                        in scenario_yaml.items() if v is not None}
+                except AttributeError:
+                    LOG.error(crayons.cyan("Alfred: I'm sorry sir, but it \
+looks like the scenario {} is empty".format(self.scenario_f)))
+                    sys.exit(2)
                 for k, v in scenario_yaml.items():
                     if k not in self.vars:
                         self.vars.update({k: v})
@@ -119,10 +125,10 @@ class Platform(object):
                     scenario_file = file_name
                     return scenario_file_path, scenario_file
                 elif SequenceMatcher(None, file_without_suffix,
-                                     scenario).ratio() >= 0.25:
+                                     scenario).ratio() >= 0.25 and ".ifr" in f:
                     similar.append(file_without_suffix)
         if similar:
-            LOG.info("Maybe you meant:\n\n{}".format(
+            LOG.info("Perhaps you meant:\n\n{}".format(
                 crayons.yellow("\n".join(similar))))
         success_or_exit(1, usage_exc.missing_scenario(scenario))
 
