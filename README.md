@@ -6,6 +6,8 @@ Unified interface for infrastructure related operations using predefined templat
 
 The idea is to quickly run common operations and yet, keep it dynamic enough so it can be done with different properties and on different locations.
 
+<div align="center"><img src="./images/infraform.png"></div><hr/>
+
 ## Requirements
 
 * Linux
@@ -67,6 +69,13 @@ You can list scenarios with `ifr list`
 ### Show Scenario
 
 You can show scenario content with `ifr show <scenario_name>`
+
+### Scenario Structure
+
+The format of a scenario is as follows:
+
+```
+```
 
 ## Supported platforms and tools
 

@@ -71,8 +71,14 @@ class Platform(object):
         with open(self.scenario_f, 'r') as stream:
             try:
                 scenario_yaml = yaml.safe_load(stream)
-                self.vars['scenario_vars'] = {
-                    k: v for k, v in scenario_yaml.items() if v is not None}
+                try:
+                    self.vars['scenario_vars'] = {
+                        k: v for k, v \
+                        in scenario_yaml.items() if v is not None}
+                except AttributeError:
+                    LOG.error(crayons.cyan("Alfred: I'm sorry sir, but it \
+looks like the scenario {} is empty".format(self.scenario_f)))
+                    sys.exit(2)
                 for k, v in scenario_yaml.items():
                     if k not in self.vars:
                         self.vars.update({k: v})

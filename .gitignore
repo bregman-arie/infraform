@@ -123,3 +123,4 @@ terraform.tfstate*
 # Any rendered scenarios created by infraform
 /*.sh
 /*.yml
+/*.ifr

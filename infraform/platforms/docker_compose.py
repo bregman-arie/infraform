@@ -11,13 +11,17 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 import logging
 import os
 import shutil
 import subprocess
+import sys
 
 from infraform.platforms.platform import Platform
 from infraform.exceptions.utils import success_or_exit
+from infraform.exceptions import usage
+from infraform.remote import execute_on_remote_host
 
 LOG = logging.getLogger(__name__)
 
@@ -46,8 +50,14 @@ class Docker_compose(Platform):
 
     def run(self):
         """Execution docker-compose."""
-        cmd = self.vars['execute']
-        res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
+        try:
+            cmd = self.vars['execute']
+        except KeyError:
+            cmd = "docker-compose up -d"
+        if "host" in self.args:
+            execute_on_remote_host(self.args['host'], cmd)
+        else:
+            res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
         success_or_exit(res.returncode)
         return res
 
