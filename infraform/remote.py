@@ -11,18 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import paramiko
-import getpass
+import subprocess
 
-def create_ssh_client():
-    """Returns paramiko SSH client."""
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    return ssh
 
 def execute_on_remote_host(host, cmd):
-    ssh = create_ssh_client()
-    ssh.connect(host)
-    stdin, stdout, stderr = ssh.exec_command('ls')
-    print(stdout.readlines())
-    ssh.close()
+    result = subprocess.check_output(['ssh', host, cmd])
+    print(result.stdout)

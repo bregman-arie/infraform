@@ -11,16 +11,13 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import crayons
 import logging
 import os
 import shutil
 import subprocess
-import sys
 
 from infraform.platforms.platform import Platform
 from infraform.exceptions.utils import success_or_exit
-from infraform.exceptions import usage
 from infraform.remote import execute_on_remote_host
 
 LOG = logging.getLogger(__name__)
@@ -30,11 +27,12 @@ class Docker_compose(Platform):
 
     PACKAGE = 'docker'
     BINARY = '/usr/local/bin/docker-compose'
+    INSTALLATION = "sudo dnf install docker"
 
     def __init__(self, args):
         self.binary = self.BINARY
         self.package = self.PACKAGE
-        self.installation = "sudo dnf install docker"
+        self.installation = self.INSTALLATION
 
         super(Docker_compose, self).__init__(args)
 

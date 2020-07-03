@@ -75,6 +75,8 @@ You can show scenario content with `ifr show <scenario_name>`
 The format of a scenario is as follows:
 
 ```
+---
+execute: <some_command>
 ```
 
 ## Supported platforms and tools

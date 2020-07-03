@@ -37,28 +37,32 @@ class Platform(object):
     SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
 
     def __init__(self, args):
+        # Load arguments provided by the user
         self.args = {k: v for k, v in vars(args).items() if v is not None}
         # vars are used for feeding scenario templates (jinja2)
         if 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
+        # Skip checking the platform or tool
         if 'skip_check' not in self.args:
             self.check_platform_avaiable()
-
         # If user specified scenario, make sure it exists
         if 'scenario' in self.args:
-            self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
-                self.SCENARIOS_PATH, self.args['scenario'])
-            self.scenario_dir = os.path.dirname(
-                self.scenario_fpath).split('/')[-1]
-
+            self.set_scenario_path_dir()
             self.render_scenario()
-
             _, suffix = os.path.splitext(self.scenario_f)
+            # Load YAML based scenario and save in self.vars
             if suffix == ".yml" or suffix == ".yaml" or suffix == ".ifr":
                 self.load_yaml_to_vars()
-
+        # Create additional vars based on passed ones
         self.create_new_vars()
+        # Create a workspace where all the files will be saved
         self.create_workspace_dir()
+
+    def set_scenario_path_dir(self):
+        self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
+            self.SCENARIOS_PATH, self.args['scenario'])
+        self.scenario_dir = os.path.dirname(
+            self.scenario_fpath).split('/')[-1]
 
     def create_workspace_dir(self):
         """Create infraform workspace."""
@@ -73,7 +77,7 @@ class Platform(object):
                 scenario_yaml = yaml.safe_load(stream)
                 try:
                     self.vars['scenario_vars'] = {
-                        k: v for k, v \
+                        k: v for k, v
                         in scenario_yaml.items() if v is not None}
                 except AttributeError:
                     LOG.error(crayons.cyan("Alfred: I'm sorry sir, but it \
