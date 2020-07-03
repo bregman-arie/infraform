@@ -48,7 +48,8 @@ You can also use more specific approach where you choose exactly what to execute
 
 ## Scenarios
 
-Scenario is a predefined instructions file or template. This is a platform dependent file (e.g. Terraform file) and not Infraform file. 
+Scenario is a predefined instructions file or template. It can be anything - creating a VM, run tests, set up ELK, ... you choose.
+Infraform provides with a couple of built-in scenarios
 
 Name | Platform | Description | Arguments
 :------ |:------:|:--------:|:---------:

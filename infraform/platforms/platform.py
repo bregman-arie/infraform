@@ -25,6 +25,7 @@ import jinja2 as j2
 import yaml
 
 from infraform import filters
+from infraform import process
 from infraform.exceptions import requirements as req_exc
 from infraform.exceptions import usage as usage_exc
 from infraform.exceptions.utils import success_or_exit
@@ -107,15 +108,8 @@ looks like the scenario {} is empty".format(self.scenario_f)))
 
     def check_platform_avaiable(self):
         """Validates the platform specified is ready for use."""
-        if "host" in self.args:
-            res = subprocess.run(["ssh", self.args['host'],
-                                  "{} --version".format(self.binary)],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
-        else:
-            res = subprocess.run("{} --version".format(self.binary),
-                                 shell=True, stderr=subprocess.PIPE,
-                                 stdout=subprocess.PIPE)
+        res = process.execute_cmd("{} --version".format(self.binary),
+                                  self.args['host'])
         success_or_exit(res.returncode,
                         req_exc.service_down(self.installation,
                                              host=self.args['host']))

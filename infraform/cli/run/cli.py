@@ -15,6 +15,7 @@ import logging
 import importlib
 import sys
 
+from infraform import process
 from infraform.cli import utils
 from infraform.exceptions.usage import missing_scenario_arg
 from infraform.exceptions.utils import success_or_exit
@@ -24,17 +25,20 @@ LOG = logging.getLogger(__name__)
 
 def main(args):
     """Runner main entry."""
-    if not args.scenario and not args.vars:
+    if not args.scenario and not args.command and not args.vars:
         LOG.error(missing_scenario_arg())
         sys.exit(2)
     if args.scenario and not args.platform:
         args.platform = utils.guess_platform(args.scenario)
-    if not args.scenario and not args.platform:
+    if not args.command and not args.scenario and not args.platform:
         success_or_exit(1, "Couldn't figure out which platform to use. \
 Please specify --platform")
-    Platform = getattr(importlib.import_module(
-        "infraform.platforms.{}".format(args.platform)),
-        args.platform.capitalize())
-    platform = Platform(args=args)
-    platform.prepare()
-    platform.run()
+    if not args.command:
+        Platform = getattr(importlib.import_module(
+            "infraform.platforms.{}".format(args.platform)),
+            args.platform.capitalize())
+        platform = Platform(args=args)
+        platform.prepare()
+        platform.run()
+    else:
+        process.execute_cmd(args.command, args.host)

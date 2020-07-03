@@ -20,7 +20,7 @@ def add_run_parser(subparsers):
     run_parser.set_defaults(func=run_cli.main)
     run_parser.add_argument('--scenario', '-s',
                             dest="scenario",
-                            help='Predefined scenario to use for exection')
+                            help='Predefined scenario to use for execution')
     run_parser.add_argument('--platform', dest="platform",
                             help="The platform to use \
 (podman, docker, terraform, shell, python)")

@@ -14,6 +14,11 @@
 import subprocess
 
 
-def execute_on_remote_host(host, cmd):
-    result = subprocess.check_output(['ssh', host, cmd])
-    print(result.stdout)
+def execute_cmd(command, host):
+    cmd = [command]
+    if host:
+        cmd = ["ssh", host] + [command]
+    res = subprocess.run(cmd)
+    #    stdout=subprocess.PIPE,
+    #    stderr=subprocess.PIPE)
+    return res
