@@ -37,13 +37,12 @@ class Platform(object):
     SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
 
     def __init__(self, args):
-        # Load arguments provided by the user
+        # Set arguments provided by the user
         self.args = {k: v for k, v in vars(args).items() if v is not None}
         # vars are used for feeding scenario templates (jinja2)
         if 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
-        # Skip checking the platform or tool
-        if 'skip_check' not in self.args:
+        if not self.args['skip_check']:
             self.check_platform_avaiable()
         # If user specified scenario, make sure it exists
         if 'scenario' in self.args:
@@ -108,10 +107,18 @@ looks like the scenario {} is empty".format(self.scenario_f)))
 
     def check_platform_avaiable(self):
         """Validates the platform specified is ready for use."""
-        res = subprocess.run("{} --version".format(self.binary), shell=True,
-                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        if "host" in self.args:
+            res = subprocess.run(["ssh", self.args['host'],
+                                  "{} --version".format(self.binary)],
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+        else:
+            res = subprocess.run("{} --version".format(self.binary),
+                                 shell=True, stderr=subprocess.PIPE,
+                                 stdout=subprocess.PIPE)
         success_or_exit(res.returncode,
-                        req_exc.service_down(self.installation))
+                        req_exc.service_down(self.installation,
+                                             host=self.args['host']))
 
     @staticmethod
     def verify_scenario_exists(scenarios_dir, scenario):

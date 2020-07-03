@@ -14,13 +14,17 @@
 import crayons
 
 
-def service_down(inst):
+def service_down(inst, host):
     """Notify user that service is down or the package is not installed."""
+    if host:
+        loc = "on the host {}".format(host)
+    else:
+        loc = "on this host"
     message = """
-It looks like the service is down or the package is not installed.
+It looks like the service is down or the package is not installed {0}
 
 To fix it, try the following:
 
-{0}
-""".format(crayons.red(inst))
+{1}
+""".format(crayons.red(loc), crayons.red(inst))
     return message
