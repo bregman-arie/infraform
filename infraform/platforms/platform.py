@@ -111,7 +111,7 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         res = process.execute_cmd("{} --version".format(self.binary),
                                   self.args['host'])
         success_or_exit(res.returncode,
-                        req_exc.service_down(self.installation,
+                        req_exc.missing_reqs(self.installation,
                                              host=self.args['host']))
 
     @staticmethod
