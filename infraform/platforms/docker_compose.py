@@ -27,8 +27,9 @@ class Docker_compose(Platform):
 
     PACKAGE = 'docker'
     BINARY = '/usr/local/bin/docker-compose'
-    INSTALLATION = "sudo curl  https://download.docker.com/linux/centos/docker\
--ce.repo -o /etc/yum.repos.d/docker-ce.repo\nsudo dnf install -y docker-compose"
+    INSTALLATION = ["sudo curl  https://download.docker.com/linux/centos/docker\
+-ce.repo -o /etc/yum.repos.d/docker-ce.repo", "sudo dnf install -y docker-compos\
+e"]
 
     def __init__(self, args):
         self.binary = self.BINARY
@@ -53,8 +54,9 @@ class Docker_compose(Platform):
             cmd = self.vars['execute']
         except KeyError:
             cmd = "docker-compose up -d"
-        if "host" in self.args:
-            porcess.execute_cmd(cmd, self.args['host'])
+        if "hosts" in self.args:
+            process.execute_cmd([cmd], self.args['hosts'])
+            res = "x"
         else:
             res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
         success_or_exit(res.returncode)

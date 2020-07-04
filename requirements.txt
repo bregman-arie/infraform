@@ -1,5 +1,6 @@
 ansible
 crayons
+fabric
 tabulate
 jinja2
 paramiko

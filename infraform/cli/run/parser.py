@@ -30,10 +30,10 @@ def add_run_parser(subparsers):
     run_parser.add_argument('--skip-check', dest="skip_check",
                             action="store_true",
                             help="Skip requirements check")
-    run_parser.add_argument('--host', dest="host",
-                            default="",
-                            help="Execute the scenario on the specified host \
+    run_parser.add_argument('--hosts', dest="hosts",
+                            default="", nargs='*',
+                            help="host(s) to execute the scenario/command on \
 by specifying host name or user@host")
-    run_parser.add_argument('--command', dest="command",
-                            default="",
-                            help="Command to execute instead of a scenario")
+    run_parser.add_argument('--commands', dest="commands",
+                            default="", nargs='*',
+                            help="Command(s) to execute instead of a scenario")

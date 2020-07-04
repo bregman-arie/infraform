@@ -98,6 +98,10 @@ Shell | Run Bash shell scripts
 Add new scenarios in `infraform/scenarios`.
 Scenario format depends on the platform. Any Scenario can be jinja2 template in order to get certain input from the user and not use fixed values.
 
+## Development
+
+If you are interested in developing Infraform further, please read [here](docs/developer.md)
+
 ## Contributions
 
 To contribute to the project use GitHub pull requests.

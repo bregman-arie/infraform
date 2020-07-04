@@ -17,7 +17,6 @@ import re
 from difflib import SequenceMatcher
 import logging
 from pathlib import Path
-import subprocess
 import sys
 from ansible.parsing.splitter import split_args, parse_kv
 import crayons
@@ -106,13 +105,23 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             variables.update(parse_kv(arg))
         return variables
 
+    def install_reqs(self):
+        ans = input("Alfred: Do you want me to try and fix that for you?\
+[yY/nN]: ")
+        if ans.lower() == "y":
+            process.execute_cmd(self.installation, self.args['hosts'])
+        else:
+            LOG.info("Alfred: Fine then, have a nice day :)")
+            sys.exit(2)
+
     def check_platform_avaiable(self):
         """Validates the platform specified is ready for use."""
-        res = process.execute_cmd("{} --version".format(self.binary),
-                                  self.args['host'])
-        success_or_exit(res.returncode,
-                        req_exc.missing_reqs(self.installation,
-                                             host=self.args['host']))
+        res = process.execute_cmd(["{} --version".format(self.binary)],
+                                  self.args['hosts'], exit_on_fail=False)
+        if not res or res[0].exited != 0:
+            LOG.error(req_exc.missing_reqs(self.installation,
+                                           hosts=self.args['hosts']))
+            self.install_reqs()
 
     @staticmethod
     def verify_scenario_exists(scenarios_dir, scenario):
@@ -136,11 +145,6 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             LOG.info("Perhaps you meant:\n\n{}".format(
                 crayons.yellow("\n".join(similar))))
         success_or_exit(1, usage_exc.missing_scenario(scenario))
-
-    @staticmethod
-    def execute_cmd(cmd, cwd=None):
-        """Executes a given command in the specified path."""
-        subprocess.run(cmd, shell=True, cwd=cwd)
 
     def get_template(self, name):
         """Returns jinja2 template."""

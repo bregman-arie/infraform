@@ -11,14 +11,35 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import subprocess
+from fabric import Connection
+import invoke
+import sys
 
 
-def execute_cmd(command, host):
-    cmd = [command]
-    if host:
-        cmd = ["ssh", host] + [command]
-    res = subprocess.run(cmd)
-    #    stdout=subprocess.PIPE,
-    #    stderr=subprocess.PIPE)
-    return res
+def execute_on_remote_host(commands, hosts, exit_on_fail=True):
+    """Execute commands remotely on a given host or hosts"""
+    results = []
+    for host in hosts:
+        c = Connection(host)
+        for cmd in commands:
+            try:
+                res = c.run(cmd)
+                results.append(res)
+            except invoke.exceptions.UnexpectedExit:
+                if exit_on_fail:
+                    sys.exit(2)
+    return results
+                    
+
+
+def execute_on_local_host(commands):
+    """Execute given commands on local host."""
+    pass
+
+
+def execute_cmd(commands, hosts=None, exit_on_fail=True):
+    """Execute given commands on remote hosts or locally."""
+    if hosts:
+        execute_on_remote_host(commands, hosts, exit_on_fail)
+    else:
+        execute_on_local_host(commands, exit_on_fail)

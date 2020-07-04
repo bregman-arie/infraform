@@ -28,9 +28,8 @@ class Container(Platform):
     def __init__(self, args, binary, package):
         self.binary = binary
         self.package = package
-        self.installation = "dnf install -y {0}\nsystemctl start {1}".format(
-            self.package,
-            self.binary)
+        self.installation = ["dnf install -y {0}\nsystemctl start {1}".format(
+            self.package, self.binary)]
 
         super(Container, self).__init__(args)
 
