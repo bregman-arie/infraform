@@ -11,9 +11,13 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 from fabric import Connection
 import invoke
+import logging
 import sys
+
+LOG = logging.getLogger(__name__)
 
 
 def execute_on_remote_host(commands, hosts, exit_on_fail=True):
@@ -23,6 +27,7 @@ def execute_on_remote_host(commands, hosts, exit_on_fail=True):
         c = Connection(host)
         for cmd in commands:
             try:
+                LOG.debug(crayons.red("Executing: {}".format(cmd)))
                 res = c.run(cmd)
                 results.append(res)
             except invoke.exceptions.UnexpectedExit:
@@ -30,7 +35,6 @@ def execute_on_remote_host(commands, hosts, exit_on_fail=True):
                     sys.exit(2)
     return results
                     
-
 
 def execute_on_local_host(commands):
     """Execute given commands on local host."""
@@ -40,6 +44,7 @@ def execute_on_local_host(commands):
 def execute_cmd(commands, hosts=None, exit_on_fail=True):
     """Execute given commands on remote hosts or locally."""
     if hosts:
-        execute_on_remote_host(commands, hosts, exit_on_fail)
+        res = execute_on_remote_host(commands, hosts, exit_on_fail)
     else:
-        execute_on_local_host(commands, exit_on_fail)
+        res = execute_on_local_host(commands, exit_on_fail)
+    return res

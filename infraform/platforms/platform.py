@@ -79,14 +79,14 @@ class Platform(object):
                         k: v for k, v
                         in scenario_yaml.items() if v is not None}
                 except AttributeError:
-                    LOG.error(crayons.cyan("Alfred: I'm sorry sir, but it \
+                    LOG.error(crayons.cyan("I'm sorry, but it \
 looks like the scenario {} is empty".format(self.scenario_f)))
                     sys.exit(2)
                 for k, v in scenario_yaml.items():
                     if k not in self.vars:
                         self.vars.update({k: v})
             except yaml.YAMLError as exc:
-                print(exc)
+                LOG.error(exc)
 
     def create_new_vars(self):
         """Create additional variables out of existing variables."""
@@ -106,12 +106,12 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         return variables
 
     def install_reqs(self):
-        ans = input("Alfred: Do you want me to try and fix that for you?\
+        ans = input("Do you want me to try and fix that for you?\
 [yY/nN]: ")
         if ans.lower() == "y":
             process.execute_cmd(self.installation, self.args['hosts'])
         else:
-            LOG.info("Alfred: Fine then, have a nice day :)")
+            LOG.info("Fine then, have a nice day :)")
             sys.exit(2)
 
     def check_platform_avaiable(self):

@@ -82,7 +82,7 @@ You can also instead, specify a command to execute with {}
 
 def scenario_example(key):
     """Template for a valid scenario"""
-    message = crayons.red("""Alfred: Sir, this is how a valid scenario looks like:
+    message = crayons.red("""This is how a valid scenario looks like:
 
 ---
 execute: <command_to_execute>

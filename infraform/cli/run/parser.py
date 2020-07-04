@@ -37,3 +37,6 @@ by specifying host name or user@host")
     run_parser.add_argument('--commands', dest="commands",
                             default="", nargs='*',
                             help="Command(s) to execute instead of a scenario")
+    run_parser.add_argument('--debug', dest="debug",
+                            action="store_true",
+                            help="Enable debug level logging")

@@ -21,7 +21,6 @@ def missing_reqs(inst, hosts):
     else:
         loc = "on this host"
     message = """
-Alfred: Sir, I'm unable to execute what you've requested from me
 There seems to be a problem {0}
 
 Perhaps try the following:

@@ -27,9 +27,7 @@ class Docker_compose(Platform):
 
     PACKAGE = 'docker'
     BINARY = '/usr/local/bin/docker-compose'
-    INSTALLATION = ["sudo curl  https://download.docker.com/linux/centos/docker\
--ce.repo -o /etc/yum.repos.d/docker-ce.repo", "sudo dnf install -y docker-compos\
-e"]
+    INSTALLATION = ["curl -L $(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep browser_download_url | cut -d '\"' -f 4 | grep Linux | grep x86_64$) -o docker-compose", "sudo mv docker-compose /usr/local/bin && sudo chmod +x /usr/local/bin/docker-compose"]
 
     def __init__(self, args):
         self.binary = self.BINARY
@@ -40,7 +38,9 @@ e"]
 
     def prepare(self):
         """Prepare environment for docker-compose execution."""
+        # .../scenarios/docker-compose/elk -> elk
         new_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
+        # $HOME/.infraform
         infraform_dir = os.path.expanduser('~') + '/.infraform/'
         self.execution_dir = infraform_dir + new_dir
         if os.path.isdir(self.execution_dir):

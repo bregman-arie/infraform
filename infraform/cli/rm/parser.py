@@ -27,3 +27,6 @@ def add_rm_parser(subparsers):
     rm_parser.add_argument('--vars', dest="vars",
                            default="",
                            help="extra variables")
+    rm_parser.add_argument('--debug', dest="debug",
+                           action="store_true",
+                           help="Enable debug level logging")

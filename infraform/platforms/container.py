@@ -67,7 +67,7 @@ class Container(Platform):
         except KeyError as e:
             LOG.error(usage.missing_arg(e.args[0]))
             sys.exit(2)
-        print(cmd)
+        LOG.info("Running: {}".format(cmd))
         res = subprocess.run(cmd, shell=True)
         success_or_exit(res.returncode)
         return res
