@@ -14,17 +14,26 @@
 import crayons
 
 
-def missing_reqs(inst, hosts):
+def missing_reqs(inst, hosts, failed_cmds=[]):
     """Message on missing requirements"""
     if hosts:
         loc = "on {}".format(' '.join(hosts))
     else:
         loc = "on this host"
+    if failed_cmds:
+        failures = "The following commands failed:\n\n{}".format(
+            crayons.red("\n".join(failed_cmds)))
+    else:
+        failures = ""
+
     message = """
 There seems to be a problem {0}
 
+{1}
+
 Perhaps try the following:
 
-{1}
-""".format(crayons.red(loc), crayons.cyan("\n".join(inst)))
+{2}
+""".format(crayons.red(loc), failures, crayons.cyan("\n".join(inst)))
+
     return message

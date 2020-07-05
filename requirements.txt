@@ -3,6 +3,6 @@ crayons
 fabric>=2.0.0
 tabulate
 jinja2
-pathchwork
+patchwork
 podman
 elasticsearch

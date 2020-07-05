@@ -35,14 +35,18 @@ LOG = logging.getLogger(__name__)
 class Platform(object):
 
     SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
+    READINESS_CHECK = []
 
     def __init__(self, args):
         # Set arguments provided by the user
         self.args = {k: v for k, v in vars(args).items() if v is not None}
+        # Array of commands to run in order to check the host is ready
+        if "hosts" in self.args:
+            self.READINESS_CHECK.append("rsync --version")
         # vars are used for feeding scenario templates (jinja2)
         if 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
-        if not self.args['skip_check']:
+        if not self.args['skip_check'] and hasattr(self, 'READINESS_CHECK'):
             self.check_platform_avaiable()
         # If user specified scenario, make sure it exists
         if 'scenario' in self.args:
@@ -106,8 +110,8 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         return variables
 
     def install_reqs(self):
-        ans = input("Do you want me to try and fix that for you?\
-[yY/nN]: ")
+        ans = input("Do you want me to try and fix that for you with the\
+ commands above? [yY/nN]: ")
         if ans.lower() == "y":
             process.execute_cmd(self.installation, self.args['hosts'])
         else:
@@ -116,12 +120,15 @@ looks like the scenario {} is empty".format(self.scenario_f)))
 
     def check_platform_avaiable(self):
         """Validates the platform specified is ready for use."""
-        res = process.execute_cmd(["{} --version".format(self.binary),
-                                   "rsync --version"],
-                                  self.args['hosts'], exit_on_fail=False)
-        if not res or res[0].exited != 0:
-            LOG.error(req_exc.missing_reqs(self.installation,
-                                           hosts=self.args['hosts']))
+        results = process.execute_cmd(self.READINESS_CHECK,
+                                      self.args['hosts'], warn_on_fail=True,
+                                      hide_output=True)
+        if not results or any(res.exited for res in results):
+            LOG.error(req_exc.missing_reqs(
+                self.installation,
+                hosts=self.args['hosts'],
+                failed_cmds=[res.command for res in results if \
+                             res.exited != 0]))
             self.install_reqs()
 
     @staticmethod
