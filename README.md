@@ -9,13 +9,14 @@ Unified interface for infrastructure related operations using dynamic, predefine
 * Execute locally or on remote hosts
 * Checks hosts are able to run the scenario and if not, modify the hosts accordingly
 
-Infraform aims to provides users with simple, yet dynamic, way to manage their infra related operations. Hope you'll enjoy using it :)
+Infraform aims to provides users with simple, yet dynamic, way to manage their infra related operations.
+Hope you'll enjoy using it :)
 
 <div align="center"><img src="./images/infraform.png"></div><hr/>
 
 ## Requirements
 
-* Linux (Tested on Fedora)
+* Linux (Developed and tested on Fedora)
 * Python>=3.7
 
 ## Installation
@@ -43,7 +44,7 @@ You can also use more specific approach where you choose exactly what to execute
 
     infraform run --scenario jenkins_node --vars="jenkins_url=https://my.jenkins.com node_name=name-in-jenkins jenkins_user=abregman jenkins_password=my-API-token labels=my-hosts host=my.host.com credsid=xxx-xxx-xxx-xxx"
 
-### Run ELK stack + Jenkins + Filebeat. Once running it will automatically process a build log and will also index it
+### Run ELK stack + Jenkins + Filebeat. Once running, it will automatically process a Jenkins build log and will also index it
 
     ifr run --scenario elk_filebeat_jenkins
 

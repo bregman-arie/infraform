@@ -11,8 +11,11 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
+import fabric
 import logging
 import os
+import patchwork.transfers
 import shutil
 import subprocess
 
@@ -27,7 +30,11 @@ class Docker_compose(Platform):
 
     PACKAGE = 'docker'
     BINARY = '/usr/local/bin/docker-compose'
-    INSTALLATION = ["curl -L $(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep browser_download_url | cut -d '\"' -f 4 | grep Linux | grep x86_64$) -o docker-compose", "sudo mv docker-compose /usr/local/bin && sudo chmod +x /usr/local/bin/docker-compose"]
+    INSTALLATION = ["curl -L $(curl -s https://api.github.com/repos/docker/c\
+ompose/releases/latest | grep browser_download_url | cut -d '\"' -f 4 | grep L\
+inux | grep x86_64$) -o docker-compose", "sudo mv docker-compose /usr/local/bin\
+&& sudo chmod +x /usr/local/bin/docker-compose"]
+    RUN = ["docker-compose up -d"]
 
     def __init__(self, args):
         self.binary = self.BINARY
@@ -36,29 +43,52 @@ class Docker_compose(Platform):
 
         super(Docker_compose, self).__init__(args)
 
+    def prepare_remote_host(self, host, s_dir):
+        """Prepares remote environment."""
+        c = fabric.Connection(host)
+        self.execution_dir = "~/.infraform/{}".format(s_dir)
+        LOG.debug(crayons.red(
+            "Copying scenario from {} to remote host: {}".format(
+                self.scenario_dir_path, host)))
+        patchwork.transfers.rsync(c, self.scenario_dir_path,
+                                  "~/.infraform")
+
+    def prepare_local_host(self, target_dir):
+        """Prepares local host environment."""
+        # $HOME/.infraform
+        infraform_dir = os.path.expanduser('~') + '/.infraform/'
+        # $HOME/.infraform/elk
+        self.execution_dir = infraform_dir + target_dir
+        # Checks if a current directory exists and removes it in case it does
+        if os.path.isdir(self.execution_dir):
+            shutil.rmtree(self.execution_dir)
+        # Copy scenario from infraform to $HOME/.infraform/elk/
+        subprocess.call(['cp', '-r', os.path.dirname(self.scenario_fpath),
+                         infraform_dir])
+
     def prepare(self):
         """Prepare environment for docker-compose execution."""
         # .../scenarios/docker-compose/elk -> elk
-        new_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
-        # $HOME/.infraform
-        infraform_dir = os.path.expanduser('~') + '/.infraform/'
-        self.execution_dir = infraform_dir + new_dir
-        if os.path.isdir(self.execution_dir):
-            shutil.rmtree(self.execution_dir)
-        subprocess.call(['cp', '-r', os.path.dirname(self.scenario_fpath),
-                         infraform_dir])
+        target_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
+        if "hosts" in self.args:
+            LOG.debug(crayons.red("Preparing remote environment"))
+            for host in self.args['hosts']:
+                self.prepare_remote_host(host, target_dir)
+        else:
+            LOG.debug(crayons.red("Preparing local environment"))
+            self.prepare_local_host(target_dir)
 
     def run(self):
         """Execution docker-compose."""
         try:
-            cmd = self.vars['execute']
+            cmds = self.vars['execute']
         except KeyError:
-            cmd = "docker-compose up -d"
+            cmds = self.RUN
         if "hosts" in self.args:
-            process.execute_cmd([cmd], self.args['hosts'])
-            res = "x"
+            process.execute_cmd(commands=cmds, hosts=self.args['hosts'],
+                                cwd=self.execution_dir)
         else:
-            res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
+            res = subprocess.run(cmds[0], shell=True, cwd=self.execution_dir)
         success_or_exit(res.returncode)
         return res
 

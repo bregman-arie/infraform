@@ -60,8 +60,8 @@ class Platform(object):
     def set_scenario_path_dir(self):
         self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
             self.SCENARIOS_PATH, self.args['scenario'])
-        self.scenario_dir = os.path.dirname(
-            self.scenario_fpath).split('/')[-1]
+        self.scenario_dir_path = os.path.dirname(self.scenario_fpath)
+        self.scenario_dir_name = self.scenario_dir_path.split('/')[-1]
 
     def create_workspace_dir(self):
         """Create infraform workspace."""
@@ -116,7 +116,8 @@ looks like the scenario {} is empty".format(self.scenario_f)))
 
     def check_platform_avaiable(self):
         """Validates the platform specified is ready for use."""
-        res = process.execute_cmd(["{} --version".format(self.binary)],
+        res = process.execute_cmd(["{} --version".format(self.binary),
+                                   "rsync --version"],
                                   self.args['hosts'], exit_on_fail=False)
         if not res or res[0].exited != 0:
             LOG.error(req_exc.missing_reqs(self.installation,
