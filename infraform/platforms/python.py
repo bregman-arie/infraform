@@ -14,6 +14,7 @@
 import logging
 
 from infraform.platforms.platform import Platform
+from infraform import process
 
 LOG = logging.getLogger(__name__)
 
@@ -26,11 +27,12 @@ class Python(Platform):
     def __init__(self, args):
         self.binary = self.BINARY
         self.package = self.PACKAGE
-        self.installation = "yum install python"
+        self.installation = ["dnf install -y python"]
         super(Python, self).__init__(args)
 
     def prepare(self):
         self.render_scenario()
 
     def run(self):
-        self.execute_cmd("chmod +x {0}; python {0}".format(self.scenario_f))
+        process.execute_cmd(["chmod +x {}".format(self.scenario_f),
+                             "python {}".format(self.scenario_f)])

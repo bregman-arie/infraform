@@ -72,14 +72,17 @@ https://github.com/bregman-arie/infraform/tree/master/infraform/scenarios
 
 def missing_scenario_arg():
     """Missing scenario arg message format."""
-    message = "Please specify which scenario to run with \
-{}".format(crayons.red("--scenario <SCENARIO_NAME>"))
+    message = """
+Please specify which scenario to run with {}
+You can also instead, specify a command to execute with {}
+""".format(crayons.red("--scenario <SCENARIO_NAME>"),
+           crayons.red("--host <HOST> --command <COMMAND>"))
     return message
 
 
 def scenario_example(key):
     """Template for a valid scenario"""
-    message = crayons.red("""Alfred: Sir, this is how a valid scenario looks like:
+    message = crayons.red("""This is how a valid scenario looks like:
 
 ---
 execute: <command_to_execute>

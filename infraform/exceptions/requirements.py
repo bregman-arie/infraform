@@ -14,13 +14,26 @@
 import crayons
 
 
-def service_down(inst):
-    """Notify user that service is down or the package is not installed."""
+def missing_reqs(inst, hosts, failed_cmds=[]):
+    """Message on missing requirements"""
+    if hosts:
+        loc = "on {}".format(' '.join(hosts))
+    else:
+        loc = "on this host"
+    if failed_cmds:
+        failures = "The following commands failed:\n\n{}".format(
+            crayons.red("\n".join(failed_cmds)))
+    else:
+        failures = ""
+
     message = """
-It looks like the service is down or the package is not installed.
+There seems to be a problem {0}
 
-To fix it, try the following:
+{1}
 
-{0}
-""".format(crayons.red(inst))
+Perhaps try the following:
+
+{2}
+""".format(crayons.red(loc), failures, crayons.cyan("\n".join(inst)))
+
     return message

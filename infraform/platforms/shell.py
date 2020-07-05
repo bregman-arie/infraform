@@ -14,6 +14,7 @@
 import logging
 
 from infraform.platforms.platform import Platform
+from infraform import process
 
 LOG = logging.getLogger(__name__)
 
@@ -26,14 +27,12 @@ class Shell(Platform):
     def __init__(self, args):
         self.binary = self.BINARY
         self.package = self.PACKAGE
-        self.installation = "yum install bash"
+        self.installation = ["dnf install -y bash"]
         super(Shell, self).__init__(args)
 
     def prepare(self):
         self.render_scenario()
 
     def run(self):
-        if 'host' in self.vars:
-            self.execute_script_remotely()
-        else:
-            self.execute_cmd("chmod +x {0}; ./{0}".format(self.scenario_f))
+        process.execute_cmd(["chmod +x {}".format(self.scenario_f),
+                             "./{0}".format(self.scenario_f)])

@@ -1,7 +1,8 @@
 ansible
 crayons
+fabric>=2.0.0
 tabulate
 jinja2
-paramiko
+patchwork
 podman
 elasticsearch

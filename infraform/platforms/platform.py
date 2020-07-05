@@ -17,7 +17,6 @@ import re
 from difflib import SequenceMatcher
 import logging
 from pathlib import Path
-import subprocess
 import sys
 from ansible.parsing.splitter import split_args, parse_kv
 import crayons
@@ -25,6 +24,7 @@ import jinja2 as j2
 import yaml
 
 from infraform import filters
+from infraform import process
 from infraform.exceptions import requirements as req_exc
 from infraform.exceptions import usage as usage_exc
 from infraform.exceptions.utils import success_or_exit
@@ -35,30 +35,37 @@ LOG = logging.getLogger(__name__)
 class Platform(object):
 
     SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
+    READINESS_CHECK = []
 
     def __init__(self, args):
+        # Set arguments provided by the user
         self.args = {k: v for k, v in vars(args).items() if v is not None}
+        # Array of commands to run in order to check the host is ready
+        if "hosts" in self.args:
+            self.READINESS_CHECK.append("rsync --version")
         # vars are used for feeding scenario templates (jinja2)
         if 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
-        if 'skip_check' not in self.args:
+        if not self.args['skip_check'] and hasattr(self, 'READINESS_CHECK'):
             self.check_platform_avaiable()
-
         # If user specified scenario, make sure it exists
         if 'scenario' in self.args:
-            self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
-                self.SCENARIOS_PATH, self.args['scenario'])
-            self.scenario_dir = os.path.dirname(
-                self.scenario_fpath).split('/')[-1]
-
+            self.set_scenario_path_dir()
             self.render_scenario()
-
             _, suffix = os.path.splitext(self.scenario_f)
+            # Load YAML based scenario and save in self.vars
             if suffix == ".yml" or suffix == ".yaml" or suffix == ".ifr":
                 self.load_yaml_to_vars()
-
+        # Create additional vars based on passed ones
         self.create_new_vars()
+        # Create a workspace where all the files will be saved
         self.create_workspace_dir()
+
+    def set_scenario_path_dir(self):
+        self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
+            self.SCENARIOS_PATH, self.args['scenario'])
+        self.scenario_dir_path = os.path.dirname(self.scenario_fpath)
+        self.scenario_dir_name = self.scenario_dir_path.split('/')[-1]
 
     def create_workspace_dir(self):
         """Create infraform workspace."""
@@ -73,17 +80,17 @@ class Platform(object):
                 scenario_yaml = yaml.safe_load(stream)
                 try:
                     self.vars['scenario_vars'] = {
-                        k: v for k, v \
+                        k: v for k, v
                         in scenario_yaml.items() if v is not None}
                 except AttributeError:
-                    LOG.error(crayons.cyan("Alfred: I'm sorry sir, but it \
+                    LOG.error(crayons.cyan("I'm sorry, but it \
 looks like the scenario {} is empty".format(self.scenario_f)))
                     sys.exit(2)
                 for k, v in scenario_yaml.items():
                     if k not in self.vars:
                         self.vars.update({k: v})
             except yaml.YAMLError as exc:
-                print(exc)
+                LOG.error(exc)
 
     def create_new_vars(self):
         """Create additional variables out of existing variables."""
@@ -102,12 +109,27 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             variables.update(parse_kv(arg))
         return variables
 
+    def install_reqs(self):
+        ans = input("Do you want me to try and fix that for you with the\
+ commands above? [yY/nN]: ")
+        if ans.lower() == "y":
+            process.execute_cmd(self.installation, self.args['hosts'])
+        else:
+            LOG.info("Fine then, have a nice day :)")
+            sys.exit(2)
+
     def check_platform_avaiable(self):
         """Validates the platform specified is ready for use."""
-        res = subprocess.run("{} --version".format(self.binary), shell=True,
-                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        success_or_exit(res.returncode,
-                        req_exc.service_down(self.installation))
+        results = process.execute_cmd(self.READINESS_CHECK,
+                                      self.args['hosts'], warn_on_fail=True,
+                                      hide_output=True)
+        if not results or any(res.exited for res in results):
+            LOG.error(req_exc.missing_reqs(
+                self.installation,
+                hosts=self.args['hosts'],
+                failed_cmds=[res.command for res in results if \
+                             res.exited != 0]))
+            self.install_reqs()
 
     @staticmethod
     def verify_scenario_exists(scenarios_dir, scenario):
@@ -131,11 +153,6 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             LOG.info("Perhaps you meant:\n\n{}".format(
                 crayons.yellow("\n".join(similar))))
         success_or_exit(1, usage_exc.missing_scenario(scenario))
-
-    @staticmethod
-    def execute_cmd(cmd, cwd=None):
-        """Executes a given command in the specified path."""
-        subprocess.run(cmd, shell=True, cwd=cwd)
 
     def get_template(self, name):
         """Returns jinja2 template."""

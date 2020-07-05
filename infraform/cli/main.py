@@ -27,12 +27,20 @@ def setup_logging(debug):
     logging.basicConfig(level=level, format=format)
 
 
+def set_logging_level(module, level):
+    logging.getLogger(module).setLevel(level)
+
+
 def main():
     """Main Entry."""
     # Parse arguments provided by the user
     parser = app_parser.create_parser()
     args = parser.parse_args()
     setup_logging(args.debug)
+    # These modules produces a lot of debug information
+    # when logging set to DEBUG. We set it back to WARNING
+    for module in ['fabric', 'paramiko', 'invoke']:
+        set_logging_level(module, logging.WARNING)
 
     if hasattr(args, 'func'):
         args.func(args)

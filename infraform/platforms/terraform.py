@@ -14,6 +14,7 @@
 import logging
 
 from infraform.platforms.platform import Platform
+from infraform import process
 
 LOG = logging.getLogger(__name__)
 
@@ -22,11 +23,10 @@ class Terraform(Platform):
 
     PACKAGE = 'terraform'
     BINARY = 'terraform'
-    INSTALLATION = (
-        "export version=0.12.10\nwget https://releases.hashicorp.com" +
-        "/terraform/${version}/terraform_${version}_linux_amd64.zip" +
-        "\nunzip terraform_${version}_linux_amd64.zip" +
-        "\nsudo mv terraform /usr/local/bin/")
+    INSTALLATION = ["export version=0.12.10\nwget https://releases.hashico\
+rp.com/terraform/${version}/terraform_${version}_linux_amd64.zip",
+                    "unzip terraform_${version}_linux_amd64.zip",
+                    "sudo mv terraform /usr/local/bin/"]
 
     def __init__(self, args):
         self.binary = self.BINARY
@@ -35,7 +35,7 @@ class Terraform(Platform):
         super(Terraform, self).__init__(args)
 
     def prepare(self):
-        self.execute_cmd('terraform init')
+        process.execute_cmd(['terraform init'])
 
     def run(self):
-        self.execute_cmd('terraform apply')
+        process.execute_cmd(['terraform apply'])
