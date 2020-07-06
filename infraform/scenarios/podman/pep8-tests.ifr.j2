@@ -11,8 +11,8 @@ dockerfile: |
   RUN dnf install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
 
   {% if 'release' in vars %}
-      RUN rhos-release {{ vars['release'] }}
+      RUN rhos-release 15-trunk
       RUN dnf config-manager --enable rhelosp-{{ vars['release'] }}-unittest
   {% endif %}
  
-  RUN dnf install -y python3-devel python2-devel git gcc openssl-devel gettext redhat-rpm-config
+  RUN dnf install -y python3-devel python2-devel git gcc openssl-devel gettext redhat-rpm-config diffutils

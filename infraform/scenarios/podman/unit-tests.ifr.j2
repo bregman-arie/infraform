@@ -16,4 +16,4 @@ dockerfile: |
       RUN dnf config-manager --enable rhelosp-{{ vars['release'] }}-unittest
   {% endif %}
  
-  RUN dnf install -y python3-devel git gcc openssl-devel gettext procps iproute
+  RUN dnf install -y python3-devel git gcc openssl-devel gettext procps iproute diffutils
