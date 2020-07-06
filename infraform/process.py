@@ -17,8 +17,6 @@ import invoke
 import logging
 import sys
 
-from infraform.exceptions.utils import success_or_exit
-
 LOG = logging.getLogger(__name__)
 
 

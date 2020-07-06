@@ -127,7 +127,7 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             LOG.error(req_exc.missing_reqs(
                 self.installation,
                 hosts=self.args['hosts'],
-                failed_cmds=[res.command for res in results if \
+                failed_cmds=[res.command for res in results if
                              res.exited != 0]))
             self.install_reqs()
 

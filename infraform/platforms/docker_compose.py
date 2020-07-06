@@ -90,12 +90,14 @@ er.com/linux/centos/docker-ce.repo",
         except KeyError:
             cmds = self.RUN
         if "hosts" in self.args:
-            process.execute_cmd(commands=cmds, hosts=self.args['hosts'],
-                                cwd=self.execution_dir)
+            results = process.execute_cmd(
+                commands=cmds, hosts=self.args['hosts'],
+                cwd=self.execution_dir)
         else:
-            res = subprocess.run(cmds[0], shell=True, cwd=self.execution_dir)
-        success_or_exit(res.returncode)
-        return res
+            results = process.execute_cmd(commands=cmds,
+                                          cwd=self.execution_dir)
+        [success_or_exit(res.exited) for res in results]
+        return results
 
     def rm(self):
         LOG.info("Removing")
