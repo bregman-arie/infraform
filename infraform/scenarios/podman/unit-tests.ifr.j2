@@ -16,4 +16,5 @@ dockerfile: |
       RUN dnf config-manager --enable rhelosp-{{ vars['release'] }}-unittest
   {% endif %}
  
+  RUN alternatives --set python /usr/bin/python3
   RUN dnf install -y python3-devel git gcc openssl-devel gettext procps iproute diffutils
