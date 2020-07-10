@@ -29,3 +29,10 @@ def get_description(f):
         return desc[0]
     else:
         return "-"
+
+
+def get_file_content(file_path):
+    """Returns file content."""
+    with open(file_path, 'r+') as f:
+        file_content = f.read()
+    return file_content

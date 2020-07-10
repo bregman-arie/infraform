@@ -11,21 +11,21 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import fabric
 import os
+import patchwork.transfers
 import re
 
-from difflib import SequenceMatcher
 import logging
 from pathlib import Path
+import shutil
 import sys
 from ansible.parsing.splitter import split_args, parse_kv
 import crayons
-import jinja2 as j2
 import yaml
 
 from infraform.executor import Executor
-from infraform.executor import Executor
-from infraform import filters
+from infraform.scenario import Scenario
 from infraform.exceptions import requirements as req_exc
 from infraform.exceptions import usage as usage_exc
 from infraform.exceptions.utils import success_or_exit
@@ -36,45 +36,26 @@ LOG = logging.getLogger(__name__)
 class Platform(object):
 
     SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
-    READINESS_CHECK = []
 
-    def __init__(self, args, installation=None, run=None,
+    def __init__(self, args, installation=None, run_platform=None,
                  readiness_check=None, binary=None, name=None, rm=None):
-        # Set arguments provided by the user
         self.args = {k: v for k, v in vars(args).items() if v is not None}
-        
         self.installation = installation
-        self.run = run
+        self.run_platform = run_platform
         self.binary = binary
         self.name = name
         self.readiness_check = readiness_check
+
         # Array of commands to run in order to check the host is ready
         if "hosts" in self.args:
-            self.READINESS_CHECK.append("rsync --version")
-        # vars are used for feeding scenario templates (jinja2)
+            self.readiness_check.append("rsync --version")
+        # vars are used for feeding scenario template
         if 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
-        if not self.args['skip_check'] and hasattr(self, 'READINESS_CHECK'):
-            self.check_platform_avaiable()
-        # If user specified scenario, make sure it exists
-        if 'scenario' in self.args:
-            self.set_scenario_path_dir()
-            self.render_scenario()
-            _, suffix = os.path.splitext(self.scenario_f)
-            # Load YAML based scenario and save in self.vars
-            if suffix == ".yml" or suffix == ".yaml" or suffix == ".ifr":
-                self.load_yaml_to_vars()
         # Create additional vars based on passed ones
         self.create_new_vars()
         # Create a workspace where all the files will be saved
         self.create_workspace_dir()
-
-    def set_scenario_path_dir(self):
-        self.scenario_fpath, self.scenario_f = self.verify_scenario_exists(
-            self.SCENARIOS_PATH, self.args['scenario'])
-        self.scenario_dir_path = os.path.dirname(self.scenario_fpath)
-        self.scenario_dir_name = self.scenario_dir_path.split('/')[-1]
-        print("==== {}".format(self.scenario_dir_name))
 
     def create_workspace_dir(self):
         """Create infraform workspace."""
@@ -84,7 +65,7 @@ class Platform(object):
 
     def load_yaml_to_vars(self):
         """Load any scenario YAML directives to variables."""
-        with open(self.scenario_f, 'r') as stream:
+        with open(self.scenario.file_name, 'r') as stream:
             try:
                 scenario_yaml = yaml.safe_load(stream)
                 try:
@@ -93,7 +74,7 @@ class Platform(object):
                         in scenario_yaml.items() if v is not None}
                 except AttributeError:
                     LOG.error(crayons.cyan("I'm sorry, but it \
-looks like the scenario {} is empty".format(self.scenario_f)))
+looks like the scenario {} is empty".format(self.scenario.file_name)))
                     sys.exit(2)
                 for k, v in scenario_yaml.items():
                     if k not in self.vars:
@@ -129,69 +110,19 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             LOG.info("Fine then, have a nice day :)")
             sys.exit(2)
 
-    def check_platform_avaiable(self):
+    def check_host_readiness(self):
         """Validates the platform specified is ready for use."""
-        exe = Executor(commands=self.READINESS_CHECK,
+        exe = Executor(commands=self.readiness_check,
                        hosts=self.args['hosts'], warn_on_fail=True,
                        hide_output=True)
         results = exe.run()
+
         if not results or any(res.exited for res in results):
             LOG.error(req_exc.missing_reqs(
-                self.installation,
-                hosts=self.args['hosts'],
+                self.installation, hosts=self.args['hosts'],
                 failed_cmds=[res.command for res in results if
                              res.exited != 0]))
             self.install_reqs()
-
-    @staticmethod
-    def verify_scenario_exists(scenarios_dir, scenario):
-        """Verifies scenario exists."""
-        similar = []
-        for p, d, files in os.walk(scenarios_dir):
-            for f in files:
-                until_dot_pattern = re.compile(r"^[^.]*")
-                file_without_suffix = re.search(until_dot_pattern, f).group(0)
-                file_name = f
-                if f.endswith('.j2'):
-                    file_name = f[:-3]
-                if file_without_suffix == scenario:
-                    scenario_file_path = p + '/' + f
-                    scenario_file = file_name
-                    return scenario_file_path, scenario_file
-                elif SequenceMatcher(None, file_without_suffix,
-                                     scenario).ratio() >= 0.25 and ".ifr" in f:
-                    similar.append(file_without_suffix)
-        if similar:
-            LOG.info("Perhaps you meant:\n\n{}".format(
-                crayons.yellow("\n".join(similar))))
-        success_or_exit(1, usage_exc.missing_scenario(scenario))
-
-    def get_template(self, name):
-        """Returns jinja2 template."""
-        with open(name, 'r+') as open_f:
-            template_content = open_f.read()
-        return template_content
-
-    def write_rendered_scenario(self, scenario):
-        """Save the rendered scenario."""
-        with open('./' + self.scenario_f, 'w+') as f:
-            f.write(scenario)
-
-    def render_scenario(self):
-        """Render a scenario and save to disk."""
-        j2_env = j2.Environment(loader=j2.FunctionLoader(
-            self.get_template), trim_blocks=True, undefined=j2.StrictUndefined)
-        j2_env.filters['env_override'] = filters.env_override
-        template = j2_env.get_template(self.scenario_fpath)
-        try:
-            rendered_scenario = template.render(vars=self.vars)
-        except j2.exceptions.UndefinedError as e:
-            LOG.error(e)
-            missing_arg = re.findall(
-                r'no attribute (.*)', e.message)[0].strip("'")
-            LOG.error(usage_exc.missing_arg(missing_arg))
-            sys.exit(2)
-        self.write_rendered_scenario(rendered_scenario)
 
     def prepare_remote_host(self, host, s_dir):
         """Prepares remote environment."""
@@ -199,8 +130,8 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         self.execution_dir = "~/.infraform/{}".format(s_dir)
         LOG.debug(crayons.red(
             "Copying scenario from {} to remote host: {}".format(
-                self.scenario_dir_path, host)))
-        patchwork.transfers.rsync(c, self.scenario_dir_path,
+                self.scenario.dir_path, host)))
+        patchwork.transfers.rsync(c, self.scenario.dir_path,
                                   "~/.infraform")
 
     def prepare_local_host(self, target_dir):
@@ -213,21 +144,31 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         if os.path.isdir(self.execution_dir):
             shutil.rmtree(self.execution_dir)
         # Copy scenario from infraform to $HOME/.infraform/elk/
-        subprocess.call(['cp', '-r', os.path.dirname(self.scenario_fpath),
+        subprocess.call(['cp', '-r', os.path.dirname(self.scenario.file_path),
                          infraform_dir])
+        _, suffix = os.path.splitext(self.scenario.file_name)
+            # Load YAML based scenario and save in self.vars
+        if suffix == ".yml" or suffix == ".yaml" or suffix == ".ifr":
+            self.load_yaml_to_vars()
 
     def prepare(self):
         """Prepare environment for docker-compose execution."""
-        # For example .../scenarios/docker-compose/elk -> elk
-        self.target_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
+        # Check the host is available to run the chosen platform/tool
+        if not self.args['skip_check'] and self.readiness_check:
+            LOG.debug(crayons.blue("# Verifying the host is ready"))
+            self.check_host_readiness()
+        if 'scenario' in self.args:
+            self.scenario = Scenario(name=self.args['scenario'],
+                                     variables=self.vars)
+            self.scenario.render()
 
         if "hosts" in self.args:
             LOG.debug(crayons.blue("# Preparing remote environment"))
             for host in self.args['hosts']:
-                self.prepare_remote_host(host, target_dir)
+                self.prepare_remote_host(host, self.scenario.dir_name)
         else:
             LOG.debug(crayons.blue("# Preparing local environment"))
-            self.prepare_local_host(target_dir)
+            self.prepare_local_host(self.scenario.dir_name)
     
     def run(self):
         """Execute platform commands."""
@@ -238,7 +179,8 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         hosts = []
         if "hosts" in self.args:
             hosts = self.args['hosts']
-        exe = Executor(commands=cmds, hosts=hosts, working_dir=self.execution_dir)
+        exe = Executor(commands=cmds, hosts=hosts,
+                       working_dir=self.execution_dir)
         results = exe.run()
         [success_or_exit(res.exited) for res in results]
         return results
@@ -246,6 +188,7 @@ looks like the scenario {} is empty".format(self.scenario_f)))
     def rm(self):
         LOG.info("Removing")
         cmd = self.vars['remove']
-        res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
+        exe = Executor()
+        res = exe.run(cmd, shell=True, cwd=self.execution_dir)
         success_or_exit(res.returncode)
         return res

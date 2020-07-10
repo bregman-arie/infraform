@@ -22,20 +22,21 @@ LOG = logging.getLogger(__name__)
 
 class Executor(object):
 
-    def __init__(self, commands, hosts=[], working_dir=None, warn_on_fail=False,
-                 hide_output=False):
+    def __init__(self, commands, hosts=[], working_dir=None,
+                 warn_on_fail=False, hide_output=False):
         self.commands = commands
         self.hosts = hosts
         self.working_dir = working_dir
         self.results = []
-        self.warn_on_fail = False
-        self.hide_output = False
+        self.warn_on_fail = warn_on_fail
+        self.hide_output = hide_output
 
     def run(self):
         if self.hosts:
-            self.execute_on_remote_host()
+            results = self.execute_on_remote_host()
         else:
-            self.execute_on_local_host()
+            results = self.execute_on_local_host()
+        return results
 
     def execute_on_remote_host(self):
         """Execute commands remotely."""
@@ -46,24 +47,24 @@ class Executor(object):
                     if self.working_dir:
                         with c.cd(self.working_dir):
                             LOG.debug(crayons.green(
-                                "Executing: {} in {}".format(cmd,
-                                                             self.working_dir)))
+                                "Executing: {} in {}".format(
+                                    cmd, self.working_dir)))
                             res = c.run(cmd, warn=self.warn_on_fail,
                                         hide=self.hide_output)
                     else:
                         LOG.debug(crayons.red("Executing: {}".format(cmd)))
-                        res = c.run(cmd, warn=self.warn_on_fail, hide=self.hide_output)
+                        res = c.run(cmd, warn=self.warn_on_fail,
+                                    hide=self.hide_output)
                     self.results.append(res)
                 except invoke.exceptions.UnexpectedExit:
-                    LOG.error("Failed to execute: {}. Exiting now...".format(cmd))
+                    LOG.error("Failed to execute: {}. Exiting now...".format(
+                        cmd))
                     sys.exit(2)
         return self.results
-
 
     def execute_on_local_host():
         """Execute given commands on local host."""
         pass
-
 
     def execute_cmd(commands, hosts=None, warn_on_fail=False, cwd=None,
                     hide_output=False):

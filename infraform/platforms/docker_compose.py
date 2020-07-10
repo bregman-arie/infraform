@@ -27,4 +27,4 @@ class Docker_compose(Platform):
             args, binary=dc_vars.BINARY,
             readiness_check=dc_vars.READINESS_CHECK,
             installation=dc_vars.INSTALLATION,
-            name=dc_vars.NAME, run=dc_vars.RUN, rm=dc_vars.REMOVE)
+            name=dc_vars.NAME, run_platform=dc_vars.RUN, rm=dc_vars.REMOVE)
