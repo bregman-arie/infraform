@@ -15,14 +15,16 @@ import crayons
 from fabric import Connection
 import invoke
 import logging
+import patchwork.transfers
 import sys
+import uuid
 
 LOG = logging.getLogger(__name__)
 
 
 class Executor(object):
 
-    def __init__(self, commands, hosts=[], working_dir=None,
+    def __init__(self, commands, hosts=[], working_dir="/tmp",
                  warn_on_fail=False, hide_output=False):
         self.commands = commands
         self.hosts = hosts
@@ -31,8 +33,19 @@ class Executor(object):
         self.warn_on_fail = warn_on_fail
         self.hide_output = hide_output
 
+    def transfer_file_to_hosts(self):
+        pass
+
+    def write_script(self):
+        self.script_name = "infraform-" + str(uuid.uuid4()) + ".sh"
+        with open(self.script_name, 'w+') as f:
+            f.write("\n".join(self.commands))
+            LOG.debug(crayons.green("Wrote: {}".format(script_name)))
+
     def run(self):
+        self.write_script()
         if self.hosts:
+            self.transfer_file_to_hosts()
             results = self.execute_on_remote_host()
         else:
             results = self.execute_on_local_host()
@@ -44,15 +57,10 @@ class Executor(object):
             c = Connection(host)
             for cmd in self.commands:
                 try:
-                    if self.working_dir:
-                        with c.cd(self.working_dir):
-                            LOG.debug(crayons.green(
-                                "Executing: {} in {}".format(
-                                    cmd, self.working_dir)))
-                            res = c.run(cmd, warn=self.warn_on_fail,
-                                        hide=self.hide_output)
-                    else:
-                        LOG.debug(crayons.red("Executing: {}".format(cmd)))
+                    with c.cd(self.working_dir):
+                        LOG.debug(crayons.green(
+                            "Executing: {} in {}".format(
+                                cmd, self.working_dir)))
                         res = c.run(cmd, warn=self.warn_on_fail,
                                     hide=self.hide_output)
                     self.results.append(res)

@@ -17,6 +17,8 @@ import jinja2 as j2
 import logging
 import os
 import re
+import sys
+import yaml
 
 from infraform.exceptions import usage as usage_exc
 from infraform.exceptions.utils import success_or_exit
@@ -37,6 +39,8 @@ class Scenario(object):
             self.SCENARIOS_PATH, self.name)
         self.dir_path = os.path.dirname(self.file_path)
         self.dir_name = self.dir_path.split('/')[-1]
+        # Get the content of the scenario in form of a dictionary
+        self.content = self.get_content()
 
     @staticmethod
     def get_scenario_file_path_name(scenarios_dir_path, scenario_name):
@@ -84,3 +88,16 @@ class Scenario(object):
         """Save the rendered scenario."""
         with open('./' + self.file_name, 'w+') as f:
             f.write(scenario)
+
+    def get_content(self):
+        """Returns Scenario content as a dictionary."""
+        content = {}
+        with open(self.file_name, 'r') as stream:
+            try:
+                content_yaml = yaml.safe_load(stream)
+                for k, v in content_yaml.items():
+                    if k not in self.variables:
+                        content.update({k: v})
+            except yaml.YAMLError as exc:
+                LOG.error(exc)
+        return content

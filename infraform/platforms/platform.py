@@ -35,8 +35,6 @@ LOG = logging.getLogger(__name__)
 
 class Platform(object):
 
-    SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
-
     def __init__(self, args, installation=None, run_platform=None,
                  readiness_check=None, binary=None, name=None, rm=None):
         self.args = {k: v for k, v in vars(args).items() if v is not None}
@@ -62,25 +60,6 @@ class Platform(object):
         ifr_dir = str(Path.home()) + '/.infraform'
         if not os.path.exists(ifr_dir):
             os.mkdir(ifr_dir)
-
-    def load_yaml_to_vars(self):
-        """Load any scenario YAML directives to variables."""
-        with open(self.scenario.file_name, 'r') as stream:
-            try:
-                scenario_yaml = yaml.safe_load(stream)
-                try:
-                    self.vars['scenario_vars'] = {
-                        k: v for k, v
-                        in scenario_yaml.items() if v is not None}
-                except AttributeError:
-                    LOG.error(crayons.cyan("I'm sorry, but it \
-looks like the scenario {} is empty".format(self.scenario.file_name)))
-                    sys.exit(2)
-                for k, v in scenario_yaml.items():
-                    if k not in self.vars:
-                        self.vars.update({k: v})
-            except yaml.YAMLError as exc:
-                LOG.error(exc)
 
     def create_new_vars(self):
         """Create additional variables out of existing variables."""
@@ -128,7 +107,7 @@ looks like the scenario {} is empty".format(self.scenario.file_name)))
         """Prepares remote environment."""
         c = fabric.Connection(host)
         self.execution_dir = "~/.infraform/{}".format(s_dir)
-        LOG.debug(crayons.red(
+        LOG.debug(crayons.green(
             "Copying scenario from {} to remote host: {}".format(
                 self.scenario.dir_path, host)))
         patchwork.transfers.rsync(c, self.scenario.dir_path,
@@ -161,6 +140,9 @@ looks like the scenario {} is empty".format(self.scenario.file_name)))
             self.scenario = Scenario(name=self.args['scenario'],
                                      variables=self.vars)
             self.scenario.render()
+            # Merge the content of the scenario with the variables
+            # we got from the user
+            self.vars.update(self.scenario.content)
 
         if "hosts" in self.args:
             LOG.debug(crayons.blue("# Preparing remote environment"))
@@ -179,6 +161,7 @@ looks like the scenario {} is empty".format(self.scenario.file_name)))
         hosts = []
         if "hosts" in self.args:
             hosts = self.args['hosts']
+        LOG.info(crayons.blue("# Executing scenario"))
         exe = Executor(commands=cmds, hosts=hosts,
                        working_dir=self.execution_dir)
         results = exe.run()
