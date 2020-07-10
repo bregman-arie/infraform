@@ -21,7 +21,7 @@ LOG = logging.getLogger(__name__)
 
 class Podman(Container):
 
-    PACKAGE = 'podman'
+    NAME = PACKAGE = 'podman'
     BINARY = '/bin/podman'
 
     def __init__(self, args):

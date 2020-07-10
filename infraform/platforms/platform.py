@@ -23,8 +23,9 @@ import crayons
 import jinja2 as j2
 import yaml
 
+from infraform.executor import Executor
+from infraform.executor import Executor
 from infraform import filters
-from infraform import process
 from infraform.exceptions import requirements as req_exc
 from infraform.exceptions import usage as usage_exc
 from infraform.exceptions.utils import success_or_exit
@@ -120,9 +121,10 @@ looks like the scenario {} is empty".format(self.scenario_f)))
 
     def check_platform_avaiable(self):
         """Validates the platform specified is ready for use."""
-        results = process.execute_cmd(self.READINESS_CHECK,
-                                      self.args['hosts'], warn_on_fail=True,
-                                      hide_output=True)
+        exe = Executor(commands=self.READINESS_CHECK,
+                       hosts=self.args['hosts'], warn_on_fail=True,
+                       hide_output=True)
+        results = exe.run()
         if not results or any(res.exited for res in results):
             LOG.error(req_exc.missing_reqs(
                 self.installation,
@@ -180,3 +182,17 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             LOG.error(usage_exc.missing_arg(missing_arg))
             sys.exit(2)
         self.write_rendered_scenario(rendered_scenario)
+
+    def run(self):
+        """Execute platform commands."""
+        try:
+            cmds = self.vars['execute'].split("\n")
+        except KeyError:
+            cmds = self.RUN
+        hosts = []
+        if "hosts" in self.args:
+            hosts = self.args['hosts']
+        exe = Executor(commands=cmds, hosts=hosts, working_dir=self.execution_dir)
+        results = exe.run()
+        [success_or_exit(res.exited) for res in results]
+        return results

@@ -11,11 +11,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 import logging
 import importlib
 import sys
 
-from infraform import process
+from infraform.executor import Executor
 from infraform.cli import utils
 from infraform.exceptions.usage import missing_scenario_arg
 from infraform.exceptions.utils import success_or_exit
@@ -37,8 +38,10 @@ Please specify --platform")
         Platform = getattr(importlib.import_module(
             "infraform.platforms.{}".format(args.platform)),
             args.platform.capitalize())
+        LOG.debug(crayons.blue("Chosen platform/tool: {}".format(Platform.NAME)))
         platform = Platform(args=args)
         platform.prepare()
         platform.run()
     else:
-        process.execute_cmd(args.commands, args.hosts)
+        exe = Executor(commands=args.commands, hosts=args.hosts)
+        exe.run()

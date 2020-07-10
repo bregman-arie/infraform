@@ -1,2 +1,5 @@
 ---
-a: b
+execute: |
+  if python -m pip --version &>/dev/null; then
+    ls
+  docker-compose -d up

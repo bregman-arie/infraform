@@ -21,8 +21,7 @@ LOG = logging.getLogger(__name__)
 
 class Terraform(Platform):
 
-    PACKAGE = 'terraform'
-    BINARY = 'terraform'
+    NAME = PACKAGE = BINARY = 'terraform'
     INSTALLATION = ["export version=0.12.10\nwget https://releases.hashico\
 rp.com/terraform/${version}/terraform_${version}_linux_amd64.zip",
                     "unzip terraform_${version}_linux_amd64.zip",

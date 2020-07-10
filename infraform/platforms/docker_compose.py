@@ -28,6 +28,7 @@ LOG = logging.getLogger(__name__)
 
 class Docker_compose(Platform):
 
+    NAME = "docker compose"
     PACKAGE = 'docker'
     BINARY = '/usr/local/bin/docker-compose'
     READINESS_CHECK = ["docker-compose --version", "systemctl status docker"]
@@ -76,28 +77,12 @@ er.com/linux/centos/docker-ce.repo",
         # .../scenarios/docker-compose/elk -> elk
         target_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
         if "hosts" in self.args:
-            LOG.debug(crayons.red("Preparing remote environment"))
+            LOG.debug(crayons.red("# Preparing remote environment"))
             for host in self.args['hosts']:
                 self.prepare_remote_host(host, target_dir)
         else:
-            LOG.debug(crayons.red("Preparing local environment"))
+            LOG.debug(crayons.red("# Preparing local environment"))
             self.prepare_local_host(target_dir)
-
-    def run(self):
-        """Execution docker-compose."""
-        try:
-            cmds = self.vars['execute']
-        except KeyError:
-            cmds = self.RUN
-        if "hosts" in self.args:
-            results = process.execute_cmd(
-                commands=cmds, hosts=self.args['hosts'],
-                cwd=self.execution_dir)
-        else:
-            results = process.execute_cmd(commands=cmds,
-                                          cwd=self.execution_dir)
-        [success_or_exit(res.exited) for res in results]
-        return results
 
     def rm(self):
         LOG.info("Removing")

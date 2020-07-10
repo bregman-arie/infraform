@@ -21,7 +21,7 @@ LOG = logging.getLogger(__name__)
 
 class Docker(Container):
 
-    PACKAGE = 'docker'
+    NAME = PACKAGE = 'docker'
     BINARY = '/bin/docker'
 
     def __init__(self, args):

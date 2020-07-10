@@ -21,8 +21,7 @@ LOG = logging.getLogger(__name__)
 
 class Shell(Platform):
 
-    PACKAGE = 'bash'
-    BINARY = 'bash'
+    PACKAGE = BINARY = NAME = 'base'
 
     def __init__(self, args):
         self.binary = self.BINARY

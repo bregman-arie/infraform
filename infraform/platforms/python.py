@@ -21,8 +21,7 @@ LOG = logging.getLogger(__name__)
 
 class Python(Platform):
 
-    PACKAGE = 'python'
-    BINARY = 'python'
+    NAME = PACKAGE = BINARY = 'python'
 
     def __init__(self, args):
         self.binary = self.BINARY
