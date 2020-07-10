@@ -38,9 +38,16 @@ class Platform(object):
     SCENARIOS_PATH = os.path.dirname(__file__) + '/../scenarios'
     READINESS_CHECK = []
 
-    def __init__(self, args):
+    def __init__(self, args, installation=None, run=None,
+                 readiness_check=None, binary=None, name=None, rm=None):
         # Set arguments provided by the user
         self.args = {k: v for k, v in vars(args).items() if v is not None}
+        
+        self.installation = installation
+        self.run = run
+        self.binary = binary
+        self.name = name
+        self.readiness_check = readiness_check
         # Array of commands to run in order to check the host is ready
         if "hosts" in self.args:
             self.READINESS_CHECK.append("rsync --version")
@@ -67,6 +74,7 @@ class Platform(object):
             self.SCENARIOS_PATH, self.args['scenario'])
         self.scenario_dir_path = os.path.dirname(self.scenario_fpath)
         self.scenario_dir_name = self.scenario_dir_path.split('/')[-1]
+        print("==== {}".format(self.scenario_dir_name))
 
     def create_workspace_dir(self):
         """Create infraform workspace."""
@@ -114,7 +122,9 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         ans = input("Do you want me to try and fix that for you with the\
  commands above? [yY/nN]: ")
         if ans.lower() == "y":
-            process.execute_cmd(self.installation, self.args['hosts'])
+            exe = Executor(commands=self.INSTALLATION,
+                           hosts=self.args['hosts'])
+            exe.run()
         else:
             LOG.info("Fine then, have a nice day :)")
             sys.exit(2)
@@ -183,6 +193,42 @@ looks like the scenario {} is empty".format(self.scenario_f)))
             sys.exit(2)
         self.write_rendered_scenario(rendered_scenario)
 
+    def prepare_remote_host(self, host, s_dir):
+        """Prepares remote environment."""
+        c = fabric.Connection(host)
+        self.execution_dir = "~/.infraform/{}".format(s_dir)
+        LOG.debug(crayons.red(
+            "Copying scenario from {} to remote host: {}".format(
+                self.scenario_dir_path, host)))
+        patchwork.transfers.rsync(c, self.scenario_dir_path,
+                                  "~/.infraform")
+
+    def prepare_local_host(self, target_dir):
+        """Prepares local host environment."""
+        # $HOME/.infraform
+        infraform_dir = os.path.expanduser('~') + '/.infraform/'
+        # $HOME/.infraform/elk
+        self.execution_dir = infraform_dir + target_dir
+        # Checks if a current directory exists and removes it in case it does
+        if os.path.isdir(self.execution_dir):
+            shutil.rmtree(self.execution_dir)
+        # Copy scenario from infraform to $HOME/.infraform/elk/
+        subprocess.call(['cp', '-r', os.path.dirname(self.scenario_fpath),
+                         infraform_dir])
+
+    def prepare(self):
+        """Prepare environment for docker-compose execution."""
+        # For example .../scenarios/docker-compose/elk -> elk
+        self.target_dir = os.path.dirname(self.scenario_fpath).split('/')[-1]
+
+        if "hosts" in self.args:
+            LOG.debug(crayons.blue("# Preparing remote environment"))
+            for host in self.args['hosts']:
+                self.prepare_remote_host(host, target_dir)
+        else:
+            LOG.debug(crayons.blue("# Preparing local environment"))
+            self.prepare_local_host(target_dir)
+    
     def run(self):
         """Execute platform commands."""
         try:
@@ -196,3 +242,10 @@ looks like the scenario {} is empty".format(self.scenario_f)))
         results = exe.run()
         [success_or_exit(res.exited) for res in results]
         return results
+
+    def rm(self):
+        LOG.info("Removing")
+        cmd = self.vars['remove']
+        res = subprocess.run(cmd, shell=True, cwd=self.execution_dir)
+        success_or_exit(res.returncode)
+        return res

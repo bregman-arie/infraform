@@ -14,7 +14,7 @@
 import logging
 
 from infraform.platforms.platform import Platform
-from infraform import process
+from infraform.executor import Executor
 
 LOG = logging.getLogger(__name__)
 
@@ -33,5 +33,6 @@ class Python(Platform):
         self.render_scenario()
 
     def run(self):
-        process.execute_cmd(["chmod +x {}".format(self.scenario_f),
-                             "python {}".format(self.scenario_f)])
+        exe = Executor(commands=["chmod +x {}".format(self.scenario_f),
+                                 "python {}".format(self.scenario_f)])
+        exe.run()

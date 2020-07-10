@@ -14,7 +14,7 @@
 import logging
 
 from infraform.platforms.platform import Platform
-from infraform import process
+from infraform.executor import Executor
 
 LOG = logging.getLogger(__name__)
 
@@ -22,16 +22,17 @@ LOG = logging.getLogger(__name__)
 class Shell(Platform):
 
     PACKAGE = BINARY = NAME = 'base'
+    INSTALLATION = ["dnf install -y bash"]
 
     def __init__(self, args):
         self.binary = self.BINARY
         self.package = self.PACKAGE
-        self.installation = ["dnf install -y bash"]
         super(Shell, self).__init__(args)
 
     def prepare(self):
         self.render_scenario()
 
     def run(self):
-        process.execute_cmd(["chmod +x {}".format(self.scenario_f),
-                             "./{0}".format(self.scenario_f)])
+        exe = Executor(commands=["chmod +x {}".format(self.scenario_f),
+                                 "./{0}".format(self.scenario_f)])
+        exe.run()

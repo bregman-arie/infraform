@@ -38,7 +38,6 @@ Please specify --platform")
         Platform = getattr(importlib.import_module(
             "infraform.platforms.{}".format(args.platform)),
             args.platform.capitalize())
-        LOG.debug(crayons.blue("Chosen platform/tool: {}".format(Platform.NAME)))
         platform = Platform(args=args)
         platform.prepare()
         platform.run()
