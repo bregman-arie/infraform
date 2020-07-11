@@ -92,7 +92,7 @@ class Scenario(object):
     def get_content(self):
         """Returns Scenario content as a dictionary."""
         content = {}
-        with open(self.file_name, 'r') as stream:
+        with open(self.file_path, 'r') as stream:
             try:
                 content_yaml = yaml.safe_load(stream)
                 for k, v in content_yaml.items():

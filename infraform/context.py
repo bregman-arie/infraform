@@ -15,6 +15,7 @@ from contextlib import contextmanager
 import os
 import sys
 
+
 @contextmanager
 def suppress_output():
     with open(os.devnull, "w") as devnull:

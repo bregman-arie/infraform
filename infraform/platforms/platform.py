@@ -11,10 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import fabric
 import os
-import patchwork.transfers
-import re
 
 import logging
 from pathlib import Path
@@ -22,19 +19,19 @@ import shutil
 import sys
 from ansible.parsing.splitter import split_args, parse_kv
 import crayons
-import yaml
 
 from infraform.context import suppress_output
 from infraform.executor import Executor
 from infraform.scenario import Scenario
 from infraform.exceptions import requirements as req_exc
-from infraform.exceptions import usage as usage_exc
 from infraform.exceptions.utils import success_or_exit
 
 LOG = logging.getLogger(__name__)
 
 
 class Platform(object):
+
+    WORKSPACE = "~/.infraform/"
 
     def __init__(self, args, installation=None, run_platform=None,
                  readiness_check=None, binary=None, name=None, rm=None):
@@ -53,14 +50,13 @@ class Platform(object):
             self.vars = self.get_vars(self.args['vars'])
         # Create additional vars based on passed ones
         self.create_new_vars()
-        # Create a workspace where all the files will be saved
-        self.create_workspace_dir()
 
     def create_workspace_dir(self):
         """Create infraform workspace."""
-        ifr_dir = str(Path.home()) + '/.infraform'
-        if not os.path.exists(ifr_dir):
-            os.mkdir(ifr_dir)
+        self.scenario_dir = os.path.join(self.WORKSPACE,
+                                         self.scenario.dir_name)
+        Executor(commands=["mkdir -p {}".format(self.scenario_dir)]).run()
+            
 
     def create_new_vars(self):
         """Create additional variables out of existing variables."""
@@ -105,17 +101,6 @@ class Platform(object):
                 failure=result.stderr))
             self.fix_host()
 
-    def prepare_remote_host(self, host, s_dir):
-        """Prepares remote environment."""
-        c = fabric.Connection(host)
-        self.execution_dir = "~/.infraform/{}".format(s_dir)
-        LOG.debug(crayons.green(
-            "Copying scenario from {} to remote host: {}".format(
-                self.scenario.dir_path, host)))
-        with suppress_output():
-            patchwork.transfers.rsync(c, self.scenario.dir_path,
-                                      "~/.infraform")
-
     def prepare_local_host(self, target_dir):
         """Prepares local host environment."""
         # $HOME/.infraform
@@ -146,15 +131,20 @@ class Platform(object):
             # Merge the content of the scenario with the variables
             # we got from the user
             self.vars.update(self.scenario.content)
+        # Create a workspace where all the files will be saved
+        self.create_workspace_dir()
 
         if "hosts" in self.args:
             LOG.debug(crayons.blue("# Preparing remote environment"))
             for host in self.args['hosts']:
-                self.prepare_remote_host(host, self.scenario.dir_name)
+                Executor.transfer(
+                    hosts=self.args['hosts'], source=self.scenario.dir_path,
+                    dest=self.scenario_dir)
+                                          
         else:
             LOG.debug(crayons.blue("# Preparing local environment"))
             self.prepare_local_host(self.scenario.dir_name)
-    
+
     def run(self):
         """Execute platform commands."""
         try:
@@ -166,10 +156,10 @@ class Platform(object):
             hosts = self.args['hosts']
         LOG.info(crayons.blue("# Executing scenario"))
         exe = Executor(commands=cmds, hosts=hosts,
-                       working_dir=self.execution_dir)
-        results = exe.run()
-        [success_or_exit(res.exited) for res in results]
-        return results
+                       working_dir=self.scenario_dir)
+        result = exe.run()
+        success_or_exit(result.exited)
+        return result
 
     def rm(self):
         LOG.info("Removing")

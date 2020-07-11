@@ -16,6 +16,7 @@ from fabric import Connection
 import invoke
 import logging
 import os
+from pathlib import Path
 import patchwork.transfers
 import sys
 import uuid
@@ -27,7 +28,7 @@ LOG = logging.getLogger(__name__)
 
 class Executor(object):
 
-    def __init__(self, commands, hosts=[], working_dir="/tmp",
+    def __init__(self, commands=None, hosts=[], working_dir="/tmp",
                  warn_on_fail=False, hide_output=False):
         self.commands = commands
         self.hosts = hosts
@@ -36,29 +37,37 @@ class Executor(object):
         self.warn_on_fail = warn_on_fail
         self.hide_output = hide_output
 
-    def transfer_file_to_hosts(self):
-        for host in self.hosts:
+    @staticmethod
+    def transfer(hosts, source, dest):
+        for host in hosts:
             with suppress_output():
                 c = Connection(host)
-                patchwork.transfers.rsync(c, self.script, self.working_dir)
-                self.script = os.path.join(self.working_dir, self.script)
-                c.run("chmod +x {}".format(self.script, hide=True, warn=True))
+                patchwork.transfers.rsync(c, source, dest)
+                c.run("chmod +x {}".format(dest, hide=True, warn=True))
+            LOG.debug(crayons.green("Transferred {} to {}:{}".format(
+                source, host, dest)))
 
     def write_script(self):
         self.script_name = "infraform-" + str(uuid.uuid4()) + ".sh"
-        with open(self.script_name, 'w+') as f:
+        self.script_path = os.path.join(self.working_dir, self.script_name)
+        with open(Path(self.script_path).expanduser(), 'w+') as f:
             f.write("\n".join(self.commands))
-            LOG.debug(crayons.green("Wrote: {}".format(self.script_name)))
-        return self.script_name
+            LOG.debug(crayons.green("Created: {}".format(self.script_path)))
+        c = Connection("127.0.0.1")
+        c.run("chmod +x {}".format(self.script_path, hide=True, warn=True))
+        return self.script_path
 
     def run(self):
         self.script = self.write_script()
         if self.hosts:
-            self.transfer_file_to_hosts()
+            self.transfer(hosts=self.hosts, source=self.script,
+                          dest=self.script)
             result = self.execute_on_remote_host()
         else:
             result = self.execute_on_local_host()
+        self.cleanup()
         return result
+       
 
     def execute_on_remote_host(self):
         """Execute on remote host(s)."""
@@ -66,9 +75,9 @@ class Executor(object):
             c = Connection(host)
             try:
                 with c.cd(self.working_dir):
-                    LOG.debug("Executing:\n{}\nin {} on {}".format(
-                        crayons.green("\n".join(self.commands)),
-                        crayons.blue(self.working_dir), crayons.blue(host)))
+                    LOG.debug("Executing on {}:{}\n-----\n{}\n-----".format(
+                        crayons.blue(host), crayons.blue(self.working_dir),
+                        crayons.green("\n".join(self.commands))))
                     self.result = c.run(self.script, warn=self.warn_on_fail,
                                          hide=self.hide_output)
             except invoke.exceptions.UnexpectedExit:
@@ -77,36 +86,16 @@ class Executor(object):
                 sys.exit(2)
         return self.result
 
-#    def execute_on_remote_host(self):
-#        """Execute commands remotely."""
-#        for host in self.hosts:
-#            c = Connection(host)
-#            for cmd in self.commands:
-#                try:
-#                    with c.cd(self.working_dir):
-#                        LOG.debug(crayons.green(
-#                            "Executing: {} in {}".format(
-#                                cmd, self.working_dir)))
-#                        res = c.run(cmd, warn=self.warn_on_fail,
-#                                    hide=self.hide_output)
-#                    self.results.append(res)
-#                except invoke.exceptions.UnexpectedExit:
-#                    LOG.error("Failed to execute: {}. Exiting now...".format(
-#                        cmd))
-#                    sys.exit(2)
-#        return self.results
-
-    def execute_on_local_host():
+    def execute_on_local_host(self):
         """Execute given commands on local host."""
-        pass
+        c = Connection("127.0.0.1")
+        with c.cd(self.working_dir):
+            c.local(self.script)
 
-    def execute_cmd(commands, hosts=None, warn_on_fail=False, cwd=None,
-                    hide_output=False):
-        """Execute given commands on remote hosts or locally."""
-        if hosts:
-            res = execute_on_remote_host(commands, hosts, warn_on_fail, cwd,
-                                         hide_output=hide_output)
-        else:
-            res = execute_on_local_host(commands, warn_on_fail, cwd,
-                                        hide_output=hide_output)
-        return res
+    def cleanup(self):
+        if self.hosts:
+            for host in self.hosts:
+                c = Connection(host)
+                c.run("rm {}".format(self.script))
+        c = Connection('127.0.0.1')
+        c.run("rm {}".format(self.script))

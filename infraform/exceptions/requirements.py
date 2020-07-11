@@ -22,7 +22,7 @@ def missing_reqs(inst, hosts, failure):
         loc = "on this host"
     if failure:
         failures = "The following failure happened:\n\n{}".format(
-            crayons.red("\n".join(failed_cmds)))
+            crayons.red("\n".join(failure)))
     else:
         failures = ""
 
