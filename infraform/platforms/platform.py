@@ -24,6 +24,7 @@ from ansible.parsing.splitter import split_args, parse_kv
 import crayons
 import yaml
 
+from infraform.context import suppress_output
 from infraform.executor import Executor
 from infraform.scenario import Scenario
 from infraform.exceptions import requirements as req_exc
@@ -78,12 +79,13 @@ class Platform(object):
             variables.update(parse_kv(arg))
         return variables
 
-    def install_reqs(self):
+    def fix_host(self):
         ans = input("Do you want me to try and fix that for you with the\
  commands above? [yY/nN]: ")
         if ans.lower() == "y":
-            exe = Executor(commands=self.INSTALLATION,
-                           hosts=self.args['hosts'])
+            exe = Executor(
+                commands=self.installation + ['sudo dnf install rsync -y'],
+                hosts=self.args['hosts'])
             exe.run()
         else:
             LOG.info("Fine then, have a nice day :)")
@@ -94,14 +96,14 @@ class Platform(object):
         exe = Executor(commands=self.readiness_check,
                        hosts=self.args['hosts'], warn_on_fail=True,
                        hide_output=True)
-        results = exe.run()
+        result = exe.run()
 
-        if not results or any(res.exited for res in results):
+        if not result:
             LOG.error(req_exc.missing_reqs(
-                self.installation, hosts=self.args['hosts'],
-                failed_cmds=[res.command for res in results if
-                             res.exited != 0]))
-            self.install_reqs()
+                self.installation + ['sudo dnf install -y rsync'],
+                hosts=self.args['hosts'],
+                failure=result.stderr))
+            self.fix_host()
 
     def prepare_remote_host(self, host, s_dir):
         """Prepares remote environment."""
@@ -110,8 +112,9 @@ class Platform(object):
         LOG.debug(crayons.green(
             "Copying scenario from {} to remote host: {}".format(
                 self.scenario.dir_path, host)))
-        patchwork.transfers.rsync(c, self.scenario.dir_path,
-                                  "~/.infraform")
+        with suppress_output():
+            patchwork.transfers.rsync(c, self.scenario.dir_path,
+                                      "~/.infraform")
 
     def prepare_local_host(self, target_dir):
         """Prepares local host environment."""

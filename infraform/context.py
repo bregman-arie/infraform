@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2020 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,27 +11,19 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import crayons
+from contextlib import contextmanager
+import os
+import sys
 
-
-def missing_reqs(inst, hosts, failure):
-    """Message on missing requirements"""
-    if hosts:
-        loc = "on {}".format(' '.join(hosts))
-    else:
-        loc = "on this host"
-    if failure:
-        failures = "The following failure happened:\n\n{}".format(
-            crayons.red("\n".join(failed_cmds)))
-    else:
-        failures = ""
-
-    message = """
-There seems to be a problem {0}
-{1}
-Perhaps try the following:
-
-{2}
-""".format(crayons.red(loc), failures, crayons.cyan("\n".join(inst)))
-
-    return message
+@contextmanager
+def suppress_output():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = devnull
+        sys.stderr = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
