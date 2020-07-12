@@ -30,3 +30,10 @@ def add_rm_parser(subparsers):
     rm_parser.add_argument('--debug', dest="debug",
                            action="store_true",
                            help="Enable debug level logging")
+    rm_parser.add_argument('--hosts', dest="hosts",
+                           default="", nargs='*',
+                           help="host(s) to execute the scenario/command on \
+by specifying host name or user@host")
+    rm_parser.add_argument('--skip-check', dest="skip_check",
+                           action="store_true",
+                           help="Skip requirements check")

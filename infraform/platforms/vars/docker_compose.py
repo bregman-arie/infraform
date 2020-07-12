@@ -24,4 +24,4 @@ er.com/linux/centos/docker-ce.repo",
                 "sudo dnf install --nobest -y docker-ce",
                 "sudo systemctl start docker"]
 RUN = ["docker-compose up -d"]
-REMOVE = ["docker-compose rm"]
+REMOVE = ["docker-compose stop", "docker-compose rm"]

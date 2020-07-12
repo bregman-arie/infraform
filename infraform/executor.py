@@ -38,14 +38,18 @@ class Executor(object):
         self.hide_output = hide_output
 
     @staticmethod
-    def transfer(hosts, source, dest):
-        for host in hosts:
-            with suppress_output():
-                c = Connection(host)
-                patchwork.transfers.rsync(c, source, dest)
-                c.run("chmod +x {}".format(dest, hide=True, warn=True))
-            LOG.debug(crayons.green("Transferred {} to {}:{}".format(
-                source, host, dest)))
+    def transfer(hosts, source, dest, local=False):
+        if not local:
+            for host in hosts:
+                with suppress_output():
+                    c = Connection(host)
+                    patchwork.transfers.rsync(c, source, dest)
+                    c.run("chmod +x {}".format(dest, hide=True, warn=True))
+                LOG.debug(crayons.green("Transferred {} to {}:{}".format(
+                    source, host, dest)))
+        else:
+            c = Connection("localhost")
+            c.run("blip blop")
 
     def write_script(self):
         self.script_name = "infraform-" + str(uuid.uuid4()) + ".sh"

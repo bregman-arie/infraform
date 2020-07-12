@@ -41,6 +41,7 @@ class Platform(object):
         self.binary = binary
         self.name = name
         self.readiness_check = readiness_check
+        self.rm = rm
 
         # Array of commands to run in order to check the host is ready
         if "hosts" in self.args:
@@ -101,23 +102,6 @@ class Platform(object):
                 failure=result.stderr))
             self.fix_host()
 
-    def prepare_local_host(self, target_dir):
-        """Prepares local host environment."""
-        # $HOME/.infraform
-        infraform_dir = os.path.expanduser('~') + '/.infraform/'
-        # $HOME/.infraform/elk
-        self.execution_dir = infraform_dir + target_dir
-        # Checks if a current directory exists and removes it in case it does
-        if os.path.isdir(self.execution_dir):
-            shutil.rmtree(self.execution_dir)
-        # Copy scenario from infraform to $HOME/.infraform/elk/
-        subprocess.call(['cp', '-r', os.path.dirname(self.scenario.file_path),
-                         infraform_dir])
-        _, suffix = os.path.splitext(self.scenario.file_name)
-            # Load YAML based scenario and save in self.vars
-        if suffix == ".yml" or suffix == ".yaml" or suffix == ".ifr":
-            self.load_yaml_to_vars()
-
     def prepare(self):
         """Prepare environment for docker-compose execution."""
         # Check the host is available to run the chosen platform/tool
@@ -139,11 +123,13 @@ class Platform(object):
             for host in self.args['hosts']:
                 Executor.transfer(
                     hosts=self.args['hosts'], source=self.scenario.dir_path,
-                    dest=self.scenario_dir)
+                    dest=self.WORKSPACE)
                                           
         else:
             LOG.debug(crayons.blue("# Preparing local environment"))
-            self.prepare_local_host(self.scenario.dir_name)
+            Executor.transfer(
+                hosts=self.args['hosts'], source=self.scenario.dir_path,
+                dest=self.WORKSPACE, local=True)
 
     def run(self):
         """Execute platform commands."""
@@ -161,10 +147,17 @@ class Platform(object):
         success_or_exit(result.exited)
         return result
 
-    def rm(self):
+    def remove(self):
         LOG.info("Removing")
-        cmd = self.vars['remove']
-        exe = Executor()
-        res = exe.run(cmd, shell=True, cwd=self.execution_dir)
-        success_or_exit(res.returncode)
-        return res
+        try:
+            cmds = self.vars['remove'].split("\n")
+        except KeyError:
+            cmds = self.rm
+        hosts = []
+        if "hosts" in self.args:
+            hosts = self.args['hosts']
+        exe = Executor(commands=cmds, hosts=hosts,
+                       working_dir=self.scenario_dir)
+        result = exe.run()
+        success_or_exit(result.exited)
+        return result
