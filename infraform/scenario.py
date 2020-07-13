@@ -39,6 +39,13 @@ class Scenario(object):
             self.SCENARIOS_PATH, self.name)
         self.dir_path = os.path.dirname(self.file_path)
         self.dir_name = self.dir_path.split('/')[-1]
+        # Scenario source determines what to copy - the entire directory or
+        # only the file itself as a scenario can be a file
+        # (e.g. scenario.yml) or an entire directory (e.g. scenario/scenario.yml)
+        if self.dir_name == self.file_name:
+            self.source = self.dir_path
+        else:
+            self.source = self.file_path
         # Get the content of the scenario in form of a dictionary
         self.content = self.get_content()
 

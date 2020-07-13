@@ -76,7 +76,7 @@ def missing_scenario_arg():
 Please specify which scenario to run with {}
 You can also instead, specify a command to execute with {}
 """.format(crayons.red("--scenario <SCENARIO_NAME>"),
-           crayons.red("--host <HOST> --command <COMMAND>"))
+           crayons.red("--hosts <HOST> --command <COMMAND>"))
     return message
 
 

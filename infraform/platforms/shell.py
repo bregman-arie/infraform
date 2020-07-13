@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2020 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -14,25 +14,18 @@
 import logging
 
 from infraform.platforms.platform import Platform
-from infraform.executor import Executor
+from infraform.platforms.vars import shell as shell_vars
 
 LOG = logging.getLogger(__name__)
 
 
 class Shell(Platform):
 
-    PACKAGE = BINARY = NAME = 'base'
-    INSTALLATION = ["dnf install -y bash"]
-
     def __init__(self, args):
-        self.binary = self.BINARY
-        self.package = self.PACKAGE
-        super(Shell, self).__init__(args)
 
-    def prepare(self):
-        self.render_scenario()
-
-    def run(self):
-        exe = Executor(commands=["chmod +x {}".format(self.scenario_f),
-                                 "./{0}".format(self.scenario_f)])
-        exe.run()
+        super(Shell, self).__init__(
+            args, binary=shell_vars.BINARY,
+            readiness_check=shell_vars.READINESS_CHECK,
+            installation=shell_vars.INSTALLATION,
+            platform_name=shell_vars.NAME,
+            run_platform=shell_vars.RUN)

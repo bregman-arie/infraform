@@ -34,12 +34,12 @@ class Platform(object):
     WORKSPACE = "~/.infraform/"
 
     def __init__(self, args, installation=None, run_platform=None,
-                 readiness_check=None, binary=None, name=None, rm=None):
+                 readiness_check=[], binary=None, platform_name=None, rm=None):
         self.args = {k: v for k, v in vars(args).items() if v is not None}
         self.installation = installation
         self.run_platform = run_platform
         self.binary = binary
-        self.name = name
+        self.platform_name = platform_name
         self.readiness_check = readiness_check
         self.rm = rm
 
@@ -53,10 +53,20 @@ class Platform(object):
         self.create_new_vars()
 
     def create_workspace_dir(self):
-        """Create infraform workspace."""
-        self.scenario_dir = os.path.join(self.WORKSPACE,
-                                         self.scenario.dir_name)
-        Executor(commands=["mkdir -p {}".format(self.scenario_dir)]).run()
+        """Create infraform workspace.
+
+        If the scenario is a file (e.g. scenario.yml) then the file is
+        copied to the workspace.
+        If the scenario is a directory (e.g. scenario/scenario.ifr that includes
+        other files as well then the whole directory is copied to the workspace.
+        """
+
+        if self.scenario.dir_name == self.scenario.name:
+            self.scenario_dir = os.path.join(self.WORKSPACE,
+                                             self.scenario.dir_name)
+            Executor(commands=["mkdir -p {}".format(self.scenario_dir)]).run()
+        else:
+            self.scenario_dir = self.WORKSPACE
             
 
     def create_new_vars(self):
@@ -122,13 +132,13 @@ class Platform(object):
             LOG.debug(crayons.blue("# Preparing remote environment"))
             for host in self.args['hosts']:
                 Executor.transfer(
-                    hosts=self.args['hosts'], source=self.scenario.dir_path,
+                    hosts=self.args['hosts'], source=self.scenario.source,
                     dest=self.WORKSPACE)
                                           
         else:
             LOG.debug(crayons.blue("# Preparing local environment"))
             Executor.transfer(
-                hosts=self.args['hosts'], source=self.scenario.dir_path,
+                hosts=self.args['hosts'], source=self.scenario.source,
                 dest=self.WORKSPACE, local=True)
 
     def run(self):
@@ -144,6 +154,7 @@ class Platform(object):
         exe = Executor(commands=cmds, hosts=hosts,
                        working_dir=self.scenario_dir)
         result = exe.run()
+        LOG.info(crayons.blue("# Done Executing scenario"))
         success_or_exit(result.exited)
         return result
 
