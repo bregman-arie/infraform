@@ -38,7 +38,6 @@ Please specify --platform")
             "infraform.platforms.{}".format(args.platform)),
             args.platform.capitalize())
         platform = Platform(args=args)
-        platform.prepare()
         platform.run()
     else:
         exe = Executor(commands=args.commands, hosts=args.hosts)

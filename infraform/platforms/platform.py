@@ -14,13 +14,10 @@
 import os
 
 import logging
-from pathlib import Path
-import shutil
 import sys
 from ansible.parsing.splitter import split_args, parse_kv
 import crayons
 
-from infraform.context import suppress_output
 from infraform.executor import Executor
 from infraform.scenario import Scenario
 from infraform.exceptions import requirements as req_exc
@@ -57,8 +54,9 @@ class Platform(object):
 
         If the scenario is a file (e.g. scenario.yml) then the file is
         copied to the workspace.
-        If the scenario is a directory (e.g. scenario/scenario.ifr that includes
-        other files as well then the whole directory is copied to the workspace.
+        If the scenario is a directory (e.g. scenario/scenario.ifr that
+        includes other files as well then the whole directory is copied
+        to the workspace.
         """
 
         if self.scenario.dir_name == self.scenario.name:
@@ -67,7 +65,6 @@ class Platform(object):
             Executor(commands=["mkdir -p {}".format(self.scenario_dir)]).run()
         else:
             self.scenario_dir = self.WORKSPACE
-            
 
     def create_new_vars(self):
         """Create additional variables out of existing variables."""
@@ -118,15 +115,14 @@ class Platform(object):
         if not self.args['skip_check'] and self.readiness_check:
             LOG.debug(crayons.blue("# Verifying the host is ready"))
             self.check_host_readiness()
-        if 'scenario' in self.args:
-            self.scenario = Scenario(name=self.args['scenario'],
-                                     variables=self.vars)
-            self.scenario.render()
-            # Merge the content of the scenario with the variables
-            # we got from the user
-            self.vars.update(self.scenario.content)
         # Create a workspace where all the files will be saved
+        self.scenario = Scenario(name=self.args['scenario'],
+                                 variables=self.vars)
         self.create_workspace_dir()
+        self.scenario.render(self.scenario_dir)
+        # Merge the content of the scenario with the variables
+        # we got from the user
+        self.vars.update(self.scenario.content)
 
         if "hosts" in self.args:
             LOG.debug(crayons.blue("# Preparing remote environment"))
@@ -134,7 +130,7 @@ class Platform(object):
                 Executor.transfer(
                     hosts=self.args['hosts'], source=self.scenario.source,
                     dest=self.WORKSPACE)
-                                          
+
         else:
             LOG.debug(crayons.blue("# Preparing local environment"))
             Executor.transfer(
@@ -143,6 +139,7 @@ class Platform(object):
 
     def run(self):
         """Execute platform commands."""
+        self.prepare()
         try:
             cmds = self.vars['execute'].split("\n")
         except KeyError:

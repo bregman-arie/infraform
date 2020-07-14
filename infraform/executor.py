@@ -71,7 +71,6 @@ class Executor(object):
             result = self.execute_on_local_host()
         self.cleanup()
         return result
-       
 
     def execute_on_remote_host(self):
         """Execute on remote host(s)."""
@@ -83,7 +82,7 @@ class Executor(object):
                         crayons.blue(host), crayons.blue(self.working_dir),
                         crayons.green("\n".join(self.commands))))
                     self.result = c.run(self.script, warn=self.warn_on_fail,
-                                         hide=self.hide_output)
+                                        hide=self.hide_output)
             except invoke.exceptions.UnexpectedExit:
                 LOG.error("Failed to execute: {}. Exiting now...".format(
                     self.commands))

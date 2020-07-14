@@ -40,12 +40,14 @@ class Scenario(object):
         self.dir_path = os.path.dirname(self.file_path)
         self.dir_name = self.dir_path.split('/')[-1]
         # Scenario source determines what to copy - the entire directory or
-        # only the file itself as a scenario can be a file
-        # (e.g. scenario.yml) or an entire directory (e.g. scenario/scenario.yml)
-        if self.dir_name == self.file_name:
+        # only the file itself as a scenario can be a file (e.g. scenario.yml)
+        # or an entire directory (e.g. scenario/scenario.yml)
+        if self.dir_name == self.file_name.split('.')[0]:
             self.source = self.dir_path
+            self.source_type = 'dir'
         else:
             self.source = self.file_path
+            self.source_type = 'file'
         # Get the content of the scenario in form of a dictionary
         self.content = self.get_content()
 
@@ -64,37 +66,59 @@ class Scenario(object):
                     scenario_file_path = p + '/' + f
                     scenario_file = file_name
                     return scenario_file_path, scenario_file
-                elif ".ifr" in f and SequenceMatcher(
-                    None, file_without_suffix, scenario_name).ratio() >= 0.25:
+                elif ".ifr" in f and SequenceMatcher(None,
+                                                     file_without_suffix,
+                                                     scenario_name).ratio(
+                                                     ) >= 0.25:
                     similar_scenarios.append(file_without_suffix)
         if similar_scenarios:
             LOG.info("Perhaps you meant:\n\n{}".format(
                 crayons.yellow("\n".join(similar_scenarios))))
         success_or_exit(1, usage_exc.missing_scenario(scenario_name))
 
-    def render(self):
-        """Render the scenario and save to disk."""
+    def get_templates(self):
+        """Returns list of templates."""
+        templates = []
+        for p, d, files in os.walk(self.dir_path):
+            for f in files:
+                if f.endswith('.j2'):
+                    templates.append(f)
+        return templates
+
+    def render(self, target_dir):
+        """Render all the files related to the scenario and save to disk."""
+        LOG.info(crayons.blue("# Rendering templates..."))
         # Create Jinja2 environment
         j2_env = j2.Environment(loader=j2.FunctionLoader(
             get_file_content), trim_blocks=True, undefined=j2.StrictUndefined)
-
         j2_env.filters['env_override'] = filters.env_override
-        template = j2_env.get_template(self.file_path)
 
-        try:
-            rendered_scenario = template.render(vars=self.variables)
-        except j2.exceptions.UndefinedError as e:
-            LOG.error(e)
-            missing_arg = re.findall(
-                r'no attribute (.*)', e.message)[0].strip("'")
-            LOG.error(usage_exc.missing_arg(missing_arg))
-            sys.exit(2)
-        self.write_rendered_scenario(rendered_scenario)
+        if self.source_type == 'dir':
+            templates = self.get_templates()
+        else:
+            templates = [self.file_path]
 
-    def write_rendered_scenario(self, scenario):
+        for template in templates:
+            try:
+                template = j2_env.get_template(self.file_path)
+                rendered_scenario = template.render(vars=self.variables)
+            except j2.exceptions.UndefinedError as e:
+                LOG.error(e)
+                missing_arg = re.findall(
+                    r'no attribute (.*)', e.message)[0].strip("'")
+                LOG.error(usage_exc.missing_arg(missing_arg))
+                sys.exit(2)
+            rendered_file_path = self.write_rendered_scenario(
+                rendered_scenario, target_dir)
+            LOG.info(crayons.green("Wrote rendered file: {}".format(
+                rendered_file_path)))
+
+    def write_rendered_scenario(self, scenario, target_dir='./'):
         """Save the rendered scenario."""
-        with open('./' + self.file_name, 'w+') as f:
+        rendered_fpath = os.path.join(target_dir, self.file_name)
+        with open(rendered_fpath, 'w+') as f:
             f.write(scenario)
+        return rendered_fpath
 
     def get_content(self):
         """Returns Scenario content as a dictionary."""
