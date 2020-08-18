@@ -113,19 +113,21 @@ class Platform(object):
         """Prepare environment for docker-compose execution."""
         # Check the host is available to run the chosen platform/tool
         if not self.args['skip_check'] and self.readiness_check:
-            LOG.debug(crayons.blue("# Verifying the host is ready"))
+            LOG.debug(crayons.blue("\n===== Verifying the host is ready ====="))
             self.check_host_readiness()
+            LOG.info(crayons.green("\U0001f44d The host is ready"))
         # Create a workspace where all the files will be saved
         self.scenario = Scenario(name=self.args['scenario'],
                                  variables=self.vars)
+        LOG.debug(crayons.blue("\n===== Create workspace ====="))
         self.create_workspace_dir()
-        self.scenario.render(self.scenario_dir)
+        self.scenario.render(target_dir=self.scenario_dir)
         # Merge the content of the scenario with the variables
         # we got from the user
         self.vars.update(self.scenario.content)
 
         if "hosts" in self.args:
-            LOG.debug(crayons.blue("# Preparing remote environment"))
+            LOG.debug(crayons.blue("\n===== Preparing remote environment ====="))
             for host in self.args['hosts']:
                 Executor.transfer(
                     hosts=self.args['hosts'], source=self.scenario.source,
@@ -147,11 +149,11 @@ class Platform(object):
         hosts = []
         if "hosts" in self.args:
             hosts = self.args['hosts']
-        LOG.info(crayons.blue("# Executing scenario"))
+        LOG.info(crayons.blue("\n===== Executing scenario ====="))
         exe = Executor(commands=cmds, hosts=hosts,
                        working_dir=self.scenario_dir)
         result = exe.run()
-        LOG.info(crayons.blue("# Done Executing scenario"))
+        LOG.info(crayons.blue("\n===== Done Executing scenario ====="))
         success_or_exit(result.exited)
         return result
 

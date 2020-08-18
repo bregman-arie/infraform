@@ -1,10 +1,10 @@
 filebeat.inputs:
   - type: log
     paths:
-      - {{ log_path }}
+      - /la/la/la
     multiline.pattern: 'TASK'
     multiline.negate: true
     multiline.match: after
 
 output.logstash:
-  hosts: ["{{ logstash_address }}:5044"]
+  hosts: ["127.0.0.1:5044"]

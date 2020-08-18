@@ -16,6 +16,7 @@ from difflib import SequenceMatcher
 import jinja2 as j2
 import logging
 import os
+from pathlib import Path
 import re
 import sys
 import yaml
@@ -82,40 +83,42 @@ class Scenario(object):
         for p, d, files in os.walk(self.dir_path):
             for f in files:
                 if f.endswith('.j2'):
-                    templates.append(f)
+                    templates.append(os.path.join(p, f))
         return templates
 
-    def render(self, target_dir):
-        """Render all the files related to the scenario and save to disk."""
-        LOG.info(crayons.blue("# Rendering templates..."))
+    def render(self, target_dir=None, file_path=None):
+        """Render all the files in a given directory and save to disk."""
+        LOG.info(crayons.blue("\n===== Rendering templates ====="))
+
         # Create Jinja2 environment
         j2_env = j2.Environment(loader=j2.FunctionLoader(
             get_file_content), trim_blocks=True, undefined=j2.StrictUndefined)
         j2_env.filters['env_override'] = filters.env_override
 
-        if self.source_type == 'dir':
+        if target_dir:
             templates = self.get_templates()
         else:
-            templates = [self.file_path]
+            templates = [file_path]
 
         for template in templates:
             try:
-                template = j2_env.get_template(self.file_path)
-                rendered_scenario = template.render(vars=self.variables)
+                j2_template = j2_env.get_template(template)
+                rendered_scenario = j2_template.render(vars=self.variables)
+                rendered_file_path = self.write_rendered_scenario(
+                    rendered_scenario, os.path.basename(template)[:-3], target_dir)
+                LOG.info(crayons.green("Wrote rendered file: {}".format(
+                    rendered_file_path)))
             except j2.exceptions.UndefinedError as e:
                 LOG.error(e)
                 missing_arg = re.findall(
                     r'no attribute (.*)', e.message)[0].strip("'")
                 LOG.error(usage_exc.missing_arg(missing_arg))
                 sys.exit(2)
-            rendered_file_path = self.write_rendered_scenario(
-                rendered_scenario, target_dir)
-            LOG.info(crayons.green("Wrote rendered file: {}".format(
-                rendered_file_path)))
 
-    def write_rendered_scenario(self, scenario, target_dir='./'):
+    def write_rendered_scenario(self, scenario, file_name, target_dir='./'):
         """Save the rendered scenario."""
-        rendered_fpath = os.path.join(target_dir, self.file_name)
+        rendered_fpath = Path(os.path.join(target_dir,
+                                           file_name)).expanduser()
         with open(rendered_fpath, 'w+') as f:
             f.write(scenario)
         return rendered_fpath

@@ -78,9 +78,13 @@ class Executor(object):
             c = Connection(host)
             try:
                 with c.cd(self.working_dir):
-                    LOG.debug("Executing on {}:{}\n-----\n{}\n-----".format(
-                        crayons.blue(host), crayons.blue(self.working_dir),
-                        crayons.green("\n".join(self.commands))))
+                    LOG.debug(
+                        "{} {}:{} {}:\n-----\n{}\n-----".format(
+                            crayons.magenta("Executing on"),
+                            crayons.yellow(host),
+                            crayons.yellow(self.working_dir),
+                            crayons.magenta("the following:"),
+                            crayons.green("\n".join(self.commands))))
                     self.result = c.run(self.script, warn=self.warn_on_fail,
                                         hide=self.hide_output)
             except invoke.exceptions.UnexpectedExit:
@@ -93,6 +97,11 @@ class Executor(object):
         """Execute given commands on local host."""
         c = Connection("127.0.0.1")
         with c.cd(self.working_dir):
+            LOG.debug("{} {} {}:\n-----\n{}\n-----".format(
+                crayons.magenta("Executing on"),
+                crayons.yellow("localhost"),
+                crayons.magenta("the following"),
+                crayons.green("\n".join(self.commands))))
             c.local(self.script)
 
     def cleanup(self):
