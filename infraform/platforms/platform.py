@@ -130,7 +130,7 @@ class Platform(object):
             LOG.debug(crayons.blue("\n==== Preparing remote environment ===="))
             for host in self.args['hosts']:
                 Executor.transfer(
-                    hosts=self.args['hosts'], source=self.scenario.source,
+                    hosts=self.args['hosts'], source=self.WORKSPACE,
                     dest=self.WORKSPACE)
 
         else:

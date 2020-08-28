@@ -94,8 +94,9 @@ class Executor(object):
                     self.result = c.run(self.script, warn=self.warn_on_fail,
                                         hide=self.hide_output)
             except invoke.exceptions.UnexpectedExit:
-                LOG.error("Failed to execute: {}. Exiting now...".format(
-                    self.commands))
+                self.cleanup()
+                LOG.error("Failed to execute:\n{}Exiting now...".format(
+                    crayons.red("\n".join(self.commands))))
                 sys.exit(2)
         return self.result
 
@@ -111,6 +112,7 @@ class Executor(object):
             c.local(self.script)
 
     def cleanup(self):
+        LOG.debug(crayons.green("Cleaning up..."))
         if self.hosts:
             for host in self.hosts:
                 c = Connection(host)
