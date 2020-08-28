@@ -7,4 +7,4 @@ filebeat.inputs:
     multiline.match: after
 
 output.logstash:
-  hosts: ["127.0.0.1:5044"]
+  hosts: ["{{ logstash_address }}"]

@@ -20,7 +20,6 @@ import crayons
 
 from infraform.executor import Executor
 from infraform.scenario import Scenario
-from infraform.exceptions import requirements as req_exc
 from infraform.exceptions.utils import success_or_exit
 
 LOG = logging.getLogger(__name__)
@@ -84,6 +83,8 @@ class Platform(object):
         return variables
 
     def fix_host(self):
+        LOG.info("To fix, run the following:\n{}".format(
+            crayons.green("\n".join(self.installation))))
         ans = input("Do you want me to try and fix that for you with the\
  commands above? [yY/nN]: ")
         if ans.lower() == "y":
@@ -99,27 +100,26 @@ class Platform(object):
         """Validates the platform specified is ready for use."""
         exe = Executor(commands=self.readiness_check,
                        hosts=self.args['hosts'], warn_on_fail=True,
-                       hide_output=True)
+                       hide_output=True, keep_files=self.args['keep_files'])
         result = exe.run()
 
-        if not result:
-            LOG.error(req_exc.missing_reqs(
-                self.installation + ['sudo dnf install -y rsync'],
-                hosts=self.args['hosts'],
-                failure=result.stderr))
+        if result.return_code != 0:
+            LOG.info(result)
+            LOG.info(crayons.red("\u274c The host is not ready"))
             self.fix_host()
+        else:
+            LOG.info(crayons.green("\u2714 The host is ready"))
 
     def prepare(self):
         """Prepare environment for docker-compose execution."""
         # Check the host is available to run the chosen platform/tool
         if not self.args['skip_check'] and self.readiness_check:
-            LOG.debug(crayons.blue("\n===== Verifying the host is ready ====="))
+            LOG.debug(crayons.blue("\n==== Verifying the host is ready ===="))
             self.check_host_readiness()
-            LOG.info(crayons.green("\U0001f44d The host is ready"))
         # Create a workspace where all the files will be saved
         self.scenario = Scenario(name=self.args['scenario'],
                                  variables=self.vars)
-        LOG.debug(crayons.blue("\n===== Create workspace ====="))
+        LOG.debug(crayons.blue("\n==== Create workspace ===="))
         self.create_workspace_dir()
         self.scenario.render(target_dir=self.scenario_dir)
         # Merge the content of the scenario with the variables
@@ -127,7 +127,7 @@ class Platform(object):
         self.vars.update(self.scenario.content)
 
         if "hosts" in self.args:
-            LOG.debug(crayons.blue("\n===== Preparing remote environment ====="))
+            LOG.debug(crayons.blue("\n==== Preparing remote environment ===="))
             for host in self.args['hosts']:
                 Executor.transfer(
                     hosts=self.args['hosts'], source=self.scenario.source,
@@ -153,7 +153,7 @@ class Platform(object):
         exe = Executor(commands=cmds, hosts=hosts,
                        working_dir=self.scenario_dir)
         result = exe.run()
-        LOG.info(crayons.blue("\n===== Done Executing scenario ====="))
+        LOG.info(crayons.blue("===== Done Executing scenario ====="))
         success_or_exit(result.exited)
         return result
 

@@ -40,3 +40,6 @@ by specifying host name or user@host")
     run_parser.add_argument('--debug', dest="debug",
                             action="store_true",
                             help="Enable debug level logging")
+    run_parser.add_argument('--keep-files', dest="keep_files",
+                            action="store_true",
+                            help="Don't remove scripts when done running")

@@ -14,7 +14,8 @@
 NAME = "docker compose"
 PACKAGE = 'docker'
 BINARY = '/usr/local/bin/docker-compose'
-READINESS_CHECK = ["docker-compose --version", "systemctl status docker"]
+READINESS_CHECK = ["docker-compose --version",
+                   "systemctl status docker --no-pager"]
 INSTALLATION = ["curl -L $(curl -s https://api.github.com/repos/docker/c\
 ompose/releases/latest | grep browser_download_url | cut -d '\"' -f 4 | grep L\
 inux | grep x86_64$) -o docker-compose", "sudo mv docker-compose /usr/local/bin\
@@ -22,6 +23,7 @@ inux | grep x86_64$) -o docker-compose", "sudo mv docker-compose /usr/local/bin\
                 "sudo dnf config-manager --add-repo=https://download.dock\
 er.com/linux/centos/docker-ce.repo",
                 "sudo dnf install --nobest -y docker-ce",
-                "sudo systemctl start docker"]
+                "sudo systemctl start docker",
+                "sudo systemctl enable docker"]
 RUN = ["docker-compose up -d"]
 REMOVE = ["docker-compose stop", "docker-compose rm -v", "docker volume prune"]

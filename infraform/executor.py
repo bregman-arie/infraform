@@ -29,24 +29,24 @@ LOG = logging.getLogger(__name__)
 class Executor(object):
 
     def __init__(self, commands=None, hosts=[], working_dir="/tmp",
-                 warn_on_fail=False, hide_output=False):
+                 warn_on_fail=False, hide_output=False, keep_files=False):
         self.commands = commands
         self.hosts = hosts
         self.working_dir = working_dir
-        self.results = []
         self.warn_on_fail = warn_on_fail
         self.hide_output = hide_output
+        self.keep_files = keep_files
 
     @staticmethod
     def transfer(hosts, source, dest, local=False):
         if not local:
             for host in hosts:
                 with suppress_output():
+                    LOG.debug(crayons.green("Transferring {} to {}:{}".format(
+                        source, host, dest)))
                     c = Connection(host)
                     patchwork.transfers.rsync(c, source, dest)
                     c.run("chmod +x {}".format(dest, hide=True, warn=True))
-                LOG.debug(crayons.green("Transferred {} to {}:{}".format(
-                    source, host, dest)))
         else:
             c = Connection("localhost")
             c.run("blip blop")
@@ -55,6 +55,8 @@ class Executor(object):
         self.script_name = "infraform-" + str(uuid.uuid4()) + ".sh"
         self.script_path = os.path.join(self.working_dir, self.script_name)
         with open(Path(self.script_path).expanduser(), 'w+') as f:
+            # Scripts should by default stop if one of the commands fail
+            f.write("set -e\n")
             f.write("\n".join(self.commands))
             LOG.debug(crayons.green("Created: {}".format(self.script_path)))
         c = Connection("127.0.0.1")
@@ -62,14 +64,18 @@ class Executor(object):
         return self.script_path
 
     def run(self):
+        # Create run script
         self.script = self.write_script()
+        # Check if script should be executed on remote host
+        # If so, copy it to the remote host
         if self.hosts:
             self.transfer(hosts=self.hosts, source=self.script,
                           dest=self.script)
             result = self.execute_on_remote_host()
         else:
             result = self.execute_on_local_host()
-        self.cleanup()
+        if not self.keep_files:
+            self.cleanup()
         return result
 
     def execute_on_remote_host(self):

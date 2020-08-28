@@ -103,15 +103,17 @@ class Scenario(object):
         for template in templates:
             try:
                 j2_template = j2_env.get_template(template)
-                rendered_scenario = j2_template.render(vars=self.variables)
+                rendered_scenario = j2_template.render(self.variables)
                 rendered_file_path = self.write_rendered_scenario(
-                    rendered_scenario, os.path.basename(template)[:-3], target_dir)
+                    rendered_scenario,
+                    os.path.basename(template)[:-3], target_dir)
                 LOG.info(crayons.green("Wrote rendered file: {}".format(
                     rendered_file_path)))
             except j2.exceptions.UndefinedError as e:
                 LOG.error(e)
                 missing_arg = re.findall(
-                    r'no attribute (.*)', e.message)[0].strip("'")
+                    r'no attribute (.*)|(.*) is undefined',
+                    e.message)[0][1].strip("'")
                 LOG.error(usage_exc.missing_arg(missing_arg))
                 sys.exit(2)
 
