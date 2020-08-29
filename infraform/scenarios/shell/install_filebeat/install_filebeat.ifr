@@ -4,3 +4,5 @@ execute: |
     yum install -y filebeat-7.8.0-x86_64.rpm
   fi
   cp filebeat.yml /etc/filebeat/
+  systemctl stop filebeat || true
+  systemctl start filebeat

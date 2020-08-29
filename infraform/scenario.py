@@ -88,7 +88,7 @@ class Scenario(object):
 
     def render(self, target_dir=None, file_path=None):
         """Render all the files in a given directory and save to disk."""
-        LOG.info(crayons.blue("\n===== Rendering templates ====="))
+        LOG.info(crayons.blue("===== Rendering templates ====="))
 
         # Create Jinja2 environment
         j2_env = j2.Environment(loader=j2.FunctionLoader(

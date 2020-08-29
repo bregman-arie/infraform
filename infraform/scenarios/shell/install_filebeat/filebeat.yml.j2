@@ -1,10 +1,13 @@
 filebeat.inputs:
   - type: log
     paths:
-      - /var/lib/jenkins/jobs/*/builds/*/*log
+      - /var/lib/jenkins/jobs/*/builds/*/log
     multiline.pattern: 'TASK'
     multiline.negate: true
     multiline.match: after
 
 output.logstash:
   hosts: ["{{ logstash_address }}"]
+
+monitoring.enabled: false
+logging.metrics.enabled: false

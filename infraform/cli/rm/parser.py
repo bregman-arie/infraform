@@ -37,3 +37,6 @@ by specifying host name or user@host")
     rm_parser.add_argument('--skip-check', dest="skip_check",
                            action="store_true",
                            help="Skip requirements check")
+    rm_parser.add_argument('--keep-files', dest="keep_files",
+                           action="store_true",
+                           help="Don't remove scripts when done running")

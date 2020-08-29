@@ -42,9 +42,9 @@ class Executor(object):
         if not local:
             for host in hosts:
                 with suppress_output():
+                    c = Connection(host)
                     LOG.debug(crayons.green("Transferring {} to {}:{}".format(
                         source, host, dest)))
-                    c = Connection(host)
                     patchwork.transfers.rsync(c, source, dest)
                     c.run("chmod +x {}".format(dest, hide=True, warn=True))
         else:
@@ -94,8 +94,7 @@ class Executor(object):
                     self.result = c.run(self.script, warn=self.warn_on_fail,
                                         hide=self.hide_output)
             except invoke.exceptions.UnexpectedExit:
-                self.cleanup()
-                LOG.error("Failed to execute:\n{}Exiting now...".format(
+                LOG.error("Failed to execute:\n{}".format(
                     crayons.red("\n".join(self.commands))))
                 sys.exit(2)
         return self.result
@@ -109,7 +108,13 @@ class Executor(object):
                 crayons.yellow("localhost"),
                 crayons.magenta("the following"),
                 crayons.green("\n".join(self.commands))))
-            c.local(self.script)
+            try:
+                self.result = c.local(self.script)
+            except invoke.exceptions.UnexpectedExit:
+                LOG.error("\nFailed to execute:\n{}".format(
+                    crayons.red("\n".join(self.commands))))
+                sys.exit(2)
+        return self.result
 
     def cleanup(self):
         LOG.debug(crayons.green("Cleaning up..."))

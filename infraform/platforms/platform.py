@@ -57,11 +57,13 @@ class Platform(object):
         includes other files as well then the whole directory is copied
         to the workspace.
         """
-
         if self.scenario.dir_name == self.scenario.name:
             self.scenario_dir = os.path.join(self.WORKSPACE,
                                              self.scenario.dir_name)
-            Executor(commands=["mkdir -p {}".format(self.scenario_dir)]).run()
+            Executor(commands=[
+                "rm -rf {}".format(self.scenario_dir),
+                "cp -r {} {}".format(self.scenario.dir_path,
+                                     self.WORKSPACE)]).run()
         else:
             self.scenario_dir = self.WORKSPACE
 
@@ -130,7 +132,8 @@ class Platform(object):
             LOG.debug(crayons.blue("\n==== Preparing remote environment ===="))
             for host in self.args['hosts']:
                 Executor.transfer(
-                    hosts=self.args['hosts'], source=self.WORKSPACE,
+                    hosts=self.args['hosts'],
+                    source=os.path.join(self.WORKSPACE, self.scenario.name),
                     dest=self.WORKSPACE)
 
         else:
@@ -158,7 +161,7 @@ class Platform(object):
         return result
 
     def remove(self):
-        LOG.info("Removing")
+        LOG.info(crayons.blue("\n===== Executing scenario removal ====="))
         try:
             cmds = self.vars['remove'].split("\n")
         except KeyError:

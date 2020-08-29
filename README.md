@@ -66,6 +66,16 @@ Terraform | Provision infrastucture using Terraform HCL files
 Python | Run Python programs
 Shell | Run Bash shell scripts
 
+## Workflow
+
+What happens when you execute a scenario on a remote host(s)?
+
+1. Infraform checks the host is ready to execute the scenario. For example, if it's Docker based scenario then Infraform checks docker is installed and running on the host
+2. A workspace is created. Basically the scenario directory (or file) copied recursively to ~/.infraform path
+3. Any templates in ~/.infraform/<scenario_dir> are being rendered, including the scenario file itself
+4. Remote environment is prepared. Local ~/.infraform/<scenario_dir> is copied to remote hosts to ~/.infraform path.
+5. Infraform runs the "run" directive in ~/.infraform/<scenario_dir>/<scenario_file> on the remote hosts
+
 ## Development
 
 If you are interested in developing Infraform further, please read [here](docs/developer.md)
