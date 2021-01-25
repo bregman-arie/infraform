@@ -1,0 +1,20 @@
+{% if "branch" in vars %}
+execute: "git checkout origin/{{ vars['branch'] }}; tox -e functional"
+{% else %}
+execute: "tox -e functional"
+{% endif %}
+image: functional-tests
+description: OpenStack Functional tests
+dockerfile: |
+  FROM {{ image_name|default("ubi8") }}
+  RUN dnf install -y python36
+  RUN pip3 install tox
+  RUN dnf install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+
+  {% if 'release' in vars %}
+      RUN rhos-release {{ vars['release'] }}
+      RUN dnf config-manager --enable rhelosp-{{ vars['release'] }}-unittest
+  {% endif %}
+ 
+  RUN alternatives --set python /usr/bin/python3
+  RUN dnf install -y python3-devel git gcc openssl-devel gettext procps iproute diffutils
