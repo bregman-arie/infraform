@@ -17,4 +17,4 @@ dockerfile: |
   {% endif %}
  
   RUN alternatives --set python /usr/bin/python3
-  RUN dnf install -y python3-devel git gcc openssl-devel gettext procps iproute diffutils
+  RUN dnf install -y python3-devel git gcc openssl-devel gettext procps iproute diffutils autoconf automake libtool make
