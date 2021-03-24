@@ -7,12 +7,15 @@ image: pep8-tests
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
   RUN dnf install -y python36 python27
-  RUN pip3 install tox
+  RUN pip3 install tox pycodestyle==2.6.0
   RUN dnf install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
 
   {% if 'release' in vars %}
       RUN rhos-release {{ vars['release'] }}
-      RUN dnf config-manager --enable rhelosp-{{ vars['release'] }}-unittest
+      RUN dnf clean all
+      RUN sed -i s/enabled=1/enabled=0/g /etc/yum/pluginconf.d/subscription-manager.conf
+      RUN sed -i s/skip_if_unavailable=False/skip_if_unavailable=True/g /etc/dnf/dnf.conf
+      RUN dnf config-manager --enable rhelosp-{{ vars['release'] }}-unittest || true
   {% endif %}
  
   RUN alternatives --set python /usr/bin/python3
