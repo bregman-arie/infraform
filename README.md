@@ -30,7 +30,7 @@ Hope you'll enjoy using it :)
 
 ### Set up ELK on a remote host
 
-    ifr run --scenario elk --host some.host
+    ifr run elk --host some.host
 
 ### Provision OpenStack instance with a floating IP
 
@@ -42,10 +42,20 @@ Scenario file is one that ends with `.ifr` or `ifr.j2` suffix. It's YAML with th
 
 ```
 description: the description of the scenario
+platform: the platform or tool to use (e.g. terraform, ansible, shell, python, etc.)
+content: |
+    just
+    the
+    contents
+    of the
+    scenario
 ```
 
-Infraform provides you with a couple of built-in scenarios you can list with `ifr list`
+Infraform provides you with a couple of built-in scenarios you can list with `ifr list`<br>
 To see the content of scenario, run `infraform show <scenario_name>`
+
+In addition to running scenarios you can also run directly files and directories with `ifr run <DIR/FILE name/path>`<br>
+As opposed to scenarios, the tool or platform used in this case, is determined by the suffix of the file or the files in the directory.
 
 ## Supported platforms and tooling
 

@@ -76,17 +76,5 @@ def missing_scenario_arg():
 Please specify which scenario to run with {}
 You can also instead, specify a command to execute with {}
 """.format(crayons.red("--scenario <SCENARIO_NAME>"),
-           crayons.red("--hosts <HOST> --command <COMMAND>"))
-    return message
-
-
-def scenario_example(key):
-    """Template for a valid scenario"""
-    message = crayons.red("""This is how a valid scenario looks like:
-
----
-execute: <command_to_execute>
-
-It seems you forgot to provide the {} key
-""".format(key))
+           crayons.red("--commands <COMMAND>"))
     return message

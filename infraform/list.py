@@ -29,17 +29,19 @@ def list_scenarios(show_path=False):
     headers = ["Scenario Name", "Description"]
     if show_path:
         headers.append("Path")
-    for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
-        for f in filenames:
-            if "ifr" in f and "." in f:
-                suffix = f.split('.')[1]
+    # Iterate over the scenarios
+    for scenario_f in os.listdir(SCENARIOS_PATH):
+        scenario_path = os.path.join(SCENARIOS_PATH, scenario_f)
+        if os.path.isfile(os.path.join(SCENARIOS_PATH, scenario_f)):
+            if "ifr" in scenario_f and "." in scenario_f:
+                scenario_info = [scenario_f.split('.')[0]]
+                suffix = scenario_f.split('.')[1]
                 if suffix == "ifr":
-                    name = get_match_until_first_dot(f)
-                    scenario_path = dirpath + '/' + f
                     with open(scenario_path, 'r') as f:
                         description = get_description(f)
-                    scenario = [name, description]
-                    if show_path:
-                        scenario.append(scenario_path)
-                    scenarios.append(scenario)
+                    scenario_info.append(description)
+                if show_path:
+                    scenario_info.append(scenario_path)
+                scenarios.append(scenario_info)
+            
     LOG.info(tabulate(scenarios, headers=headers))

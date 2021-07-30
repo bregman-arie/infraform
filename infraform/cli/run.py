@@ -19,6 +19,7 @@ from infraform.executor import Executor
 from infraform.cli import utils
 from infraform.exceptions.usage import missing_scenario_arg
 from infraform.exceptions.utils import success_or_exit
+from infraform.orchestrator import Orchestrator
 
 LOG = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ def add_run_parser(subparsers):
     run_parser.add_argument('--scenario', '-s',
                             dest="scenario",
                             help='Predefined scenario to use for execution')
-    run_parser.add_argument('--platform', dest="platform",
+    run_parser.add_argument('--platform', dest="platform_name",
                             help="The platform to use \
 (podman, docker, terraform, shell, python)")
     run_parser.add_argument('--vars', dest="vars",
@@ -46,30 +47,26 @@ by specifying host name or user@host")
     run_parser.add_argument('--commands', dest="commands",
                             default="", nargs='*',
                             help="Command(s) to execute instead of a scenario")
-    run_parser.add_argument('--debug', dest="debug",
-                            action="store_true",
-                            help="Enable debug level logging")
-    run_parser.add_argument('--keep-files', dest="keep_files",
-                            action="store_true",
-                            help="Don't remove scripts when done running")
 
 
 def main(args):
     """Runner main entry."""
-    if not args.scenario and not args.commands and not args.vars:
-        LOG.error(missing_scenario_arg())
-        sys.exit(2)
-    if args.scenario and not args.platform:
-        args.platform = utils.guess_platform(args.scenario)
-    if not args.commands and not args.scenario and not args.platform:
-        success_or_exit(1, "Couldn't figure out which platform to use. \
-Please specify --platform")
-    if not args.commands:
-        Platform = getattr(importlib.import_module(
-            "infraform.platforms.{}".format(args.platform)),
-            args.platform.capitalize())
-        platform = Platform(args=args)
-        platform.run()
-    else:
-        exe = Executor(commands=args.commands, hosts=args.hosts)
-        exe.run()
+    # TODO(abregman): do actually something with debug
+    del args.debug
+    del args.func
+
+    orc = Orchestrator(**vars(args))
+    orc.prepare()
+    orc.run()
+    # if not args.scenario and not args.commands and not args.vars:
+    #    LOG.error(missing_scenario_arg())
+    #    sys.exit(2)
+    # if not args.commands:
+    #    Platform = getattr(importlib.import_module(
+    #        "infraform.platforms.{}".format(args.platform)),
+    #        args.platform.capitalize())
+    #    platform = Platform(args=args)
+    #    platform.run()
+    # else:
+    #    exe = Executor(commands=args.commands, hosts=args.hosts)
+    #    exe.run()
