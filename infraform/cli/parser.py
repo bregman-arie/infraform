@@ -13,11 +13,10 @@
 #    under the License.
 import argparse
 
-from infraform.cli.show import parser as show_parser
-from infraform.cli.rm import parser as rm_parser
-from infraform.cli.run import parser as run_parser
-from infraform.cli.list import parser as list_parser
-from infraform.cli.ssh import parser as ssh_parser
+import infraform.cli.show as show_parser
+import infraform.cli.rm as rm_parser
+import infraform.cli.run as run_parser 
+import infraform.cli.list as list_parser
 
 
 def create_parser():
@@ -34,6 +33,5 @@ def create_parser():
     rm_parser.add_rm_parser(subparsers)
     list_parser.add_list_parser(subparsers)
     show_parser.add_show_parser(subparsers)
-    ssh_parser.add_ssh_parser(subparsers)
 
     return parser

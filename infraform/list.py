@@ -31,7 +31,7 @@ def list_scenarios(show_path=False):
         headers.append("Path")
     for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
         for f in filenames:
-            if "." in f:
+            if "ifr" in f and "." in f:
                 suffix = f.split('.')[1]
                 if suffix == "ifr":
                     name = get_match_until_first_dot(f)

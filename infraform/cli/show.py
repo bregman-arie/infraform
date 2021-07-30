@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2021 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,13 +11,22 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from infraform.cli.show import cli as show_cli
+import logging
+
+from infraform.show import show_scenario
+
+LOG = logging.getLogger(__name__)
 
 
 def add_show_parser(subparsers):
     """The parser for sub command 'show'."""
     show_parser = subparsers.add_parser("show")
-    show_parser.set_defaults(func=show_cli.main)
+    show_parser.set_defaults(func=main)
     show_parser.add_argument('scenario',
                              type=str,
                              help='scenario name')
+
+
+def main(args):
+    """Runner main entry."""
+    show_scenario(args.scenario)
