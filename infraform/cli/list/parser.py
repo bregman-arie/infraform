@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2021 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -18,7 +18,7 @@ def add_list_parser(subparsers):
     """The parser for sub command 'list'."""
     list_parser = subparsers.add_parser("list")
     list_parser.set_defaults(func=list_cli.main)
-    list_parser.add_argument('--scenarios', '-s',
-                             dest="scenarios",
+    list_parser.add_argument('-p', '--path',
+                             dest="show_path",
                              action='store_true',
-                             help='List Scenarios')
+                             help='Show the path of the scenario')

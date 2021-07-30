@@ -23,10 +23,12 @@ LOG = logging.getLogger(__name__)
 SCENARIOS_PATH = os.path.dirname(__file__) + '/../infraform/scenarios'
 
 
-def list_scenarios():
+def list_scenarios(show_path=False):
     scenarios = []
     # The headers of the table that will be displayed to the user
-    headers = ["Scenario Name", "Path", "Description"]
+    headers = ["Scenario Name", "Description"]
+    if show_path:
+        headers.append("Path")
     for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
         for f in filenames:
             if "." in f:
@@ -36,5 +38,8 @@ def list_scenarios():
                     scenario_path = dirpath + '/' + f
                     with open(scenario_path, 'r') as f:
                         description = get_description(f)
-                    scenarios.append([name, scenario_path, description])
+                    scenario = [name, description]
+                    if show_path:
+                        scenario.append(scenario_path)
+                    scenarios.append(scenario)
     LOG.info(tabulate(scenarios, headers=headers))

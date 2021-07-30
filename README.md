@@ -4,12 +4,13 @@
 
 Unified interface for infrastructure related operations. Infraform allows you to:
 
-* Run common built-in operations (aka scenarios) or provide your own and let infraform handle the execution
-* Use templated scenarios - one scenario, many ways to run it
+* Run common built-in operations (aka scenarios) or provide your own and let Infraform handle the execution
+* Use templated scenarios - one scenario, many ways to render it
 * Execute scenarios locally or on remote hosts
-* Use multiple different tools and platforms - Ansible, Python, Terraform, Docker, Docker Compose
+* Make use of different technologies to run the scenarios - Ansible, Python, Terraform, Docker, Docker Compose
 
-Infraform aims to provides users with simple, yet dynamic, way to manage their infra related operations.<br>
+Infraform is really all about ease of use. Infraform not only let's you use the same interface to run all these different technologies but it also supports templating which makes the use common technologies like Ansible, Terraform, Containers, ... much easier.
+
 Hope you'll enjoy using it :)
 
 <div align="center"><img src="./images/infraform.png"></div><hr/>
@@ -35,27 +36,20 @@ Hope you'll enjoy using it :)
 
     infraform run --scenario os-1-vm-fip --vars="network_provider=..."
 
-### SSH to the last host Infraform connected to
-
-    infraform ssh
-
 ## Scenarios
 
-Scenario is a predefined instructions file or template. It can be anything - creating a VM, run tests, set up ELK, ... you choose (or write your own)<br>
-Infraform provides you with a couple of built-in scenarios
+Scenario file is one that ends with `.ifr` or `ifr.j2` suffix. It's YAML with the following directives:
 
-Name | Platform | Description | Arguments
-:------ |:------:|:--------:|:---------:
-os-1-vm-fip | Terraform | One OpenStack instance with a floating IP | 
-pep8-tests | Podman, Docker | Run PEP8 tests in a container | override_image
-elk_filebeat_jenkins | Docker Compose | Containerized ELK + Filbeat + Jenkins and process Jenkins build log
+```
+description: the description of the scenario
+```
 
-To see the full list of scenarios and learn more it, have a look [here](docs/scenarios.md) or run `infraform list`<br>
+Infraform provides you with a couple of built-in scenarios you can list with `ifr list`
 To see the content of scenario, run `infraform show <scenario_name>`
 
-## Supported platforms and tools
+## Supported platforms and tooling
 
-InfraForm is able to execute the following types of platforms and tools
+InfraForm is able to execute using the following technologies
 
 Name | Comments 
 :------ |:------:
@@ -75,10 +69,6 @@ What happens when you execute a scenario on a remote host(s)?
 3. Any templates in ~/.infraform/<scenario_dir> are being rendered, including the scenario file itself
 4. Remote environment is prepared. Local ~/.infraform/<scenario_dir> is copied to remote hosts to ~/.infraform path.
 5. Infraform runs the "run" directive in ~/.infraform/<scenario_dir>/<scenario_file> on the remote hosts
-
-## Development
-
-If you are interested in developing Infraform further, please read [here](docs/developer.md)
 
 ## Contributions
 
