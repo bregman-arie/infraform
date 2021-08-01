@@ -12,14 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import logging
-import importlib
 import os
-import sys
 
-from infraform.executor import Executor
-from infraform.cli import utils
-from infraform.exceptions.usage import missing_scenario_arg
-from infraform.exceptions.utils import success_or_exit
 from infraform.orchestrator import Orchestrator
 
 LOG = logging.getLogger(__name__)
@@ -31,7 +25,8 @@ def add_run_parser(subparsers):
     run_parser.set_defaults(func=main)
     run_parser.add_argument('scenario',
                             nargs=1,
-                            help='An Infraform file or any other type that is supported by Infraform')
+                            help='An Infraform file or any other type \
+                            that is supported by Infraform')
     run_parser.add_argument('--platform', dest="platform_name",
                             help="The platform to use \
 (podman, docker, terraform, shell, python)")
@@ -49,8 +44,10 @@ by specifying host name or user@host")
                             default="", nargs='*',
                             help="Command(s) to execute instead of a scenario")
     run_parser.add_argument('--scenarios-dir', '-sd', dest="scenarios_dir",
-                            default=(os.path.dirname(__file__) + '/..' + '/scenarios'),
-                            help="The path of the directory where to look for Scenarios")
+                            default=(os.path.dirname(
+                                __file__) + '/..' + '/scenarios'),
+                            help="The path of the directory where \
+                            to look for Scenarios")
 
 
 def main(args):

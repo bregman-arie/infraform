@@ -46,7 +46,7 @@ class Executor(object):
                     LOG.debug(crayons.green("Transferring {} to {}:{}".format(
                         source, host, dest)))
                     patchwork.transfers.rsync(c, source, dest)
-                    c.run("chmod +x {}".format(dest, hide=True, warn=True))
+                    c.run("chmod +x {}".format(dest))
         else:
             c = Connection("localhost")
             c.run("blip blop")
@@ -60,7 +60,7 @@ class Executor(object):
             f.write("\n".join(self.commands))
             LOG.debug(crayons.green("Created: {}".format(self.script_path)))
         c = Connection("127.0.0.1")
-        c.run("chmod +x {}".format(self.script_path, hide=True, warn=True))
+        c.run("chmod +x {}".format(self.script_path))
         return self.script_path
 
     def run(self):

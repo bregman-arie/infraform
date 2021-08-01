@@ -19,7 +19,8 @@ LOG = logging.getLogger(__name__)
 
 class Workspace(object):
 
-    def __init__(self, ws_root=os.path.join(os.path.expanduser('~'), '.infraform')):
+    def __init__(self, ws_root=os.path.join(
+                 os.path.expanduser('~'), '.infraform')):
         self.ws_root = ws_root
 
     def create(self):

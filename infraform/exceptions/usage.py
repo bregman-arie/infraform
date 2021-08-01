@@ -24,6 +24,7 @@ Nor a file or directory in that name.
 """.format(crayons.red(scenario))
         super().__init__(self.message)
 
+
 class RunUsageError(Exception):
     """Exception raised for errors in run invocation"""
 

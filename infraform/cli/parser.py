@@ -15,7 +15,7 @@ import argparse
 
 import infraform.cli.show as show_parser
 import infraform.cli.rm as rm_parser
-import infraform.cli.run as run_parser 
+import infraform.cli.run as run_parser
 import infraform.cli.list as list_parser
 
 
