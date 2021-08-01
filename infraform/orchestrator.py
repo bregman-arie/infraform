@@ -12,28 +12,44 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import logging
+import os
+import yaml
+
+from infraform.workspace import Workspace
+from infraform.exceptions import usage as usage_exc
+from infraform.utils import file as file_utils
 
 LOG = logging.getLogger(__name__)
 
 
 class Orchestrator(object):
 
-    def __init__(self, platform_name=None, scenario=None, commands=None, vars=None,
-                 skip_check=False, hosts=[]):
+    def __init__(self, platform_name=None, scenario=[], commands=None, vars=None,
+                 skip_check=False, hosts=[], scenarios_dir=None):
         self.platform_name = platform_name
-        self.scenario = scenario
+        self.scenario = scenario[0]
         self.commands = commands
+        self.scenarios_dir = scenarios_dir
 
     def prepare(self):
         self.validate_input()
         self.prepare_workspace()
 
     def run(self):
-        if not self.platform_name:
-            self.platform = get_platform()
-        self.platform.prepare()
-        self.platform.run()
+        with open(self.scenario_path, 'r') as stream:
+            print(yaml.safe_load(stream))
+
+    def prepare_workspace(self):
+        self.workspace = Workspace()
+        self.workspace.create()
 
     def validate_input(self):
-        if not self.scenario and not self.commands:
-            pass
+        # Check a scenario was provided
+        if not self.scenario:
+            raise usage_exc.RunUsageError
+        # Validate it actually exists 
+        else:
+            self.scenario_path = file_utils.get_file_path(self.scenarios_dir, self.scenario, exact_match=False)
+            if not self.scenario_path:
+                raise usage_exc.ScenarioNotFoundError(self.scenario)
+        LOG.info(f"Found scenario: {self.scenario_path}")

@@ -34,7 +34,7 @@ Hope you'll enjoy using it :)
 
 ### Provision OpenStack instance with a floating IP
 
-    infraform run --scenario os-1-vm-fip --vars="network_provider=..."
+    infraform run os-1-vm-fip --vars="network_provider=..."
 
 ## Scenarios
 

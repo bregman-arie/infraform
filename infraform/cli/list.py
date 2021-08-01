@@ -35,4 +35,4 @@ def main(args):
     list_scenarios(show_path=args.show_path)
     LOG.info("\nTo display a scenario use {}\nTo run a scenario use {}".format(
         crayons.yellow("ifr show <scenario_name>"),
-        crayons.yellow("ifr run --scenario <scenario_name>")))
+        crayons.yellow("ifr run <scenario_name>")))

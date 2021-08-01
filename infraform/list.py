@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2021 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -15,8 +15,8 @@ import logging
 import os
 from tabulate import tabulate
 
-from infraform.utils import get_match_until_first_dot
-from infraform.utils import get_description
+from infraform.utils.file import get_match_until_first_dot
+from infraform.utils.file import get_description
 
 LOG = logging.getLogger(__name__)
 
@@ -29,19 +29,17 @@ def list_scenarios(show_path=False):
     headers = ["Scenario Name", "Description"]
     if show_path:
         headers.append("Path")
-    # Iterate over the scenarios
-    for scenario_f in os.listdir(SCENARIOS_PATH):
-        scenario_path = os.path.join(SCENARIOS_PATH, scenario_f)
-        if os.path.isfile(os.path.join(SCENARIOS_PATH, scenario_f)):
-            if "ifr" in scenario_f and "." in scenario_f:
-                scenario_info = [scenario_f.split('.')[0]]
-                suffix = scenario_f.split('.')[1]
+    for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
+        for f in filenames:
+            if "." in f:
+                suffix = f.split('.')[1]
                 if suffix == "ifr":
+                    name = get_match_until_first_dot(f)
+                    scenario_path = dirpath + '/' + f
                     with open(scenario_path, 'r') as f:
                         description = get_description(f)
-                    scenario_info.append(description)
-                if show_path:
-                    scenario_info.append(scenario_path)
-                scenarios.append(scenario_info)
-            
+                    scenario = [name, description]
+                    if show_path:
+                        scenario.append(scenario_path)
+                    scenarios.append(scenario)
     LOG.info(tabulate(scenarios, headers=headers))
