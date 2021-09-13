@@ -7,7 +7,7 @@ verify_ssl = true
 infraform = {path = ".",editable = true}
 
 [packages]
-infraform = {editable = true,path = "."}
+infraform = {editable = true, path = "."}
 crayons = "*"
 podman = "*"
 jinja2 = "*"

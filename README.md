@@ -28,7 +28,7 @@ Hope you'll enjoy using it :)
 
 ## Usage Examples
 
-### Set up ELK on a remote host
+### Setup ELK on a remote host
 
     ifr run elk --host some.host
 
@@ -74,7 +74,7 @@ Shell | Run Bash shell scripts
 
 What happens when you execute a scenario on a remote host(s)?
 
-1. Infraform checks the host is ready to execute the scenario. For example, if it's Docker based scenario then Infraform checks docker is installed and running on the host
+1. Infraform checks the host is ready to execute the scenario. For example, if it's a Docker based scenario then Infraform checks that Docker is installed and running on the host
 2. A workspace is created. Basically the scenario directory (or file) copied recursively to ~/.infraform path
 3. Any templates in ~/.infraform/<scenario_dir> are being rendered, including the scenario file itself
 4. Remote environment is prepared. Local ~/.infraform/<scenario_dir> is copied to remote hosts to ~/.infraform path.
