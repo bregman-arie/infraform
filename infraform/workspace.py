@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 import logging
 import os
 
@@ -26,3 +27,5 @@ class Workspace(object):
     def create(self):
         if not os.path.exists(self.ws_root):
             os.makedirs(self.ws_root)
+            LOG.info("{}: {}".format(crayons.yellow("Creating workspace"), self.ws_root))
+        LOG.info("{}: {}".format(crayons.green("Using workspace"), self.ws_root))

@@ -5,6 +5,7 @@ execute: "tox -e py36"
 {% endif %}
 image: unit-tests
 description: OpenStack Unit Tests (py36)
+platform: podman
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
   RUN dnf install -y python36

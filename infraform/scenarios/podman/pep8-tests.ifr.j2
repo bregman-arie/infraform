@@ -4,6 +4,8 @@ execute: "git checkout origin/{{ vars['branch'] }}; tox -e pep8"
 execute: "tox -e pep8"
 {% endif %}
 image: pep8-tests
+description: OpenStack PEP8 test
+platform: podman
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
   RUN dnf install -y python36 python27

@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 import logging
 
 from infraform.workspace import Workspace
@@ -36,7 +37,7 @@ class Orchestrator(object):
         self.prepare_workspace()
 
     def run(self):
-        scenario_executor = Scenario()
+        scenario_executor = Scenario(self.scenario_path)
         scenario_executor.validate()
         scenario_executor.run()
         self.cleanup_workspace()
@@ -58,4 +59,4 @@ class Orchestrator(object):
                 self.scenarios_dir, self.scenario, exact_match=False)
             if not self.scenario_path:
                 raise usage_exc.ScenarioNotFoundError(self.scenario)
-        LOG.info(f"Found scenario: {self.scenario_path}")
+        LOG.info("{}: {}".format(crayons.green("Found scenario"), self.scenario_path))

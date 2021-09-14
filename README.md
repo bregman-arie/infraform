@@ -28,6 +28,10 @@ Hope you'll enjoy using it :)
 
 ## Usage Examples
 
+### List Scenarios
+
+    ifr list
+
 ### Setup ELK on a remote host
 
     ifr run elk --host some.host
@@ -38,7 +42,7 @@ Hope you'll enjoy using it :)
 
 ## Scenarios
 
-Scenario file is one that ends with `.ifr` or `ifr.j2` suffix. It's YAML with the following directives:
+Scenario file is one that ends with `.ifr` or `ifr.j2` suffix. It uses the YAML format with the following directives:
 
 ```
 description: the description of the scenario
@@ -79,6 +83,8 @@ What happens when you execute a scenario on a remote host(s)?
 3. Any templates in ~/.infraform/<scenario_dir> are being rendered, including the scenario file itself
 4. Remote environment is prepared. Local ~/.infraform/<scenario_dir> is copied to remote hosts to ~/.infraform path.
 5. Infraform runs the "run" directive in ~/.infraform/<scenario_dir>/<scenario_file> on the remote hosts
+
+### Too detailed workflow
 
 ## Contributions
 
