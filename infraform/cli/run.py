@@ -30,7 +30,7 @@ def add_run_parser(subparsers):
     run_parser.add_argument('--platform', dest="platform_name",
                             help="The platform to use \
 (podman, docker, terraform, shell, python)")
-    run_parser.add_argument('--vars', dest="vars",
+    run_parser.add_argument('--vars', dest="scenario_vars",
                             default="",
                             help="extra variables")
     run_parser.add_argument('--skip-check', dest="skip_check",

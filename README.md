@@ -86,6 +86,8 @@ What happens when you execute a scenario on a remote host(s)?
 
 ### Too detailed workflow
 
+1. Workspace is created: ~/.infraform 
+
 ## Contributions
 
 To contribute to the project use GitHub pull requests.

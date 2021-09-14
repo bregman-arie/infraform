@@ -25,38 +25,35 @@ LOG = logging.getLogger(__name__)
 class Orchestrator(object):
 
     def __init__(self, platform_name=None, scenario=[],
-                 commands=None, vars=None,
+                 commands=None, scenario_vars=None,
                  skip_check=False, hosts=[], scenarios_dir=None):
         self.platform_name = platform_name
-        self.scenario = scenario[0]
+        self.scenario_name = scenario[0]
         self.commands = commands
         self.scenarios_dir = scenarios_dir
+        self.scenario_vars = scenario_vars
 
     def prepare(self):
         self.validate_input()
         self.prepare_workspace()
 
     def run(self):
-        scenario_executor = Scenario(self.scenario_path)
-        scenario_executor.validate()
-        scenario_executor.run()
-        self.cleanup_workspace()
+        scenario_exe = Scenario(self.scenario_path, self.workspace, scenario_vars=self.scenario_vars)
+        scenario_exe.validate()
+        scenario_exe.prepare()
+        scenario_exe.run()
 
     def prepare_workspace(self):
-        self.workspace = Workspace()
-        self.workspace.create()
-
-    def cleanup_workspace(self):
-        pass
+        self.workspace = Workspace(subdir=self.scenario_name)
 
     def validate_input(self):
         # Check a scenario was provided
-        if not self.scenario:
+        if not self.scenario_name:
             raise usage_exc.RunUsageError
         # Validate it actually exists
         else:
             self.scenario_path = file_utils.get_file_path(
-                self.scenarios_dir, self.scenario, exact_match=False)
+                self.scenarios_dir, self.scenario_name, exact_match=False)
             if not self.scenario_path:
-                raise usage_exc.ScenarioNotFoundError(self.scenario)
+                raise usage_exc.ScenarioNotFoundError(self.scenario_name)
         LOG.info("{}: {}".format(crayons.green("Found scenario"), self.scenario_path))

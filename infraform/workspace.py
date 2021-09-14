@@ -14,18 +14,30 @@
 import crayons
 import logging
 import os
+import shutil
 
 LOG = logging.getLogger(__name__)
 
 
 class Workspace(object):
 
-    def __init__(self, ws_root=os.path.join(
-                 os.path.expanduser('~'), '.infraform')):
-        self.ws_root = ws_root
+    def __init__(self, root=os.path.join(
+                 os.path.expanduser('~'), '.infraform'), subdir=None):
+        if subdir:
+            self.root = os.path.join(root, subdir)
+        else:
+            self.root = root
+        if os.path.exists(self.root):
+            self.cleanup()
+        self.create()
 
     def create(self):
-        if not os.path.exists(self.ws_root):
-            os.makedirs(self.ws_root)
-            LOG.info("{}: {}".format(crayons.yellow("Creating workspace"), self.ws_root))
-        LOG.info("{}: {}".format(crayons.green("Using workspace"), self.ws_root))
+        if not os.path.exists(self.root):
+            os.makedirs(self.root)
+            LOG.info("{}: {}".format(crayons.yellow("Creating workspace"), self.root))
+        else:
+            self.cleanup()
+
+    def cleanup(self):
+        shutil.rmtree(self.root)
+        LOG.info("{}: {}".format(crayons.green("Removed existing workspace"), self.root))
