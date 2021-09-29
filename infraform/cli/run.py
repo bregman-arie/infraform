@@ -59,15 +59,3 @@ def main(args):
     orc = Orchestrator(**vars(args))
     orc.prepare()
     orc.run()
-    # if not args.scenario and not args.commands and not args.vars:
-    #    LOG.error(missing_scenario_arg())
-    #    sys.exit(2)
-    # if not args.commands:
-    #    Platform = getattr(importlib.import_module(
-    #        "infraform.platforms.{}".format(args.platform)),
-    #        args.platform.capitalize())
-    #    platform = Platform(args=args)
-    #    platform.run()
-    # else:
-    #    exe = Executor(commands=args.commands, hosts=args.hosts)
-    #    exe.run()

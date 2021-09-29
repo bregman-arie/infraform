@@ -45,9 +45,12 @@ Hope you'll enjoy using it :)
 Scenario file is one that ends with `.ifr` or `ifr.j2` suffix. It uses the YAML format with the following directives:
 
 ```
-description: the description of the scenario
-platform: the platform or tool to use (e.g. terraform, ansible, shell, python, etc.)
-content: |
+description: # the description of the scenario
+platform:    # the platform or tool to use (e.g. terraform, ansible, shell, python, etc.)
+files:       # the files to copy to the workspace to be used during the execution of the scenario
+ - file1
+ - file2
+content: |   # The content of the scenario (shell script, terraform, ansible playbooks, etc.)
     just
     the
     contents
@@ -74,19 +77,14 @@ Terraform | Provision infrastucture using Terraform HCL files
 Python | Run Python programs
 Shell | Run Bash shell scripts
 
-## Workflow
-
-What happens when you execute a scenario on a remote host(s)?
-
-1. Infraform checks the host is ready to execute the scenario. For example, if it's a Docker based scenario then Infraform checks that Docker is installed and running on the host
-2. A workspace is created. Basically the scenario directory (or file) copied recursively to ~/.infraform path
-3. Any templates in ~/.infraform/<scenario_dir> are being rendered, including the scenario file itself
-4. Remote environment is prepared. Local ~/.infraform/<scenario_dir> is copied to remote hosts to ~/.infraform path.
-5. Infraform runs the "run" directive in ~/.infraform/<scenario_dir>/<scenario_file> on the remote hosts
-
 ### Too detailed workflow
 
-1. Workspace is created: ~/.infraform 
+The following is a description of what InfraForm does when you run a scenario
+
+1. Validates the scenario you've specified exists (the .ifr file)
+2. Check if a workspace (~/.infraform/<SCENARIO_NAME>) directory exists already. If it exists, it removes the entire directory
+3. Creates a workspace (~/.infraform/<SCENARIO_NAME>) directory
+4. Copies the scenario file (.ifr) and all the related content to the directory
 
 ## Contributions
 

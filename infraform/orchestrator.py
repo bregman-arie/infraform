@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import crayons
+import importlib
 import logging
 
 from infraform.workspace import Workspace
@@ -36,12 +37,14 @@ class Orchestrator(object):
     def prepare(self):
         self.validate_input()
         self.prepare_workspace()
+        scenario = Scenario(self.scenario_path, self.workspace, scenario_vars=self.scenario_vars)
+        scenario.validate()
+        scenario.prepare()
+        platform = self.create_platform(scenario.platform)
+        platform.prepare()
 
     def run(self):
-        scenario_exe = Scenario(self.scenario_path, self.workspace, scenario_vars=self.scenario_vars)
-        scenario_exe.validate()
-        scenario_exe.prepare()
-        scenario_exe.run()
+        platform.run()
 
     def prepare_workspace(self):
         self.workspace = Workspace(subdir=self.scenario_name)
@@ -57,3 +60,12 @@ class Orchestrator(object):
             if not self.scenario_path:
                 raise usage_exc.ScenarioNotFoundError(self.scenario_name)
         LOG.info("{}: {}".format(crayons.green("Found scenario"), self.scenario_path))
+
+    def create_platform(self, platform):
+        """Returns platform instance based on the given platform argument."""
+        Platform = getattr(importlib.import_module(
+            "infraform.platforms.{}".format(platform)),
+            platform.capitalize())
+        LOG.info("{}: {}".format(crayons.green("Using the platform"), platform))
+        platform_instance = Platform()
+        return platform_instance

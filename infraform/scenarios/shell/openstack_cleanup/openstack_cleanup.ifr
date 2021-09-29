@@ -1,5 +1,0 @@
-execute: |
-  for net in $(openstack network list --internal --format value -c Name); do openstack network delete $net; done
-  for port in $(openstack port list --internal --format value -c Name); do openstack port delete $port ; done
-  for subnet in $(openstack subnet list --internal --format value -c Name); do openstack subnet delete $subnet; done
-  for server in $(openstack server list --format value -c Name); do openstack server delete $server; done

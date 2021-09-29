@@ -29,9 +29,10 @@ class Platform(object):
 
     WORKSPACE = "~/.infraform/"
 
-    def __init__(self, args, installation=None, run_platform=None,
+    def __init__(self, args=None, installation=None, run_platform=None,
                  readiness_check=[], binary=None, platform_name=None, rm=None):
-        self.args = {k: v for k, v in vars(args).items() if v is not None}
+        if args:
+            self.args = {k: v for k, v in vars(args).items() if v is not None}
         self.installation = installation
         self.run_platform = run_platform
         self.binary = binary

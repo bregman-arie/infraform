@@ -14,7 +14,7 @@
 import logging
 
 from infraform.platforms.platform import Platform
-from infraform import process
+from infraform.utils import process
 
 LOG = logging.getLogger(__name__)
 

@@ -16,6 +16,7 @@ import jinja2 as j2
 import logging
 import os
 import shutil
+import yaml
 
 from infraform import filters
 
@@ -63,6 +64,23 @@ class Scenario(object):
         if self.scenario_suffix == "j2":
             self.render()
 
+        self.load_scenario()
+
+    def load_scenario(self):
+        """Returns Scenario content as a dictionary."""
+        content = {}
+        with open(self.scenario_path, 'r') as stream:
+            try:
+                content_yaml = yaml.safe_load(stream)
+                for k, v in content_yaml.items():
+                    if k not in self.scenario_vars:
+                        content.update({k: v})
+                        if not hasattr(self, k):
+                            setattr(self, k, v)
+            except yaml.YAMLError as exc:
+                LOG.error(exc)
+        self.scenario_content = content
+
     def move_scenario_to_workspace(self):
         LOG.info("{}: {} to {}".format(crayons.green("Copied scenario"), self.scenario_path, self.workspace.root))
         shutil.copy(self.scenario_path, self.workspace.root)
@@ -72,5 +90,6 @@ class Scenario(object):
 
     def write_rendered_scenario(self, scenario):
         """Save the rendered scenario."""
-        with open(os.path.join(self.workspace.root, self.scenario_name + '.ifr'), 'w+') as f:
+        self.scenario_path = os.path.join(self.workspace.root, self.scenario_name + '.ifr')
+        with open(self.scenario_path, 'w+') as f:
             f.write(scenario)
