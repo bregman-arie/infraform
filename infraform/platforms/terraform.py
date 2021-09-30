@@ -27,7 +27,7 @@ rp.com/terraform/${version}/terraform_${version}_linux_amd64.zip",
                     "unzip terraform_${version}_linux_amd64.zip",
                     "sudo mv terraform /usr/local/bin/"]
 
-    def __init__(self, args):
+    def __init__(self, args=None):
         self.binary = self.BINARY
         self.package = self.PACKAGE
         self.installation = self.INSTALLATION

@@ -37,14 +37,15 @@ class Orchestrator(object):
     def prepare(self):
         self.validate_input()
         self.prepare_workspace()
-        scenario = Scenario(self.scenario_path, self.workspace, scenario_vars=self.scenario_vars)
+        scenario = Scenario(self.scenario_path, self.workspace,
+                            scenario_vars=self.scenario_vars)
         scenario.validate()
         scenario.prepare()
-        platform = self.create_platform(scenario.platform)
-        platform.prepare()
+        self.platform = self.create_platform(scenario.platform)
+        self.platform.prepare()
 
     def run(self):
-        platform.run()
+        self.platform.run()
 
     def prepare_workspace(self):
         self.workspace = Workspace(subdir=self.scenario_name)
@@ -59,13 +60,15 @@ class Orchestrator(object):
                 self.scenarios_dir, self.scenario_name, exact_match=False)
             if not self.scenario_path:
                 raise usage_exc.ScenarioNotFoundError(self.scenario_name)
-        LOG.info("{}: {}".format(crayons.green("Found scenario"), self.scenario_path))
+        LOG.info("{}: {}".format(crayons.green("Found scenario"),
+                                 self.scenario_path))
 
     def create_platform(self, platform):
         """Returns platform instance based on the given platform argument."""
         Platform = getattr(importlib.import_module(
             "infraform.platforms.{}".format(platform)),
             platform.capitalize())
-        LOG.info("{}: {}".format(crayons.green("Using the platform"), platform))
+        LOG.info("{}: {}".format(crayons.green("Using the platform"),
+                                 platform))
         platform_instance = Platform()
         return platform_instance

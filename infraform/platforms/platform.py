@@ -27,8 +27,6 @@ LOG = logging.getLogger(__name__)
 
 class Platform(object):
 
-    WORKSPACE = "~/.infraform/"
-
     def __init__(self, args=None, installation=None, run_platform=None,
                  readiness_check=[], binary=None, platform_name=None, rm=None):
         if args:

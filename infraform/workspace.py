@@ -34,10 +34,12 @@ class Workspace(object):
     def create(self):
         if not os.path.exists(self.root):
             os.makedirs(self.root)
-            LOG.info("{}: {}".format(crayons.yellow("Creating workspace"), self.root))
+            LOG.info("{}: {}".format(crayons.yellow("Creating workspace"),
+                                     self.root))
         else:
             self.cleanup()
 
     def cleanup(self):
         shutil.rmtree(self.root)
-        LOG.info("{}: {}".format(crayons.green("Removed existing workspace"), self.root))
+        LOG.info("{}: {}".format(crayons.green("Removed existing workspace"),
+                                 self.root))

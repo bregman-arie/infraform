@@ -31,7 +31,8 @@ def list_scenarios(show_path=False):
     if show_path:
         headers.append("Path")
 
-    # Walk through the tree of scenarios to find scenario files (ending with .ifr)
+    # Walk through the tree of scenarios to find
+    # scenario files (ending with .ifr)
     for (dirpath, dirnames, filenames) in os.walk(SCENARIOS_PATH):
         for f in filenames:
             if "." in f:
@@ -46,8 +47,10 @@ def list_scenarios(show_path=False):
                     with open(scenario_path, 'r') as f:
                         for line in f.readlines():
                             if re.findall("description:(.*)", line):
-                                description = re.findall("description:(.*)", line)[0]
-                            if re.findall("platform:(.*)".format(description), line):
+                                description = re.findall("description:(.*)",
+                                                         line)[0]
+                            if re.findall("platform:(.*)",
+                                          line):
                                 platform = re.findall("platform:(.*)", line)[0]
                     scenario = [name, description, platform]
                     if show_path:
