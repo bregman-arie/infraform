@@ -24,13 +24,14 @@ class Terraform(Platform):
     RUN_CMD = "terraform apply"
     readiness_check = ["terraform"]
     PRE_CMDS = ['terraform init']
-    INSTALLATION = ["export version=0.12.10\nwget https://releases.hashico\
+    installation_cmds = [
+        "export version=1.0.8\nwget https://releases.hashico\
 rp.com/terraform/${version}/terraform_${version}_linux_amd64.zip",
-                    "unzip terraform_${version}_linux_amd64.zip",
-                    "sudo mv terraform /usr/local/bin/"]
+        "unzip terraform_${version}_linux_amd64.zip",
+        "sudo mv terraform /usr/local/bin/"
+    ]
 
     def __init__(self, args=None):
         self.binary = self.BINARY
         self.package = self.PACKAGE
-        self.installation = self.INSTALLATION
         super(Terraform, self).__init__(args)

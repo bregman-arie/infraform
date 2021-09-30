@@ -85,6 +85,9 @@ The following is a description of what InfraForm does when you run a scenario
 2. Check if a workspace (~/.infraform/<SCENARIO_NAME>) directory exists already. If it exists, it removes the entire directory
 3. Creates a workspace (~/.infraform/<SCENARIO_NAME>) directory
 4. Copies the scenario file (.ifr) and all the related content to the directory
+5. Checks the host is ready for executing the scenario by running chosen platform check command(s)
+  1. If check command fails, it stops execution until the user fixes the issue
+6. Executes the scenario using the platform default run command
 
 ## Contributions
 

@@ -57,7 +57,14 @@ class Orchestrator(object):
                 hosts=self.hosts, hide_output=True, warn_on_fail=True)
             for res in results:
                 if res.return_code != 0:
-                    print(crayons.red(("FAILED")))
+                    print(crayons.red(("FAILED\n")))
+                    LOG.info("host: {} isn't ready.\nstderr: {}".format(
+                        crayons.cyan(host), crayons.red(res.stderr)))
+                    LOG.info(
+                        "To fix this issue,\
+please run the following on {}:\n{}".format(crayons.cyan(host),
+                                            crayons.yellow("\n".join(
+                                                self.platform.installation_cmds))))
                     sys.exit(2)
         print(crayons.green("PASSED"))
 
