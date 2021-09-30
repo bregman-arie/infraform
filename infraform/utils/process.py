@@ -45,16 +45,21 @@ def execute_on_remote_host(commands, hosts, warn_on_fail=False,
                             "Executing: {} in {}".format(cmd, cwd)))
                         res = c.run(cmd, warn=warn_on_fail, hide=hide_output)
                 else:
-                    LOG.debug(crayons.red("Executing: {}".format(cmd)))
+                    if not hide_output:
+                        LOG.debug(crayons.red("Executing: {}".format(cmd)))
                     res = c.run(cmd, warn=warn_on_fail, hide=hide_output)
                 results.append(res)
             except invoke.exceptions.UnexpectedExit:
-                LOG.error("Failed to execute: {}. Exiting now...".format(cmd))
+                if not hide_output:
+                    LOG.error("{}: {} on {}. Exiting now...".format(
+                        crayons.red("Failed to execute"), crayons.yellow(cmd),
+                        crayons.cyan(host)))
                 sys.exit(2)
     return results
 
 
-def execute_on_local_host(commands, warn_on_fail=False, cwd=None, hide_output=False):
+def execute_on_local_host(commands, warn_on_fail=False,
+                          cwd=None, hide_output=False):
     """Execute given commands on local host."""
     pass
 

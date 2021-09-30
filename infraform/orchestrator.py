@@ -14,11 +14,13 @@
 import crayons
 import importlib
 import logging
+import sys
 
-from infraform.workspace import Workspace
-from infraform.exceptions import usage as usage_exc
+from infraform.utils import process
 from infraform.utils import file as file_utils
 from infraform.scenario import Scenario
+from infraform.exceptions import usage as usage_exc
+from infraform.workspace import Workspace
 
 LOG = logging.getLogger(__name__)
 
@@ -43,10 +45,24 @@ class Orchestrator(object):
         scenario.validate()
         scenario.prepare()
         self.platform = self.create_platform(scenario.platform)
-        self.platform.prepare()
+        self.platform.prepare(hosts=self.hosts)
+
+        self.check_host_readiness()
+
+    def check_host_readiness(self):
+        print(crayons.yellow("verifying host readiness..."), end="")
+        for host in self.hosts:
+            results = process.execute_cmd(
+                commands=self.platform.readiness_check,
+                hosts=self.hosts, hide_output=True, warn_on_fail=True)
+            for res in results:
+                if res.return_code != 0:
+                    print(crayons.red(("FAILED")))
+                    sys.exit(2)
+        print(crayons.green("PASSED"))
 
     def run(self):
-        LOG.info("{}: {}".format(crayons.yellow("Running the scenario"),
+        LOG.info("{}: {}".format(crayons.yellow("running scenario"),
                                  self.scenario_name))
         self.platform.run(hosts=self.hosts)
         LOG.info("{}: {}".format(crayons.green(
@@ -65,7 +81,7 @@ class Orchestrator(object):
                 self.scenarios_dir, self.scenario_name, exact_match=False)
             if not self.scenario_path:
                 raise usage_exc.ScenarioNotFoundError(self.scenario_name)
-        LOG.info("{}: {}".format(crayons.green("Found scenario"),
+        LOG.info("{}: {}".format(crayons.green("scenario"),
                                  self.scenario_path))
 
     def create_platform(self, platform):
@@ -73,7 +89,7 @@ class Orchestrator(object):
         Platform = getattr(importlib.import_module(
             "infraform.platforms.{}".format(platform)),
             platform.capitalize())
-        LOG.info("{}: {}".format(crayons.green("Using the platform"),
+        LOG.info("{}: {}".format(crayons.green("platform"),
                                  platform))
         platform_instance = Platform()
         return platform_instance

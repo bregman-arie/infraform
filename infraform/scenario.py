@@ -89,7 +89,7 @@ class Scenario(object):
         self.scenario_content = content
 
     def move_scenario_to_workspace(self):
-        LOG.info("{}: {} to {}".format(crayons.green("Copied scenario"),
+        LOG.info("{}: {} to {}".format(crayons.green("scenario copied"),
                                        self.scenario_path,
                                        self.workspace.root))
         shutil.copy(self.scenario_path, self.workspace.root)

@@ -11,11 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import crayons
 import logging
 
 from infraform.platforms.platform import Platform
-from infraform.utils import process
 
 LOG = logging.getLogger(__name__)
 
@@ -24,6 +22,8 @@ class Terraform(Platform):
 
     NAME = PACKAGE = BINARY = 'terraform'
     RUN_CMD = "terraform apply"
+    readiness_check = ["terraform"]
+    PRE_CMDS = ['terraform init']
     INSTALLATION = ["export version=0.12.10\nwget https://releases.hashico\
 rp.com/terraform/${version}/terraform_${version}_linux_amd64.zip",
                     "unzip terraform_${version}_linux_amd64.zip",
@@ -34,10 +34,3 @@ rp.com/terraform/${version}/terraform_${version}_linux_amd64.zip",
         self.package = self.PACKAGE
         self.installation = self.INSTALLATION
         super(Terraform, self).__init__(args)
-
-    def prepare(self):
-        process.execute_cmd(['terraform init'])
-
-    # def run(self, hosts=None):
-    #    LOG.info("{}: running {}".format(crayons.cyan(self.NAME), self.RUN_CMD))
-    #    process.execute_cmd(commands=[self.RUN_CMD], hosts=hosts)
