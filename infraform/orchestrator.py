@@ -33,6 +33,7 @@ class Orchestrator(object):
         self.commands = commands
         self.scenarios_dir = scenarios_dir
         self.scenario_vars = scenario_vars
+        self.hosts = hosts
 
     def prepare(self):
         self.validate_input()
@@ -45,7 +46,11 @@ class Orchestrator(object):
         self.platform.prepare()
 
     def run(self):
-        self.platform.run()
+        LOG.info("{}: {}".format(crayons.yellow("Running the scenario"),
+                                 self.scenario_name))
+        self.platform.run(hosts=self.hosts)
+        LOG.info("{}: {}".format(crayons.green(
+            "Finished executing the scenario"), self.scenario_name))
 
     def prepare_workspace(self):
         self.workspace = Workspace(subdir=self.scenario_name)

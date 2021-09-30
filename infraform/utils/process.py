@@ -54,7 +54,7 @@ def execute_on_remote_host(commands, hosts, warn_on_fail=False,
     return results
 
 
-def execute_on_local_host(commands, cwd):
+def execute_on_local_host(commands, warn_on_fail=False, cwd=None, hide_output=False):
     """Execute given commands on local host."""
     pass
 

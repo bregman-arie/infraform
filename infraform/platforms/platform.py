@@ -19,6 +19,7 @@ from ansible.parsing.splitter import split_args, parse_kv
 import crayons
 
 from infraform.executor import Executor
+from infraform.utils import process
 from infraform.scenario import Scenario
 from infraform.exceptions.utils import success_or_exit
 
@@ -39,10 +40,10 @@ class Platform(object):
         self.rm = rm
 
         # Array of commands to run in order to check the host is ready
-        if "hosts" in self.args:
+        if args and "hosts" in self.args:
             self.readiness_check.append("rsync --version")
         # vars are used for feeding scenario template
-        if 'vars' in self.args:
+        if args and 'vars' in self.args:
             self.vars = self.get_vars(self.args['vars'])
         # Create additional vars based on passed ones
         self.create_new_vars()
@@ -68,7 +69,7 @@ class Platform(object):
 
     def create_new_vars(self):
         """Create additional variables out of existing variables."""
-        if 'project' in self.vars:
+        if hasattr(self, 'vars') and 'project' in self.vars:
             if '/' in self.vars['project']:
                 self.vars['project_name'] = os.path.basename(
                     self.vars['project'])
@@ -141,35 +142,7 @@ class Platform(object):
                 hosts=self.args['hosts'], source=self.scenario.source,
                 dest=self.WORKSPACE, local=True)
 
-    def run(self):
+    def run(self, hosts=None):
         """Execute platform commands."""
-        self.prepare()
-        try:
-            cmds = self.vars['execute'].split("\n")
-        except KeyError:
-            cmds = self.RUN
-        hosts = []
-        if "hosts" in self.args:
-            hosts = self.args['hosts']
-        LOG.info(crayons.blue("\n===== Executing scenario ====="))
-        exe = Executor(commands=cmds, hosts=hosts,
-                       working_dir=self.scenario_dir)
-        result = exe.run()
-        LOG.info(crayons.blue("===== Done Executing scenario ====="))
-        success_or_exit(result.exited)
-        return result
-
-    def remove(self):
-        LOG.info(crayons.blue("\n===== Executing scenario removal ====="))
-        try:
-            cmds = self.vars['remove'].split("\n")
-        except KeyError:
-            cmds = self.rm
-        hosts = []
-        if "hosts" in self.args:
-            hosts = self.args['hosts']
-        exe = Executor(commands=cmds, hosts=hosts,
-                       working_dir=self.scenario_dir)
-        result = exe.run()
-        success_or_exit(result.exited)
-        return result
+        LOG.info("{}: running {}".format(crayons.cyan(self.NAME), self.RUN_CMD))
+        process.execute_cmd(commands=[self.RUN_CMD], hosts=hosts)
