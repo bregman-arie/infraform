@@ -2,22 +2,22 @@
 
 [![Build Status](https://travis-ci.org/bregman-arie/infraform.svg?branch=master)](https://travis-ci.org/bregman-arie/infraform)
 
-Unified interface for infrastructure related operations. Infraform allows you to:
+Unified interface for automation cross different technologies and platforms. Infraform allows you to:
 
-* Run common built-in operations (aka scenarios) or provide your own and let Infraform handle the execution
+* Run common built-in operations (aka scenarios) or write/provide your own and let Infraform handle the execution
 * Use templated scenarios - one scenario, many ways to render it
-* Execute scenarios locally or on remote hosts
-* Make use of different technologies to run the scenarios - Ansible, Python, Terraform, Docker, Docker Compose
+* Execute scenarios locally or on remote host(s)
+* Make use of different technologies to run the scenarios - Ansible, Python, Terraform, Podman, Docker, ...
 
-Infraform is really all about ease of use. Infraform not only let's you use the same interface to run all these different technologies but it also supports templating which makes the use common technologies like Ansible, Terraform, Containers, ... much easier.
+With Infraform it's really all about ease of use. Infraform not only let's you use the same interface to run all these different technologies but it also supports templating which allows you to re-use the same scenarios for different purposes (e.g. staging and prod environments)
 
-Hope you'll enjoy using it :)
+Hope you'll enjoy using it and if not, let us know and open an issue :)
 
 <div align="center"><img src="./images/infraform.png"></div><hr/>
 
 ## Requirements
 
-* Linux (Developed and tested on Fedora)
+* Linux (developed and tested on Fedora)
 * Python>=3.7
 
 ## Installation
@@ -31,14 +31,6 @@ Hope you'll enjoy using it :)
 ### List Scenarios
 
     ifr list
-
-### Setup ELK on a remote host
-
-    ifr run elk --host some.host
-
-### Provision OpenStack instance with a floating IP
-
-    infraform run os-1-vm-fip --vars="network_provider=..."
 
 ## Scenarios
 
@@ -72,22 +64,21 @@ Name | Comments
 :------ |:------:
 Podman | Run containers using Podman
 Docker | Run containers using Docker
-docker-compose | Run containers using Docker
 Terraform | Provision infrastucture using Terraform HCL files
-Python | Run Python programs
-Shell | Run Bash shell scripts
 
 ### Too detailed workflow
 
 The following is a description of what InfraForm does when you run a scenario
 
 1. Validates the scenario you've specified exists (the .ifr file)
-2. Check if a workspace (~/.infraform/<SCENARIO_NAME>) directory exists already. If it exists, it removes the entire directory
-3. Creates a workspace (~/.infraform/<SCENARIO_NAME>) directory
+2. Check if a workspace (.infraform/<SCENARIO_NAME>) directory exists already. If it exists, it removes the entire directory
+3. Creates a workspace (.infraform/<SCENARIO_NAME>) directory
 4. Copies the scenario file (.ifr) and all the related content to the directory
 5. Checks the host is ready for executing the scenario by running chosen platform check command(s)
-  1. If check command fails, it stops execution until the user fixes the issue
-6. Executes the scenario using the platform default run command
+  1. If check command fails, it will ask the user whether to run commands to fix the check result
+    1. If user replied with 'y', it will start executing installation commands based on the chosen platform
+    2. If user replied with 'n', it will exit with return code different than 0
+6. Executes the scenario using the platform default run command (e.g. Terraform -> terraform apply)
 
 ## Contributions
 

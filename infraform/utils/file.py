@@ -11,8 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
+from fabric import Connection
+import logging
 import os
+import patchwork.transfers
 import re
+
+from infraform.context import suppress_output
+
+LOG = logging.getLogger(__name__)
 
 
 def get_file_content(file_path):
@@ -40,3 +48,16 @@ def get_match_until_first_dot(string):
     """
     until_dot_pattern = re.compile(r"^[^.]*")
     return re.search(until_dot_pattern, string).group(0)
+
+
+def transfer(host, source, dest, local=False):
+    if not local:
+        with suppress_output():
+            c = Connection(host)
+            LOG.debug(crayons.green("Transferring {} to {}:{}".format(
+                source, host, dest)))
+            patchwork.transfers.rsync(c, source, dest)
+            c.run("chmod +x {}".format(dest))
+    else:
+        c = Connection("localhost")
+        c.run("blip blop")

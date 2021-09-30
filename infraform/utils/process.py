@@ -21,7 +21,7 @@ LOG = logging.getLogger(__name__)
 
 
 def execute_on_remote_host(commands, hosts, warn_on_fail=False,
-                           cwd=None, hide_output=False):
+                           cwd='/tmp', hide_output=False):
     """Execute commands remotely on a given list of hosts
 
     Args:
@@ -37,24 +37,20 @@ def execute_on_remote_host(commands, hosts, warn_on_fail=False,
     results = []
     for host in hosts:
         c = Connection(host)
-        for cmd in commands:
-            try:
-                if cwd:
-                    with c.cd(cwd):
-                        LOG.debug(crayons.red(
-                            "Executing: {} in {}".format(cmd, cwd)))
-                        res = c.run(cmd, warn=warn_on_fail, hide=hide_output)
-                else:
+        with c.cd(cwd):
+            for cmd in commands:
+                try:
                     if not hide_output:
                         LOG.debug(crayons.red("Executing: {}".format(cmd)))
                     res = c.run(cmd, warn=warn_on_fail, hide=hide_output)
-                results.append(res)
-            except invoke.exceptions.UnexpectedExit:
-                if not hide_output:
-                    LOG.error("{}: {} on {}. Exiting now...".format(
-                        crayons.red("Failed to execute"), crayons.yellow(cmd),
-                        crayons.cyan(host)))
-                sys.exit(2)
+                    results.append(res)
+                except invoke.exceptions.UnexpectedExit:
+                    if not hide_output:
+                        LOG.error("{}: {} on {}. Exiting now...".format(
+                            crayons.red("Failed to execute"),
+                            crayons.yellow(cmd),
+                            crayons.cyan(host)))
+                    sys.exit(2)
     return results
 
 
@@ -64,7 +60,7 @@ def execute_on_local_host(commands, warn_on_fail=False,
     pass
 
 
-def execute_cmd(commands, hosts=None, warn_on_fail=False, cwd=None,
+def execute_cmd(commands, hosts: list = [], warn_on_fail=False, cwd="/tmp",
                 hide_output=False):
     """Execute given commands on remote hosts or locally."""
     if hosts:

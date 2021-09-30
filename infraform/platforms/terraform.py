@@ -22,12 +22,12 @@ class Terraform(Platform):
 
     NAME = PACKAGE = BINARY = 'terraform'
     RUN_CMD = "terraform apply"
-    readiness_check = ["terraform"]
+    readiness_check = ["terraform -v"]
     PRE_CMDS = ['terraform init']
     installation_cmds = [
-        "export version=1.0.8\nwget https://releases.hashico\
-rp.com/terraform/${version}/terraform_${version}_linux_amd64.zip",
-        "unzip terraform_${version}_linux_amd64.zip",
+        "wget https://releases.hashico\
+rp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip",
+        "unzip terraform_1.0.8_linux_amd64.zip",
         "sudo mv terraform /usr/local/bin/"
     ]
 

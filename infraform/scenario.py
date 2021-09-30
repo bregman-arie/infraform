@@ -93,6 +93,7 @@ class Scenario(object):
                                        self.scenario_path,
                                        self.workspace.root))
         shutil.copy(self.scenario_path, self.workspace.root)
+        self.dir = self.workspace.root
 
     def run(self):
         LOG.info("{}: {}".format(crayons.yellow("Running scenario"),

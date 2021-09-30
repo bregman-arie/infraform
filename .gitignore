@@ -124,3 +124,4 @@ terraform.tfstate*
 /*.sh
 /*.yml
 /*.ifr
+.infraform*

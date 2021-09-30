@@ -21,8 +21,7 @@ LOG = logging.getLogger(__name__)
 
 class Workspace(object):
 
-    def __init__(self, root=os.path.join(
-                 os.path.expanduser('~'), '.infraform'), subdir=None):
+    def __init__(self, root='.infraform', subdir=None):
         if subdir:
             self.root = os.path.join(root, subdir)
         else:

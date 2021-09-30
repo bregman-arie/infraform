@@ -48,9 +48,12 @@ class Orchestrator(object):
         self.platform.prepare(hosts=self.hosts)
 
         self.check_host_readiness()
+        for host in self.hosts:
+            file_utils.transfer(host=host, source=scenario.dir,
+                                dest=self.workspace.root)
 
     def check_host_readiness(self):
-        print(crayons.yellow("verifying host readiness..."), end="")
+        LOG.info(crayons.yellow("host verification started"))
         for host in self.hosts:
             results = process.execute_cmd(
                 commands=self.platform.readiness_check,
@@ -60,13 +63,21 @@ class Orchestrator(object):
                     print(crayons.red(("FAILED\n")))
                     LOG.info("host: {} isn't ready.\nstderr: {}".format(
                         crayons.cyan(host), crayons.red(res.stderr)))
-                    LOG.info(
-                        "To fix this issue,\
-please run the following on {}:\n{}".format(crayons.cyan(host),
-                                            crayons.yellow("\n".join(
-                                                self.platform.installation_cmds))))
-                    sys.exit(2)
-        print(crayons.green("PASSED"))
+                    LOG.info("Run the following on {}:\n{}".format(
+                        crayons.cyan(host), crayons.yellow(
+                            "\n".join(self.platform.installation_cmds))))
+                    ans = input("Should I run it for you?[yY/Nn]: ")
+                    if ans.lower() == "y":
+                        LOG.info(
+                            "Running installation commands on {}".format(
+                                crayons.cyan(host)))
+                        process.execute_cmd(
+                            commands=self.platform.installation_cmds,
+                            hosts=[host])
+                    else:
+                        LOG.info("Goodbye")
+                        sys.exit(2)
+        LOG.info(crayons.green("host verification result: PASSED"))
 
     def run(self):
         LOG.info("{}: {}".format(crayons.yellow("running scenario"),
