@@ -18,6 +18,7 @@ import sys
 
 from infraform.utils import process
 from infraform.utils import file as file_utils
+from infraform.host import Host
 from infraform.scenario import Scenario
 from infraform.exceptions import usage as usage_exc
 from infraform.workspace import Workspace
@@ -35,79 +36,40 @@ class Orchestrator(object):
         self.commands = commands
         self.scenarios_dir = scenarios_dir
         self.scenario_vars = scenario_vars
-        self.hosts = hosts
+        self.hosts_names = hosts
+        self.hosts = []
 
     def prepare(self):
-        self.validate_input()
-        self.prepare_workspace()
-        scenario = Scenario(self.scenario_path, self.workspace,
-                            scenario_vars=self.scenario_vars)
-        scenario.validate()
-        scenario.prepare()
-        self.platform = self.create_platform(scenario.platform)
-        self.platform.prepare(hosts=self.hosts)
+        scenario_fpath = self.get_scenario_file_path()
+        scenario = Scenario(path=scenario_fpath, platform_name=self.platform_name)
+        workspace = Workspace(root_dir_path='.infraform', subdir=scenario.name)
+        scenario.copy(path=workspace.path)
+        scenario.load_content()
 
-        self.check_host_readiness()
-        for host in self.hosts:
-            file_utils.transfer(host=host, source=scenario.dir,
-                                dest=self.workspace.root)
-
-    def check_host_readiness(self):
-        LOG.info(crayons.yellow("host verification started"))
-        for host in self.hosts:
-            results = process.execute_cmd(
-                commands=self.platform.readiness_check,
-                hosts=self.hosts, hide_output=True, warn_on_fail=True)
-            for res in results:
-                if res.return_code != 0:
-                    print(crayons.red(("FAILED\n")))
-                    LOG.info("host: {} isn't ready.\nstderr: {}".format(
-                        crayons.cyan(host), crayons.red(res.stderr)))
-                    LOG.info("Run the following on {}:\n{}".format(
-                        crayons.cyan(host), crayons.yellow(
-                            "\n".join(self.platform.installation_cmds))))
-                    ans = input("Should I run it for you?[yY/Nn]: ")
-                    if ans.lower() == "y":
-                        LOG.info(
-                            "Running installation commands on {}".format(
-                                crayons.cyan(host)))
-                        process.execute_cmd(
-                            commands=self.platform.installation_cmds,
-                            hosts=[host])
-                    else:
-                        LOG.info("Goodbye")
-                        sys.exit(2)
-        LOG.info(crayons.green("host verification result: PASSED"))
+        # Create a list of hosts instances
+        for host in self.hosts_names:
+            host_instance = Host(address=host,
+                                 workspace_dir=scenario.name,
+                                 platform_name=self.platform_name)
+            scenario.copy(host=host_instance.address, path=host_instance.workspace.path)
+            host_instance.check_host_platform_readiness(scenario.platform)
+            self.hosts.append(host_instance)
+        sys.exit(2)
 
     def run(self):
-        LOG.info("{}: {}".format(crayons.yellow("running scenario"),
-                                 self.scenario_name))
-        self.platform.run(hosts=self.hosts)
-        LOG.info("{}: {}".format(crayons.green(
-            "Finished executing the scenario"), self.scenario_name))
+        for host in self.hosts:
+            host.scenario.run()
 
-    def prepare_workspace(self):
-        self.workspace = Workspace(subdir=self.scenario_name)
-
-    def validate_input(self):
+    def get_scenario_file_path(self):
         # Check a scenario was provided
         if not self.scenario_name:
             raise usage_exc.RunUsageError
         # Validate it actually exists
         else:
-            self.scenario_path = file_utils.get_file_path(
+            scenario_fpath = file_utils.get_file_path(
                 self.scenarios_dir, self.scenario_name, exact_match=False)
-            if not self.scenario_path:
-                raise usage_exc.ScenarioNotFoundError(self.scenario_name)
-        LOG.info("{}: {}".format(crayons.green("scenario"),
-                                 self.scenario_path))
-
-    def create_platform(self, platform):
-        """Returns platform instance based on the given platform argument."""
-        Platform = getattr(importlib.import_module(
-            "infraform.platforms.{}".format(platform)),
-            platform.capitalize())
-        LOG.info("{}: {}".format(crayons.green("platform"),
-                                 platform))
-        platform_instance = Platform()
-        return platform_instance
+            if not scenario_fpath:
+                raise usage_exc.ScenarioNotFoundError(scenario_fpath)
+            else:
+                LOG.info("{}: {}".format(crayons.green("scenario"), scenario_fpath))
+                return scenario_fpath

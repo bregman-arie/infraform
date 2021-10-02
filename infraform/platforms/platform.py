@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import importlib
 import logging
 import sys
 # from ansible.parsing.splitter import split_args, parse_kv
@@ -54,3 +55,14 @@ class Platform(object):
         LOG.info("----- Scenario Output START-----")
         process.execute_cmd(commands=[self.RUN_CMD], hosts=hosts)
         LOG.info("----- Scenario Output END-----")
+
+    @staticmethod
+    def create_platform(platform):
+        """Returns platform instance based on the given platform argument."""
+        Platform = getattr(importlib.import_module(
+            "infraform.platforms.{}".format(platform)),
+            platform.capitalize())
+        LOG.info("{}: {}".format(crayons.green("platform"),
+                                 platform))
+        platform_instance = Platform()
+        return platform_instance

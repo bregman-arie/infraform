@@ -11,7 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from fabric import Connection
 import crayons
+import importlib
 import jinja2 as j2
 import logging
 import os
@@ -21,24 +23,24 @@ import shutil
 import yaml
 
 from infraform import filters
+from infraform.utils.file import transfer
 from infraform.exceptions import usage as usage_exc
+from infraform.platforms.platform import Platform
 
 LOG = logging.getLogger(__name__)
 
 
 class Scenario(object):
 
-    def __init__(self, scenario_path, workspace, scenario_vars=None):
-        self.scenario_path = scenario_path
-        self.workspace = workspace
-        self.scenario_name = os.path.basename(
-            self.scenario_path).split('.')[0]
-        self.scenario_suffix = os.path.basename(
-            self.scenario_path).split('.')[-1]
+    def __init__(self, path, platform_name=None, scenario_vars={}):
+        self.path = path
+        if platform_name:
+            self.platform = create_platform(platform_name)
+        self.name = os.path.basename(
+            self.path).split('.')[0]
+        self.file_suffix = os.path.basename(
+            self.path).split('.')[-1]
         self.scenario_vars = scenario_vars
-
-    def validate(self):
-        pass
 
     def get_scenario_template(self, name):
         """Returns jinja2 template."""
@@ -73,20 +75,20 @@ class Scenario(object):
 
         self.load_scenario()
 
-    def load_scenario(self):
+    def load_content(self, host='localhost'):
         """Returns Scenario content as a dictionary."""
-        content = {}
-        with open(self.scenario_path, 'r') as stream:
-            try:
-                content_yaml = yaml.safe_load(stream)
-                for k, v in content_yaml.items():
-                    if k not in self.scenario_vars:
-                        content.update({k: v})
-                        if not hasattr(self, k):
-                            setattr(self, k, v)
-            except yaml.YAMLError as exc:
-                LOG.error(exc)
-        self.scenario_content = content
+        with Connection(host) as conn:
+            with conn.sftp().open(self.path) as stream:
+                try:
+                    content_yaml = yaml.safe_load(stream)
+                    for k, v in content_yaml.items():
+                        if k == "platform":
+                            self.platform = Platform.create_platform(v)
+                        elif k not in self.scenario_vars:
+                            if not hasattr(self, k):
+                                setattr(self, k, v)
+                except yaml.YAMLError as exc:
+                    LOG.error(exc)
 
     def move_scenario_to_workspace(self):
         LOG.info("{}: {} to {}".format(crayons.green("scenario copied"),
@@ -105,3 +107,7 @@ class Scenario(object):
                                           self.scenario_name + '.ifr')
         with open(self.scenario_path, 'w+') as f:
             f.write(scenario)
+
+    def copy(self, path, host='localhost'):
+        # Copy the scenario to remote or local path
+        transfer(host=host, source=self.path, dest=path)

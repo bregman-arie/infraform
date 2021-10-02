@@ -71,7 +71,8 @@ Terraform | Provision infrastucture using Terraform HCL files
 The following is a description of what InfraForm does when you run a scenario
 
 1. Validates the scenario you've specified exists (the .ifr file)
-2. Check if a workspace (.infraform/<SCENARIO_NAME>) directory exists already. If it exists, it removes the entire directory
+2. Iterates over the hosts specified (if not specific, then it uses localhost)
+2. Checks if a workspace (.infraform/<SCENARIO_NAME>) directory exists already. If it exists, it removes the entire directory
 3. Creates a workspace (.infraform/<SCENARIO_NAME>) directory
 4. Copies the scenario file (.ifr) and all the related content to the directory
 5. Checks the host is ready for executing the scenario by running chosen platform check command(s)

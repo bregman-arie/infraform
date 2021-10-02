@@ -20,13 +20,13 @@ import sys
 LOG = logging.getLogger(__name__)
 
 
-def execute_on_remote_host(commands, hosts, warn_on_fail=False,
+def execute_on_remote_host(commands, host, warn_on_fail=False,
                            cwd='/tmp', hide_output=False):
-    """Execute commands remotely on a given list of hosts
+    """Execute commands remotely on a given host addresss
 
     Args:
         commands (list): List of commands to execute
-        hosts (list): List of hosts on which the commands will be executed
+        host (str): an host on which the commands will be executed
         warn_on_fail (bool): A flag used to determine whether to warn
                              only when a failure occurs and keep running
         cwd (str): the working directory where to execute the commands
@@ -34,24 +34,21 @@ def execute_on_remote_host(commands, hosts, warn_on_fail=False,
     Returns:
         list: a list of results (fabric run results) for each executed command
     """
-    results = []
-    for host in hosts:
-        c = Connection(host)
-        with c.cd(cwd):
-            for cmd in commands:
-                try:
-                    if not hide_output:
-                        LOG.debug(crayons.red("Executing: {}".format(cmd)))
-                    res = c.run(cmd, warn=warn_on_fail, hide=hide_output)
-                    results.append(res)
-                except invoke.exceptions.UnexpectedExit:
-                    if not hide_output:
-                        LOG.error("{}: {} on {}. Exiting now...".format(
-                            crayons.red("Failed to execute"),
-                            crayons.yellow(cmd),
-                            crayons.cyan(host)))
-                    sys.exit(2)
-    return results
+    c = Connection(host)
+    with c.cd(cwd):
+        for cmd in commands:
+            try:
+                if not hide_output:
+                    LOG.debug(crayons.red("Executing: {}".format(cmd)))
+                res = c.run(cmd, warn=warn_on_fail, hide=hide_output)
+            except invoke.exceptions.UnexpectedExit:
+                if not hide_output:
+                    LOG.error("{}: {} on {}. Exiting now...".format(
+                        crayons.red("Failed to execute"),
+                        crayons.yellow(cmd),
+                        crayons.cyan(host)))
+                sys.exit(2)
+    return res
 
 
 def execute_on_local_host(commands, warn_on_fail=False,
@@ -60,11 +57,11 @@ def execute_on_local_host(commands, warn_on_fail=False,
     pass
 
 
-def execute_cmd(commands, hosts: list = [], warn_on_fail=False, cwd="/tmp",
+def execute_cmd(commands, host=None, warn_on_fail=False, cwd="/tmp",
                 hide_output=False):
-    """Execute given commands on remote hosts or locally."""
-    if hosts:
-        res = execute_on_remote_host(commands, hosts, warn_on_fail, cwd,
+    """Execute given commands on remote host or locally."""
+    if host:
+        res = execute_on_remote_host(commands, host, warn_on_fail, cwd,
                                      hide_output=hide_output)
     else:
         res = execute_on_local_host(commands, warn_on_fail, cwd,

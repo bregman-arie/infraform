@@ -16,29 +16,39 @@ import logging
 import os
 import shutil
 
+from infraform.utils import file as file_utils
+
 LOG = logging.getLogger(__name__)
 
 
 class Workspace(object):
 
-    def __init__(self, root='.infraform', subdir=None):
-        if subdir:
-            self.root = os.path.join(root, subdir)
-        else:
-            self.root = root
-        if os.path.exists(self.root):
-            self.cleanup()
+    def __init__(self, subdir, root_dir_path='/tmp/.infraform', host='localhost'):
+        self.subdir = subdir
+        self.root_dir_path = root_dir_path
+        self.path = os.path.join(root_dir_path, subdir)
+        self.host = host
+        self.cleanup()
         self.create()
 
     def create(self):
-        if not os.path.exists(self.root):
-            os.makedirs(self.root)
+        if self.host == "localhost" or self.host == "127.0.0.1":
+            os.makedirs(self.path)
             LOG.info("{}: {}".format(crayons.yellow("workspace created"),
-                                     self.root))
+                                     self.path))
         else:
-            self.cleanup()
+            file_utils.create_remote_dir(host=self.host, path=self.path)
+            LOG.info("workspace {} created on host {}".format(
+            crayons.cyan(self.path), crayons.cyan(self.host)))
 
     def cleanup(self):
-        shutil.rmtree(self.root)
-        LOG.info("{}: {}".format(crayons.yellow("workspace removed"),
-                                 self.root))
+        if self.host == "localhost" or self.host == "127.0.0.1":
+            try:
+                shutil.rmtree(self.path)
+                LOG.info("{}: {}".format(crayons.yellow("workspace removed"),
+                                     self.root_dir_path))
+            except FileNotFoundError:
+                pass
+        else:
+            file_utils.remove_remote_dir(
+                host=self.host, path=self.path, directory=self.subdir)

@@ -15,6 +15,7 @@ import crayons
 from fabric import Connection
 import logging
 import os
+from patchwork.files import exists
 import patchwork.transfers
 import re
 
@@ -50,14 +51,29 @@ def get_match_until_first_dot(string):
     return re.search(until_dot_pattern, string).group(0)
 
 
-def transfer(host, source, dest, local=False):
-    if not local:
+def transfer(host, source, dest):
+    c = Connection(host)
+    if host != "localhost" and host != "127.0.0.1":
         with suppress_output():
-            c = Connection(host)
             LOG.debug(crayons.green("Transferring {} to {}:{}".format(
                 source, host, dest)))
             patchwork.transfers.rsync(c, source, dest)
             c.run("chmod +x {}".format(dest))
     else:
-        c = Connection("localhost")
-        c.run("blip blop")
+        c.run("cp -r {} {}".format(source, dest))
+
+
+def remove_remote_dir(host, path, directory):
+    c = Connection(host)
+    if exists(c, path):
+        with c.cd(path):
+            c.run("rm -rf {}".format(directory))
+            LOG.info("directory {} removed from host {}".format(
+                crayons.cyan(path), crayons.cyan(host)))
+    else:
+        LOG.info("directory {} doesn't exists on {}".format(
+            crayons.cyan(path), crayons.cyan(host)))
+
+def create_remote_dir(host, path):
+    c = Connection(host)
+    c.run("mkdir -p {}".format(path))
