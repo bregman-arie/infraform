@@ -22,6 +22,7 @@ LOG = logging.getLogger(__name__)
 class Python(Platform):
 
     NAME = PACKAGE = BINARY = 'python'
+    readiness_check = ['python -v']
 
     def __init__(self, args):
         self.binary = self.BINARY

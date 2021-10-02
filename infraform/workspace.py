@@ -28,8 +28,9 @@ class Workspace(object):
         self.root_dir_path = root_dir_path
         self.path = os.path.join(root_dir_path, subdir)
         self.host = host
-        self.cleanup()
-        self.create()
+        if host != 'localhost' and host != '127.0.0.1':
+            self.cleanup()
+            self.create()
 
     def create(self):
         if self.host == "localhost" or self.host == "127.0.0.1":

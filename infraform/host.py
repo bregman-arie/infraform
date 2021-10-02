@@ -59,10 +59,3 @@ class Host(object):
                 LOG.info("Goodbye")
                 sys.exit(2)
         LOG.info(crayons.green("host verification result: PASSED"))
-
-    def move_scenario_to_workspace(self):
-        file_utils.transfer(host=self.address,
-                            source=self.scenario.path,
-                            dest=self.workspace.path)
-        LOG.info("scenario transferred to {} on {}".format(
-        crayons.cyan(self.workspace.path), crayons.cyan(self.address)))

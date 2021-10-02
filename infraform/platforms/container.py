@@ -25,21 +25,13 @@ LOG = logging.getLogger(__name__)
 
 class Container(Platform):
 
-    def __init__(self, args, binary, package):
+    def __init__(self, variables, binary, package):
         self.binary = binary
         self.package = package
         self.installation = ["dnf install -y {0}\nsystemctl start {1}".format(
             self.package, self.binary)]
 
-        super(Container, self).__init__(args)
-
-    # def clone_project(self):
-    #    """Clones given project."""
-    #    # Change project to path since docker run mounts volume
-    #    # using the project argument
-    #    clone_cmd = "git clone {}".format(self.vars['project'])
-    #    subprocess.run(clone_cmd, shell=True, stdout=subprocess.DEVNULL)
-    #    self.vars['project'] = os.getcwd() + '/' + self.vars['project_name']
+        super(Container, self).__init__(variables)
 
     def verify_project_exists(self):
         if not os.path.isdir(self.vars['project']):
@@ -54,13 +46,13 @@ class Container(Platform):
         if 'project' in self.vars:
             self.verify_project_exists()
 
-    def run(self):
+    def run(self, host='localhost', cwd='/tmp'):
         """Run tests."""
         try:
             cmd = "{0} run -v {1}:/{2}:z {3} \
 /bin/bash -c 'cd {2}; {4}'".format(
                 self.binary,
-                self.vars['project'],
+                self.vars['project_path'],
                 self.vars['project_name'],
                 self.vars['image'],
                 self.vars['execute'])

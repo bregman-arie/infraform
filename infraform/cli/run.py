@@ -31,13 +31,13 @@ def add_run_parser(subparsers):
                             help="The platform to use \
 (podman, docker, terraform, shell, python)")
     run_parser.add_argument('--vars', dest="scenario_vars",
-                            default="",
+                            default={},
                             help="extra variables")
     run_parser.add_argument('--skip-check', dest="skip_check",
                             action="store_true",
                             help="Skip requirements check")
     run_parser.add_argument('--hosts', dest="hosts",
-                            default="", nargs='*',
+                            default=['localhost'], nargs='*',
                             help="host(s) to execute the scenario/command on \
 by specifying host name or user@host")
     run_parser.add_argument('--commands', dest="commands",

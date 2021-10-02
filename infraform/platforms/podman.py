@@ -23,6 +23,7 @@ class Podman(Container):
 
     NAME = PACKAGE = 'podman'
     BINARY = '/bin/podman'
+    readiness_check = ["podman -v"]
 
-    def __init__(self, args):
-        super(Podman, self).__init__(args, self.BINARY, self.PACKAGE)
+    def __init__(self, variables={}):
+        super(Podman, self).__init__(variables, self.BINARY, self.PACKAGE)

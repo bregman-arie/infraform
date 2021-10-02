@@ -35,7 +35,8 @@ class Scenario(object):
     def __init__(self, path, platform_name=None, scenario_vars={}):
         self.path = path
         if platform_name:
-            self.platform = create_platform(platform_name)
+            self.platform = create_platform(
+                platform_name, scenario_vars)
         self.name = os.path.basename(
             self.path).split('.')[0]
         self.file_suffix = os.path.basename(
@@ -48,32 +49,25 @@ class Scenario(object):
             template_content = open_f.read()
         return template_content
 
-    def render(self):
-        LOG.info("{}: {}".format(crayons.yellow("Rendering the scenario"),
-                                 self.scenario_name))
-        j2_env = j2.Environment(loader=j2.FunctionLoader(
-            self.get_scenario_template), trim_blocks=True,
-            undefined=j2.StrictUndefined)
-        j2_env.filters['env_override'] = filters.env_override
-        template = j2_env.get_template(self.scenario_path)
-        try:
-            rendered_scenario = template.render(vars=self.scenario_vars)
-        except j2.exceptions.UndefinedError as e:
-            LOG.error(e)
-            missing_arg = re.findall(
-                r'no attribute (.*)', e.message)[0].strip("'")
-            LOG.error(usage_exc.missing_arg(missing_arg))
-            sys.exit(2)
-        self.write_rendered_scenario(rendered_scenario)
-
-    def prepare(self):
-        self.move_scenario_to_workspace()
-
-        # Check if scenario is templated and has to be rendered
-        if self.scenario_suffix == "j2":
-            self.render()
-
-        self.load_scenario()
+    def render(self, dest):
+        if self.file_suffix == "j2":
+            LOG.info("{}: {}".format(
+                crayons.yellow("rendering the scenario"),
+                self.path))
+            j2_env = j2.Environment(loader=j2.FunctionLoader(
+                self.get_scenario_template), trim_blocks=True,
+                undefined=j2.StrictUndefined)
+            j2_env.filters['env_override'] = filters.env_override
+            template = j2_env.get_template(self.path)
+            try:
+                rendered_scenario = template.render(vars=self.scenario_vars)
+            except j2.exceptions.UndefinedError as e:
+                LOG.error(e)
+                missing_arg = re.findall(
+                    r'no attribute (.*)', e.message)[0].strip("'")
+                LOG.error(usage_exc.missing_arg(missing_arg))
+                sys.exit(2)
+            self.write_rendered_scenario(rendered_scenario, dest)
 
     def load_content(self, host='localhost'):
         """Returns Scenario content as a dictionary."""
@@ -83,35 +77,34 @@ class Scenario(object):
                     content_yaml = yaml.safe_load(stream)
                     for k, v in content_yaml.items():
                         if k == "platform":
-                            self.platform = Platform.create_platform(v)
+                            self.platform = Platform.create_platform(
+                                v, self.scenario_vars)
                         elif k not in self.scenario_vars:
                             if not hasattr(self, k):
                                 setattr(self, k, v)
                 except yaml.YAMLError as exc:
                     LOG.error(exc)
 
-    def move_scenario_to_workspace(self):
-        LOG.info("{}: {} to {}".format(crayons.green("scenario copied"),
-                                       self.scenario_path,
-                                       self.workspace.root))
-        shutil.copy(self.scenario_path, self.workspace.root)
-        self.dir = self.workspace.root
-
     def run(self, host, cwd='/tmp/'):
         LOG.info("{}: {}".format(crayons.yellow("running scenario"),
                                  self.name))
         self.platform.run(host=host, cwd=cwd)
 
-    def write_rendered_scenario(self, scenario):
+    def write_rendered_scenario(self, scenario, dest):
         """Save the rendered scenario."""
-        self.scenario_path = os.path.join(self.workspace.root,
-                                          self.scenario_name + '.ifr')
-        with open(self.scenario_path, 'w+') as f:
+        self.path = os.path.join(dest, self.name + '.ifr')
+        with open(self.path, 'w+') as f:
             f.write(scenario)
 
     def copy(self, path, host='localhost'):
         # Copy the scenario to remote or local path
         transfer(host=host, source=self.path, dest=path)
+        LOG.info("{} {} to {}".format(crayons.yellow("copied"),
+        crayons.cyan(self.path), crayons.cyan(path)))
+        if self.file_suffix == 'j2':
+            self.path = os.path.join(path, self.name + '.ifr.j2')
+        else:
+            self.path = os.path.join(path, self.name + '.ifr')
         # Check if additional files specified in the scenario itself
         if hasattr(self, 'files'):
             for file in self.files:

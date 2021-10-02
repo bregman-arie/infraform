@@ -14,6 +14,7 @@
 import crayons
 import importlib
 import logging
+import os
 import sys
 
 from infraform.utils import process
@@ -29,7 +30,7 @@ LOG = logging.getLogger(__name__)
 class Orchestrator(object):
 
     def __init__(self, platform_name=None, scenario=[],
-                 commands=None, scenario_vars=None,
+                 commands=None, scenario_vars={},
                  skip_check=False, hosts=[], scenarios_dir=None):
         self.platform_name = platform_name
         self.scenario_name = scenario[0]
@@ -42,10 +43,12 @@ class Orchestrator(object):
     def prepare(self):
         scenario_fpath = self.get_scenario_file_path()
         self.scenario = Scenario(path=scenario_fpath,
-                                 platform_name=self.platform_name)
-        workspace = Workspace(root_dir_path='.infraform',
-                              subdir=self.scenario.name)
+                                 platform_name=self.platform_name,
+                                 scenario_vars=self.scenario_vars)
+        workspace = Workspace(root_dir_path=os.path.join(
+            os.getcwd(), '.infraform'), subdir=self.scenario.name)
         self.scenario.copy(path=workspace.path)
+        self.scenario.render(dest=workspace.path)
         self.scenario.load_content()
 
         # Create a list of hosts instances

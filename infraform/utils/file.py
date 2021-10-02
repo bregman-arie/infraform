@@ -52,15 +52,14 @@ def get_match_until_first_dot(string):
 
 
 def transfer(host, source, dest):
-    c = Connection(host)
+    conn = Connection(host)
     if host != "localhost" and host != "127.0.0.1":
         with suppress_output():
-            LOG.debug(crayons.green("Transferring {} to {}:{}".format(
-                source, host, dest)))
             patchwork.transfers.rsync(c, source, dest)
-            c.run("chmod +x {}".format(dest))
+            conn.run("chmod +x {}".format(dest))
     else:
-        c.run("cp -r {} {}".format(source, dest))
+        cp_command = "cp -r {} {}".format(source, dest)
+        conn.run(cp_command)
 
 
 def remove_remote_dir(host, path, directory):
