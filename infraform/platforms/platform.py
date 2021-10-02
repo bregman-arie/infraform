@@ -43,18 +43,27 @@ class Platform(object):
             LOG.info("Fine then, have a nice day :)")
             sys.exit(2)
 
-    def prepare(self, hosts):
-        pass
-
-    def run(self, hosts=None):
-        """Execute platform commands."""
+    def pre(self, host, cwd):
         LOG.info("{}: {} on host {}".format(
             crayons.yellow("running command"),
-            crayons.cyan(self.RUN_CMD),
-            crayons.cyan(','.join(hosts))))
+            crayons.cyan('\n'.join(self.pre_commands)),
+            crayons.cyan(host)))
+        process.execute_cmd(commands=self.pre_commands, host=host, cwd=cwd)
+
+    def run(self, host, cwd):
+        """Execute platform commands."""
+        self.pre(host=host, cwd=cwd)
+        LOG.info("{}: {} on host {}".format(
+            crayons.yellow("running command"),
+            crayons.cyan('\n'.join(self.run_commands)),
+            crayons.cyan(host)))
         LOG.info("----- Scenario Output START-----")
-        process.execute_cmd(commands=[self.RUN_CMD], hosts=hosts)
+        process.execute_cmd(commands=self.run_commands, host=host, cwd=cwd)
         LOG.info("----- Scenario Output END-----")
+        self.post()
+
+    def post(self, host, cwd):
+        pass
 
     @staticmethod
     def create_platform(platform):

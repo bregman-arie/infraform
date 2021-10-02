@@ -21,9 +21,10 @@ LOG = logging.getLogger(__name__)
 class Terraform(Platform):
 
     NAME = PACKAGE = BINARY = 'terraform'
-    RUN_CMD = "terraform apply"
     readiness_check = ["terraform -v"]
-    PRE_CMDS = ['terraform init']
+    pre_commands = ['terraform init']
+    run_commands = ["terraform apply"]
+    post_commands = []
     installation_cmds = [
         "wget https://releases.hashico\
 rp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip",

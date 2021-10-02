@@ -97,9 +97,10 @@ class Scenario(object):
         shutil.copy(self.scenario_path, self.workspace.root)
         self.dir = self.workspace.root
 
-    def run(self):
-        LOG.info("{}: {}".format(crayons.yellow("Running scenario"),
-                                 self.scenario_name))
+    def run(self, host, cwd='/tmp/'):
+        LOG.info("{}: {}".format(crayons.yellow("running scenario"),
+                                 self.name))
+        self.platform.run(host=host, cwd=cwd)
 
     def write_rendered_scenario(self, scenario):
         """Save the rendered scenario."""
@@ -111,3 +112,9 @@ class Scenario(object):
     def copy(self, path, host='localhost'):
         # Copy the scenario to remote or local path
         transfer(host=host, source=self.path, dest=path)
+        # Check if additional files specified in the scenario itself
+        if hasattr(self, 'files'):
+            for file in self.files:
+                transfer(host=host, source=os.path.join(
+                    os.path.dirname(self.path), file),
+                         dest=path)

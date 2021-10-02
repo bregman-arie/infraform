@@ -41,24 +41,29 @@ class Orchestrator(object):
 
     def prepare(self):
         scenario_fpath = self.get_scenario_file_path()
-        scenario = Scenario(path=scenario_fpath, platform_name=self.platform_name)
-        workspace = Workspace(root_dir_path='.infraform', subdir=scenario.name)
-        scenario.copy(path=workspace.path)
-        scenario.load_content()
+        self.scenario = Scenario(path=scenario_fpath,
+                                 platform_name=self.platform_name)
+        workspace = Workspace(root_dir_path='.infraform',
+                              subdir=self.scenario.name)
+        self.scenario.copy(path=workspace.path)
+        self.scenario.load_content()
 
         # Create a list of hosts instances
         for host in self.hosts_names:
             host_instance = Host(address=host,
-                                 workspace_dir=scenario.name,
+                                 workspace_dir=self.scenario.name,
                                  platform_name=self.platform_name)
-            scenario.copy(host=host_instance.address, path=host_instance.workspace.path)
-            host_instance.check_host_platform_readiness(scenario.platform)
+            self.scenario.copy(host=host_instance.address,
+                               path=host_instance.workspace.path)
+            host_instance.check_host_platform_readiness(
+                self.scenario.platform)
             self.hosts.append(host_instance)
-        sys.exit(2)
 
     def run(self):
         for host in self.hosts:
-            host.scenario.run()
+            self.scenario.run(host=host.address, cwd=host.workspace.path)
+        else:
+            LOG.info("Finished executing the scenarios on all hosts")
 
     def get_scenario_file_path(self):
         # Check a scenario was provided
@@ -71,5 +76,6 @@ class Orchestrator(object):
             if not scenario_fpath:
                 raise usage_exc.ScenarioNotFoundError(scenario_fpath)
             else:
-                LOG.info("{}: {}".format(crayons.green("scenario"), scenario_fpath))
+                LOG.info("{}: {}".format(crayons.green("scenario"),
+                                         scenario_fpath))
                 return scenario_fpath

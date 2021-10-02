@@ -40,6 +40,7 @@ def execute_on_remote_host(commands, host, warn_on_fail=False,
             try:
                 if not hide_output:
                     LOG.debug(crayons.red("Executing: {}".format(cmd)))
+                print(cmd)
                 res = c.run(cmd, warn=warn_on_fail, hide=hide_output)
             except invoke.exceptions.UnexpectedExit:
                 if not hide_output:

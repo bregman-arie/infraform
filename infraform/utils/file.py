@@ -74,6 +74,7 @@ def remove_remote_dir(host, path, directory):
         LOG.info("directory {} doesn't exists on {}".format(
             crayons.cyan(path), crayons.cyan(host)))
 
+
 def create_remote_dir(host, path):
     c = Connection(host)
     c.run("mkdir -p {}".format(path))

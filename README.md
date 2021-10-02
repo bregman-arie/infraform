@@ -42,19 +42,13 @@ platform:    # the platform or tool to use (e.g. terraform, ansible, shell, pyth
 files:       # the files to copy to the workspace to be used during the execution of the scenario
  - file1
  - file2
-content: |   # The content of the scenario (shell script, terraform, ansible playbooks, etc.)
-    just
-    the
-    contents
-    of the
-    scenario
+ - directory1
 ```
 
 Infraform provides you with a couple of built-in scenarios you can list with `ifr list`<br>
 To see the content of scenario, run `infraform show <scenario_name>`
 
-In addition to running scenarios you can also run directly files and directories with `ifr run <DIR/FILE name/path>`<br>
-As opposed to scenarios, the tool or platform used in this case, is determined by the suffix of the file or the files in the directory.
+Read more about "Scenarios" [here](docs/scenarios.md)
 
 ## Supported platforms and tooling
 
@@ -71,10 +65,11 @@ Terraform | Provision infrastucture using Terraform HCL files
 The following is a description of what InfraForm does when you run a scenario
 
 1. Validates the scenario you've specified exists (the .ifr file)
+2. If a workspace already exists (.infraform/<SCENARIO_NAME>) it removes it. A new workspace is then created
 2. Iterates over the hosts specified (if not specific, then it uses localhost)
-2. Checks if a workspace (.infraform/<SCENARIO_NAME>) directory exists already. If it exists, it removes the entire directory
-3. Creates a workspace (.infraform/<SCENARIO_NAME>) directory
-4. Copies the scenario file (.ifr) and all the related content to the directory
+  1. Checks if a workspace (.infraform/<SCENARIO_NAME>) directory exists already on the remote host. If it exists, it removes the entire directory
+  2. Creates a workspace (.infraform/<SCENARIO_NAME>) directory on the remote host
+4. Copies the scenario file (.ifr) and all the related content to the directory on the remote/local host
 5. Checks the host is ready for executing the scenario by running chosen platform check command(s)
   1. If check command fails, it will ask the user whether to run commands to fix the check result
     1. If user replied with 'y', it will start executing installation commands based on the chosen platform
