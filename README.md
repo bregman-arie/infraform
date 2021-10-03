@@ -8,6 +8,7 @@ Unified interface for automation cross different technologies and platforms. Inf
 * Use templated scenarios - one scenario, many ways to render it
 * Execute scenarios locally or on remote host(s)
 * Make use of different technologies to run the scenarios - Ansible, Python, Terraform, Podman, Docker, ...
+* Adjusts the host accordingly it it isn't ready to run the chosen technology (Ansible, Terraform ...)
 
 With Infraform it's really all about ease of use. Infraform not only let's you use the same interface to run all these different technologies but it also supports templating which allows you to re-use the same scenarios for different purposes (e.g. staging and prod environments)
 
@@ -43,6 +44,9 @@ files:       # the files to copy to the workspace to be used during the executio
  - file1
  - file2
  - directory1
+vars:        # variables which will be used for executing the scenario
+  x: 2
+  y: 'value'
 ```
 
 Infraform provides you with a couple of built-in scenarios you can list with `ifr list`<br>

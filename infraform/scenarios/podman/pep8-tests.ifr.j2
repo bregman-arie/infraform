@@ -1,9 +1,10 @@
+vars:
+  image: pep8-tests
 {% if "branch" in vars %}
-execute: "git checkout origin/{{ vars['branch'] }}; tox -e pep8"
+  execute: "git checkout origin/{{ vars['branch'] }}; tox -e pep8"
 {% else %}
-execute: "tox -e pep8"
+  execute: "tox -e pep8"
 {% endif %}
-image: pep8-tests
 description: OpenStack PEP8 test
 platform: podman
 dockerfile: |

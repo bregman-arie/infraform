@@ -13,6 +13,7 @@
 #    under the License.
 import crayons
 import logging
+import sys
 
 from infraform.utils import process
 from infraform.utils import file as file_utils
@@ -41,19 +42,25 @@ class Host(object):
             commands=platform.readiness_check,
             host=self.address, hide_output=True, warn_on_fail=True)
         if result.return_code != 0:
-            print(crayons.red(("FAILED\n")))
-            LOG.info("host: {} isn't ready.\nstderr: {}".format(
-                crayons.cyan(self.address), crayons.red(result.stderr)))
-            LOG.info("Run the following on {}:\n{}".format(
-                crayons.cyan(self.address), crayons.yellow(
-                    "\n".join(platform.installation_cmds))))
+            LOG.info("host platform check result: {}".format(
+                crayons.red("FAILED")))
+            if result.stderr:
+                LOG.info("host: {} isn't ready.\nstderr: {}".format(
+                    crayons.cyan(self.address), crayons.red(result.stderr)))
+            try:
+                LOG.info("Run the following on {}:\n{}".format(
+                    crayons.cyan(self.address), crayons.yellow(
+                        "\n".join(platform.installation_commands))))
+            except AttributeError:
+                LOG.info("I have no idea how to fix this...bye :'(")
+                sys.exit(2)
             ans = input("Should I run it for you?[yY/Nn]: ")
             if ans.lower() == "y":
                 LOG.info(
                     "Running installation commands on {}".format(
                         crayons.cyan(self.address)))
                 process.execute_cmd(
-                    commands=platform.installation_cmds,
+                    commands=platform.installation_commands,
                     host=self.address)
             else:
                 LOG.info("Goodbye")

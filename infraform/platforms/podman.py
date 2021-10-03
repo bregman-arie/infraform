@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2021 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -23,7 +23,10 @@ class Podman(Container):
 
     NAME = PACKAGE = 'podman'
     BINARY = '/bin/podman'
-    readiness_check = ["podman -v"]
+    readiness_check = ["podman -v",
+                       "systemctl status podman"]
+    installation_commands = ["sudo dnf install -y podman",
+                             "sudo systemctl start podman"]
 
-    def __init__(self, variables={}):
-        super(Podman, self).__init__(variables, self.BINARY, self.PACKAGE)
+    def __init__(self, scenario):
+        super(Podman, self).__init__(scenario, self.BINARY, self.PACKAGE)

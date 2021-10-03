@@ -25,23 +25,19 @@ import yaml
 from infraform import filters
 from infraform.utils.file import transfer
 from infraform.exceptions import usage as usage_exc
-from infraform.platforms.platform import Platform
 
 LOG = logging.getLogger(__name__)
 
 
 class Scenario(object):
 
-    def __init__(self, path, platform_name=None, scenario_vars={}):
+    def __init__(self, path, scenario_vars={}):
         self.path = path
-        if platform_name:
-            self.platform = create_platform(
-                platform_name, scenario_vars)
         self.name = os.path.basename(
             self.path).split('.')[0]
         self.file_suffix = os.path.basename(
             self.path).split('.')[-1]
-        self.scenario_vars = scenario_vars
+        self.vars = scenario_vars
 
     def get_scenario_template(self, name):
         """Returns jinja2 template."""
@@ -60,7 +56,7 @@ class Scenario(object):
             j2_env.filters['env_override'] = filters.env_override
             template = j2_env.get_template(self.path)
             try:
-                rendered_scenario = template.render(vars=self.scenario_vars)
+                rendered_scenario = template.render(vars=self.vars)
             except j2.exceptions.UndefinedError as e:
                 LOG.error(e)
                 missing_arg = re.findall(
@@ -76,19 +72,13 @@ class Scenario(object):
                 try:
                     content_yaml = yaml.safe_load(stream)
                     for k, v in content_yaml.items():
-                        if k == "platform":
-                            self.platform = Platform.create_platform(
-                                v, self.scenario_vars)
-                        elif k not in self.scenario_vars:
+                        if k == "vars":
+                            self.vars.update(v)
+                        if k not in self.vars:
                             if not hasattr(self, k):
                                 setattr(self, k, v)
                 except yaml.YAMLError as exc:
                     LOG.error(exc)
-
-    def run(self, host, cwd='/tmp/'):
-        LOG.info("{}: {}".format(crayons.yellow("running scenario"),
-                                 self.name))
-        self.platform.run(host=host, cwd=cwd)
 
     def write_rendered_scenario(self, scenario, dest):
         """Save the rendered scenario."""

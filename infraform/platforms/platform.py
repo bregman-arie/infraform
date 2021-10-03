@@ -14,7 +14,6 @@
 import importlib
 import logging
 import sys
-from ansible.parsing.splitter import split_args, parse_kv
 import crayons
 
 from infraform.executor import Executor
@@ -25,12 +24,8 @@ LOG = logging.getLogger(__name__)
 
 class Platform(object):
 
-    def __init__(self, variables={}):
-        self.vars = {}
-        if variables:
-            args_split = split_args(variables)
-            for arg in args_split:
-                self.vars.update(parse_kv(arg))
+    def __init__(self, scenario):
+        self.scenario = scenario
 
     def adjust_hosts(self):
         LOG.info("To fix, run the following:\n{}".format(
@@ -69,12 +64,12 @@ class Platform(object):
         pass
 
     @staticmethod
-    def create_platform(platform, scenario_vars):
+    def create_platform(platform_name, scenario):
         """Returns platform instance based on the given platform argument."""
         Platform = getattr(importlib.import_module(
-            "infraform.platforms.{}".format(platform)),
-            platform.capitalize())
+            "infraform.platforms.{}".format(platform_name)),
+            platform_name.capitalize())
         LOG.info("{}: {}".format(crayons.green("platform"),
-                                 platform))
-        platform_instance = Platform(variables=scenario_vars)
+                                 platform_name))
+        platform_instance = Platform(scenario=scenario)
         return platform_instance

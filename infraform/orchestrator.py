@@ -15,11 +15,13 @@ import crayons
 import importlib
 import logging
 import os
+from ansible.parsing.splitter import split_args, parse_kv
 import sys
 
 from infraform.utils import process
 from infraform.utils import file as file_utils
 from infraform.host import Host
+from infraform.platforms.platform import Platform
 from infraform.scenario import Scenario
 from infraform.exceptions import usage as usage_exc
 from infraform.workspace import Workspace
@@ -36,20 +38,33 @@ class Orchestrator(object):
         self.scenario_name = scenario[0]
         self.commands = commands
         self.scenarios_dir = scenarios_dir
-        self.scenario_vars = scenario_vars
+        self.scenario_vars = self.parse_vars(scenario_vars)
         self.hosts_names = hosts
         self.hosts = []
+        self.skip_check = skip_check
+
+    def parse_vars(self, scenario_vars):
+        variables = {}
+        if scenario_vars:
+            vars_split = split_args(scenario_vars)
+            for var in vars_split:
+                variables.update(parse_kv(var))
+        return variables
 
     def prepare(self):
         scenario_fpath = self.get_scenario_file_path()
         self.scenario = Scenario(path=scenario_fpath,
-                                 platform_name=self.platform_name,
                                  scenario_vars=self.scenario_vars)
+
+        # Create and arrange local workspace
         workspace = Workspace(root_dir_path=os.path.join(
             os.getcwd(), '.infraform'), subdir=self.scenario.name)
         self.scenario.copy(path=workspace.path)
         self.scenario.render(dest=workspace.path)
         self.scenario.load_content()
+
+        self.platform = Platform.create_platform(
+            platform_name=self.scenario.platform, scenario=self.scenario)
 
         # Create a list of hosts instances
         for host in self.hosts_names:
@@ -58,13 +73,14 @@ class Orchestrator(object):
                                  platform_name=self.platform_name)
             self.scenario.copy(host=host_instance.address,
                                path=host_instance.workspace.path)
-            host_instance.check_host_platform_readiness(
-                self.scenario.platform)
+            if not self.skip_check:
+                host_instance.check_host_platform_readiness(
+                    self.scenario.platform)
             self.hosts.append(host_instance)
 
     def run(self):
         for host in self.hosts:
-            self.scenario.run(host=host.address, cwd=host.workspace.path)
+            self.platform.run(host=host.address, cwd=host.workspace.path)
         else:
             LOG.info("Finished executing the scenarios on all hosts")
 

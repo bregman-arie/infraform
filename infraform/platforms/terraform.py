@@ -25,7 +25,7 @@ class Terraform(Platform):
     pre_commands = ['terraform init']
     run_commands = ["terraform apply"]
     post_commands = []
-    installation_cmds = [
+    installation_commands = [
         "wget https://releases.hashico\
 rp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip",
         "unzip terraform_1.0.8_linux_amd64.zip",
