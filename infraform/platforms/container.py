@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+import crayons
 import logging
 import os
 import subprocess
@@ -28,8 +29,12 @@ class Container(Platform):
     def __init__(self, scenario, binary, package):
         self.binary = binary
         self.package = package
-        self.installation = ["dnf install -y {0}\nsystemctl start {1}".format(
-            self.package, self.binary)]
+        self.scenario = scenario
+        self.installation = [
+            "dnf install -y {0}\nsystemctl start {1}".format(
+                self.package, self.binary)]
+        if hasattr(self.scenario, 'image'):
+            self.scenario.vars['image'] = self.scenario.image
 
         super(Container, self).__init__(scenario)
 
@@ -40,8 +45,11 @@ class Container(Platform):
 
     def pre(self):
         if self.image_not_exists() or (self.scenario.vars.get('override_image')):
-            LOG.warning("Building image: {}".format(self.scenario.vars['image']))
-            dockerfile_path = self.write_dockerfile()
+            LOG.warning("{}: {}".format(
+                crayons.yellow("building image"),
+                self.scenario.vars['image']))
+            dockerfile_path = self.write_dockerfile(
+                cwd=self.scenario.workspace.path)
             self.build_image(dockerfile_path)
         if 'project' in self.scenario.vars:
             self.verify_project_exists()
@@ -50,26 +58,36 @@ class Container(Platform):
         """Run the container."""
         self.pre()
         try:
-            cmd = "{0} run -v {1}:/{2}:z {3} \
-/bin/bash -c 'cd {2}; {4}'".format(
-                self.binary,
-                self.scenario.vars['project'],
-                self.scenario.vars['project_name'],
-                self.scenario.vars['image'],
-                self.scenario.vars['execute'])
+            cmd = "{0} run {1}".format(
+                self.binary, self.scenario.vars['image'])
+
+            if 'bind_source' in self.scenario.vars and \
+               'bind_target' in self.scenario.vars:
+                cmd = '{} run -v {}:{}:z {}'.format(
+                    self.binary,
+                    self.scenario.vars['bind_source'],
+                    self.scenario.vars['bind_target'],
+                    self.scenario.vars['image'])
+
+            if hasattr(self.scenario, 'run_in_container'):
+                cmd += " /bin/bash -c '{}'".format(self.scenario.run_in_container)
         except KeyError as e:
             LOG.error(usage.missing_arg(e.args[0]))
             sys.exit(2)
-        LOG.info("Running: {}".format(cmd))
+        LOG.info("running: {}".format(cmd))
         res = subprocess.run(cmd, shell=True)
         success_or_exit(res.returncode)
         return res
 
     def image_not_exists(self):
         """Returns true if image exists."""
-        res = subprocess.run(
-            "{} inspect {}".format(self.binary, self.scenario.vars['image']),
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        try:
+            res = subprocess.run(
+                "{} inspect {}".format(self.binary, self.scenario.vars['image']),
+                shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        except KeyError as e:
+            LOG.error(usage.missing_arg(e.args[0]))
+            sys.exit(2)
         return res.returncode
 
     def get_template(self, name):
@@ -78,10 +96,11 @@ class Container(Platform):
             template_content = open_f.read()
         return template_content
 
-    def write_dockerfile(self, df_path="Dockerfile"):
-        with open(df_path, 'w+') as f:
-            f.write(self.scenario.vars['dockerfile'])
-        return df_path
+    def write_dockerfile(self, cwd):
+        dockerfile_path = cwd + '/Dockerfile'
+        with open(cwd + '/Dockerfile', 'w+') as f:
+            f.write(self.scenario.dockerfile)
+        return dockerfile_path
 
     def destroy(self):
         """Removes the container from the system."""

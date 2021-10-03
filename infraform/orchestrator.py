@@ -59,6 +59,7 @@ class Orchestrator(object):
         # Create and arrange local workspace
         workspace = Workspace(root_dir_path=os.path.join(
             os.getcwd(), '.infraform'), subdir=self.scenario.name)
+        self.scenario.workspace = workspace
         self.scenario.copy(path=workspace.path)
         self.scenario.render(dest=workspace.path)
         self.scenario.load_content()

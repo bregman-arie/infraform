@@ -1,12 +1,15 @@
-vars:
-  image: pep8-tests
-{% if "branch" in vars %}
-  execute: "git checkout origin/{{ vars['branch'] }}; tox -e pep8"
-{% else %}
-  execute: "tox -e pep8"
-{% endif %}
+image: pep8-tests
 description: OpenStack PEP8 test
 platform: podman
+run_in_container: |
+  cd {{ vars['project_name'] }}
+{% if "branch" in vars %}
+  git checkout origin/{{ vars['branch'] }}
+{% endif %}
+  tox -e pep8
+vars:
+  bind_source: {{ vars['project_path'] }}
+  bind_target: /{{ vars['project_name'] }}
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
   RUN dnf install -y python36 python27
