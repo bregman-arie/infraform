@@ -18,6 +18,7 @@ import os
 from patchwork.files import exists
 import patchwork.transfers
 import re
+import subprocess
 
 from infraform.context import suppress_output
 
@@ -52,14 +53,14 @@ def get_match_until_first_dot(string):
 
 
 def transfer(host, source, dest):
-    conn = Connection(host)
     if host != "localhost" and host != "127.0.0.1":
+        conn = Connection(host)
         with suppress_output():
             patchwork.transfers.rsync(conn, source, dest)
             conn.run("chmod +x {}".format(dest))
     else:
         cp_command = "cp -r {} {}".format(source, dest)
-        conn.run(cp_command)
+        subprocess.run(cp_command,shell=True)
 
 
 def remove_remote_dir(host, path, directory):

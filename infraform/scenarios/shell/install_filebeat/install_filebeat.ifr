@@ -1,8 +1,0 @@
-execute: |
-  if ! rpm -qa | grep -q filebeat-7.8.0; then
-    curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.8.0-x86_64.rpm
-    yum install -y filebeat-7.8.0-x86_64.rpm
-  fi
-  cp filebeat.yml /etc/filebeat/
-  systemctl stop filebeat || true
-  systemctl start filebeat

@@ -7,6 +7,9 @@ run_in_container: |
 image: unit-tests
 description: OpenStack Unit Tests (py36)
 platform: podman
+vars:
+  bind_source: {{ vars['project_path'] }}
+  bind_target: /{{ vars['project_name'] }}
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
   RUN dnf install -y python36
