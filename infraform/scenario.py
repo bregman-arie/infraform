@@ -65,23 +65,31 @@ class Scenario(object):
                 sys.exit(2)
             self.write_rendered_scenario(rendered_scenario, dest)
 
+    def load_scenario_yaml(self, stream):
+        try:
+            content_yaml = yaml.safe_load(stream)
+            for k, v in content_yaml.items():
+                if k == "vars":
+                    self.vars.update(v)
+                if k not in self.vars:
+                    if not hasattr(self, k):
+                        setattr(self, k, v)
+        except yaml.YAMLError as exc:
+            LOG.error(exc)
+
+
     def load_content(self, host='localhost'):
         """Returns Scenario content as a dictionary."""
         LOG.info("{}: {}".format(
             crayons.yellow("loading scenario content"),
             crayons.cyan(self.name)))
-        with Connection(host) as conn:
-            with conn.sftp().open(self.path) as stream:
-                try:
-                    content_yaml = yaml.safe_load(stream)
-                    for k, v in content_yaml.items():
-                        if k == "vars":
-                            self.vars.update(v)
-                        if k not in self.vars:
-                            if not hasattr(self, k):
-                                setattr(self, k, v)
-                except yaml.YAMLError as exc:
-                    LOG.error(exc)
+        if host != "localhost" and host != "127.0.0.1":
+            with Connection(host) as conn:
+                with conn.sftp().open(self.path) as stream:
+                    self.load_scenario_yaml(stream)
+        else:    
+            with open(self.path, 'r') as stream:
+                    self.load_scenario_yaml(stream)
 
     def write_rendered_scenario(self, scenario, dest):
         """Save the rendered scenario."""
