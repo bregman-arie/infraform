@@ -55,7 +55,7 @@ def transfer(host, source, dest):
     conn = Connection(host)
     if host != "localhost" and host != "127.0.0.1":
         with suppress_output():
-            patchwork.transfers.rsync(c, source, dest)
+            patchwork.transfers.rsync(conn, source, dest)
             conn.run("chmod +x {}".format(dest))
     else:
         cp_command = "cp -r {} {}".format(source, dest)

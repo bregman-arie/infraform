@@ -52,6 +52,7 @@ class Orchestrator(object):
         return variables
 
     def prepare(self):
+        # Get scenario file path and create a Scenario instance
         scenario_fpath = self.get_scenario_file_path()
         self.scenario = Scenario(path=scenario_fpath,
                                  scenario_vars=self.scenario_vars)
@@ -63,7 +64,9 @@ class Orchestrator(object):
         self.scenario.copy(path=workspace.path)
         self.scenario.render(dest=workspace.path)
         self.scenario.load_content()
+        self.scenario.copy_data(path=workspace.path)
 
+        # Create a platform instance
         self.platform = Platform.create_platform(
             platform_name=self.scenario.platform, scenario=self.scenario)
 
@@ -76,7 +79,7 @@ class Orchestrator(object):
                                path=host_instance.workspace.path)
             if not self.skip_check:
                 host_instance.check_host_platform_readiness(
-                    self.scenario.platform)
+                    self.platform)
             self.hosts.append(host_instance)
 
     def run(self):

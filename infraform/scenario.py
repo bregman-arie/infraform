@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 class Scenario(object):
 
     def __init__(self, path, scenario_vars={}):
-        self.path = path
+        self.path = self.origin_path = path
         self.name = os.path.basename(
             self.path).split('.')[0]
         self.file_suffix = os.path.basename(
@@ -67,6 +67,9 @@ class Scenario(object):
 
     def load_content(self, host='localhost'):
         """Returns Scenario content as a dictionary."""
+        LOG.info("{}: {}".format(
+            crayons.yellow("loading scenario content"),
+            crayons.cyan(self.name)))
         with Connection(host) as conn:
             with conn.sftp().open(self.path) as stream:
                 try:
@@ -89,15 +92,19 @@ class Scenario(object):
     def copy(self, path, host='localhost'):
         # Copy the scenario to remote or local path
         transfer(host=host, source=self.path, dest=path)
-        LOG.info("{} {} to {}".format(crayons.yellow("copied"),
-        crayons.cyan(self.path), crayons.cyan(path)))
+        LOG.info("{} {} to {} on {}".format(crayons.yellow("copied"),
+        crayons.cyan(self.path), crayons.cyan(path), crayons.cyan(host)))
         if self.file_suffix == 'j2':
             self.path = os.path.join(path, self.name + '.ifr.j2')
         else:
             self.path = os.path.join(path, self.name + '.ifr')
         # Check if additional files specified in the scenario itself
+
+    def copy_data(self, path):
         if hasattr(self, 'files'):
             for file in self.files:
-                transfer(host=host, source=os.path.join(
-                    os.path.dirname(self.path), file),
+                transfer(host='localhost', source=os.path.join(
+                    os.path.dirname(self.origin_path), file),
                          dest=path)
+        LOG.info("copied data from {} to {}".format(
+        crayons.cyan(self.origin_path), crayons.cyan(path)))

@@ -32,7 +32,8 @@ rp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip",
         "sudo mv terraform /usr/local/bin/"
     ]
 
-    def __init__(self, args=None):
+    def __init__(self, scenario):
         self.binary = self.BINARY
         self.package = self.PACKAGE
-        super(Terraform, self).__init__(args)
+        self.scenario = scenario
+        super(Terraform, self).__init__(scenario)

@@ -1,8 +1,9 @@
+run_in_container: |
+  cd {{ vars['project_name'] }}
 {% if "branch" in vars %}
-execute: "git checkout origin/{{ vars['branch'] }}; tox -e py36"
-{% else %}
-execute: "tox -e py36"
+  git checkout origin/{{ vars['branch'] }}
 {% endif %}
+  tox -e py36
 image: unit-tests
 description: OpenStack Unit Tests (py36)
 platform: podman
