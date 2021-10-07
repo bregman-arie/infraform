@@ -1,0 +1,28 @@
+run_in_container: |
+  cd {{ vars['project_name'] }}
+{% if "branch" in vars %}
+  git checkout origin/{{ vars['branch'] }}
+{% endif %}
+  tox -e functional
+image: functional-tests
+description: OpenStack Functional Tests
+platform: podman
+vars:
+  bind_source: {{ vars['project_path'] }}
+  bind_target: /{{ vars['project_name'] }}
+dockerfile: |
+  FROM {{ image_name|default("ubi8") }}
+  RUN dnf install -y python36
+  RUN pip3 install tox
+  RUN dnf install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+
+  {% if 'release' in vars %}
+      RUN rhos-release {{ vars['release'] }}
+      RUN dnf clean all
+      RUN sed -i s/enabled=1/enabled=0/g /etc/yum/pluginconf.d/subscription-manager.conf
+      RUN sed -i s/skip_if_unavailable=False/skip_if_unavailable=True/g /etc/dnf/dnf.conf
+      RUN dnf config-manager --enable rhelosp-{{ vars['release'] }}-unittest || true
+  {% endif %}
+ 
+  RUN alternatives --set python /usr/bin/python3
+  RUN dnf install -y python3-devel git gcc openssl-devel gettext procps iproute diffutils autoconf automake libtool make

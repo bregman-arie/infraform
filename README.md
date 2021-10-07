@@ -38,15 +38,17 @@ Hope you'll enjoy using it and if not, let us know and open an issue :)
 Scenario file is one that ends with `.ifr` or `ifr.j2` suffix. It uses the YAML format with the following directives:
 
 ```
-description: # the description of the scenario
-platform:    # the platform or tool to use (e.g. terraform, ansible, shell, python, etc.)
-files:       # the files to copy to the workspace to be used during the execution of the scenario
+description:  # the description of the scenario
+platform:     # the platform or tool to use (e.g. terraform, ansible, shell, python, etc.)
+files:        # the files to copy to the workspace to be used during the execution of the scenario
  - file1
  - file2
  - directory1
-vars:        # variables which will be used for executing the scenario
+vars:         # variables which will be used for executing the scenario
   x: 2
   y: 'value'
+dockerfile: | # used for building an image and running a container using that image
+ ...
 ```
 
 Infraform provides you with a couple of built-in scenarios you can list with `ifr list`<br>
@@ -60,11 +62,11 @@ InfraForm is able to execute using the following technologies
 
 Name | Comments 
 :------ |:------:
+Terraform | Provision infrastucture using Terraform HCL files
 Podman | Run containers using Podman
 Docker | Run containers using Docker
-Terraform | Provision infrastucture using Terraform HCL files
 
-### Too detailed workflow
+### Possibly too detailed workflow
 
 The following is a description of what InfraForm does when you run a scenario
 
@@ -78,8 +80,11 @@ The following is a description of what InfraForm does when you run a scenario
   1. If check command fails, it will ask the user whether to run commands to fix the check result
     1. If user replied with 'y', it will start executing installation commands based on the chosen platform
     2. If user replied with 'n', it will exit with return code different than 0
-6. Executes the scenario using the platform default run command (e.g. Terraform -> terraform apply)
+6. Runs possible pre-commands. This depends highly on the platform used
+   - Terraform -> terraform init
+   - Podman -> Possibly build an image before running container
+7. Executes the scenario using the platform default run command (e.g. Terraform -> terraform apply)
 
 ## Contributions
 
-To contribute to the project use GitHub pull requests.
+To contribute to the project, use GitHub pull requests.
