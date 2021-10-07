@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% if "branch" in vars %}
 execute: "git checkout origin/{{ vars['branch'] }}; tox -e functional"
 {% else %}
@@ -5,6 +6,20 @@ execute: "tox -e functional"
 {% endif %}
 image: functional-tests
 description: OpenStack Functional tests
+=======
+run_in_container: |
+  cd {{ vars['project_name'] }}
+{% if "branch" in vars %}
+  git checkout origin/{{ vars['branch'] }}
+{% endif %}
+  tox -e functional
+image: functional-tests
+description: OpenStack Functional Tests
+platform: podman
+vars:
+  bind_source: {{ vars['project_path'] }}
+  bind_target: /{{ vars['project_name'] }}
+>>>>>>> devel
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
   RUN dnf install -y python36

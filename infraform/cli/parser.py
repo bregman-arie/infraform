@@ -13,10 +13,10 @@
 #    under the License.
 import argparse
 
-from infraform.cli.show import parser as show_parser
-from infraform.cli.rm import parser as rm_parser
-from infraform.cli.run import parser as run_parser
-from infraform.cli.list import parser as list_parser
+import infraform.cli.show as show_parser
+import infraform.cli.rm as rm_parser
+import infraform.cli.run as run_parser
+import infraform.cli.list as list_parser
 
 
 def create_parser():

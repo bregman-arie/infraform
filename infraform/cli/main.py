@@ -39,6 +39,7 @@ def main():
     setup_logging(args.debug)
     # These modules produces a lot of debug information
     # when logging set to DEBUG. We set it back to WARNING
+    logging.getLogger("patchwork.transfers").setLevel(logging.ERROR)
     for module in ['fabric', 'paramiko', 'invoke']:
         set_logging_level(module, logging.WARNING)
 

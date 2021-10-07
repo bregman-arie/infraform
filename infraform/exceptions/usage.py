@@ -14,6 +14,37 @@
 import crayons
 
 
+class ScenarioNotFoundError(Exception):
+    """Exception raised for scenario that doesn't exist"""
+
+    def __init__(self, scenario):
+        self.message = """
+Couldn't find a scenario called: {}
+Nor a file or directory in that name.
+""".format(crayons.red(scenario))
+        super().__init__(self.message)
+
+
+class RunUsageError(Exception):
+    """Exception raised for errors in run invocation"""
+
+    def __init__(self):
+        self.message = """
+{}
+Run invocation examples:
+
+$ {}
+
+$ {}
+
+If you want to get the list of scenarios, run: {}
+        """.format(crayons.red("You didn't specify a scenario"),
+                   crayons.green("ifr run libvirt-vm"),
+                   crayons.green("ifr run pep8-tests"),
+                   crayons.yellow("ifr list"))
+        super().__init__(self.message)
+
+
 def general_usage():
     """Returns general usage string."""
     message = """
@@ -39,14 +70,14 @@ Usage Examples:
     $ {}
 
 """.format(crayons.red("run, rm, list, show"),
-           crayons.yellow("infraform run --scenario \
+           crayons.yellow("infraform run \
 os-1-vm-fip --vars \"provider_network=...\""),
-           crayons.yellow('ifr run --scenario pep8-tests \
+           crayons.yellow('ifr run pep8-tests \
 --vars "project=/home/user/neutron"'),
            crayons.yellow('ifr list'),
            crayons.yellow('ifr show <scenario_name>'),
-           crayons.yellow('ifr rm --scenario elk_filebeat_jenkins'),
-           crayons.yellow("ifr run --scenario pep8-tests --vars \
+           crayons.yellow('ifr rm elk_filebeat_jenkins'),
+           crayons.yellow("ifr run pep8-tests --vars \
 'project=/my/project execute=\"git \
 checkout origin/some-branch; tox -e pep8\"'"))
     return message
@@ -75,18 +106,6 @@ def missing_scenario_arg():
     message = """
 Please specify which scenario to run with {}
 You can also instead, specify a command to execute with {}
-""".format(crayons.red("--scenario <SCENARIO_NAME>"),
-           crayons.red("--host <HOST> --command <COMMAND>"))
-    return message
-
-
-def scenario_example(key):
-    """Template for a valid scenario"""
-    message = crayons.red("""This is how a valid scenario looks like:
-
----
-execute: <command_to_execute>
-
-It seems you forgot to provide the {} key
-""".format(key))
+""".format(crayons.red("<SCENARIO_NAME>"),
+           crayons.red("--commands <COMMAND>"))
     return message

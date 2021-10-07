@@ -14,23 +14,21 @@
 import crayons
 
 
-def missing_reqs(inst, hosts, failed_cmds=[]):
+def missing_reqs(inst, hosts, failure):
     """Message on missing requirements"""
     if hosts:
         loc = "on {}".format(' '.join(hosts))
     else:
         loc = "on this host"
-    if failed_cmds:
-        failures = "The following commands failed:\n\n{}".format(
-            crayons.red("\n".join(failed_cmds)))
+    if failure:
+        failures = "The following failure happened:\n\n{}".format(
+            crayons.red("\n".join(failure)))
     else:
         failures = ""
 
     message = """
 There seems to be a problem {0}
-
 {1}
-
 Perhaps try the following:
 
 {2}

@@ -1,6 +1,0 @@
-execute: |
-    mkdir jenkins;chown -R 1000:1000 jenkins
-    docker-compose up -d
-    docker exec -it elk_filebeat_jenkins_jenkins_1 mkdir -p /var/jenkins_home/jobs/x-job/builds/1/
-    docker cp log elk_filebeat_jenkins_jenkins_1:/var/jenkins_home/jobs/x-job/builds/1/
-remove: "docker-compose down"

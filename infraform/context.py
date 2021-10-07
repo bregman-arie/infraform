@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2021 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,18 +11,20 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import logging
-
-from infraform.platforms.container import Container
-
-
-LOG = logging.getLogger(__name__)
+from contextlib import contextmanager
+import os
+import sys
 
 
-class Docker(Container):
-
-    NAME = PACKAGE = 'docker'
-    BINARY = '/bin/docker'
-
-    def __init__(self, args):
-        super(Docker, self).__init__(args, self.BINARY, self.PACKAGE)
+@contextmanager
+def suppress_output():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = devnull
+        sys.stderr = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr

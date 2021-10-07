@@ -1,4 +1,4 @@
-# Copyright 2019 Arie Bregman
+# Copyright 2021 Arie Bregman
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -13,16 +13,20 @@
 #    under the License.
 import logging
 
-from infraform.platforms.container import Container
-
+from infraform.show import show_scenario
 
 LOG = logging.getLogger(__name__)
 
 
-class Docker(Container):
+def add_show_parser(subparsers):
+    """The parser for sub command 'show'."""
+    show_parser = subparsers.add_parser("show")
+    show_parser.set_defaults(func=main)
+    show_parser.add_argument('scenario',
+                             type=str,
+                             help='scenario name')
 
-    NAME = PACKAGE = 'docker'
-    BINARY = '/bin/docker'
 
-    def __init__(self, args):
-        super(Docker, self).__init__(args, self.BINARY, self.PACKAGE)
+def main(args):
+    """Runner main entry."""
+    show_scenario(args.scenario)

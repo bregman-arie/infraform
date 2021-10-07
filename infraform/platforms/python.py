@@ -14,15 +14,15 @@
 import logging
 
 from infraform.platforms.platform import Platform
-from infraform import process
+from infraform.executor import Executor
 
 LOG = logging.getLogger(__name__)
 
 
 class Python(Platform):
 
-    PACKAGE = 'python'
-    BINARY = 'python'
+    NAME = PACKAGE = BINARY = 'python'
+    readiness_check = ['python -v']
 
     def __init__(self, args):
         self.binary = self.BINARY
@@ -34,5 +34,6 @@ class Python(Platform):
         self.render_scenario()
 
     def run(self):
-        process.execute_cmd(["chmod +x {}".format(self.scenario_f),
-                             "python {}".format(self.scenario_f)])
+        exe = Executor(commands=["chmod +x {}".format(self.scenario_f),
+                                 "python {}".format(self.scenario_f)])
+        exe.run()

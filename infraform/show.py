@@ -15,7 +15,7 @@ import crayons
 import logging
 import os
 
-from infraform.utils import get_match_until_first_dot
+from infraform.utils.file import get_match_until_first_dot
 
 LOG = logging.getLogger(__name__)
 
