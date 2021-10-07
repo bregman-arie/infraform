@@ -12,13 +12,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import crayons
-import importlib
 import logging
 import os
 from ansible.parsing.splitter import split_args, parse_kv
-import sys
 
-from infraform.utils import process
 from infraform.utils import file as file_utils
 from infraform.host import Host
 from infraform.platforms.platform import Platform

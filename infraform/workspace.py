@@ -23,7 +23,8 @@ LOG = logging.getLogger(__name__)
 
 class Workspace(object):
 
-    def __init__(self, subdir, root_dir_path='/tmp/.infraform', host='localhost'):
+    def __init__(self, subdir, root_dir_path='/tmp/.infraform',
+                 host='localhost'):
         self.subdir = subdir
         self.root_dir_path = root_dir_path
         self.path = os.path.join(root_dir_path, subdir)
@@ -39,14 +40,14 @@ class Workspace(object):
         else:
             file_utils.create_remote_dir(host=self.host, path=self.path)
             LOG.info("workspace {} created on host {}".format(
-            crayons.cyan(self.path), crayons.cyan(self.host)))
+                crayons.cyan(self.path), crayons.cyan(self.host)))
 
     def cleanup(self):
         if self.host == "localhost" or self.host == "127.0.0.1":
             try:
                 shutil.rmtree(self.path)
                 LOG.info("{}: {}".format(crayons.yellow("workspace removed"),
-                                     self.root_dir_path))
+                                         self.root_dir_path))
             except FileNotFoundError:
                 pass
         else:

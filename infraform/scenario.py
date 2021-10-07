@@ -13,13 +13,11 @@
 #    under the License.
 from fabric import Connection
 import crayons
-import importlib
 import jinja2 as j2
 import logging
 import os
 import re
 import sys
-import shutil
 import yaml
 
 from infraform import filters
@@ -77,7 +75,6 @@ class Scenario(object):
         except yaml.YAMLError as exc:
             LOG.error(exc)
 
-
     def load_content(self, host='localhost'):
         """Returns Scenario content as a dictionary."""
         LOG.info("{}: {}".format(
@@ -87,9 +84,9 @@ class Scenario(object):
             with Connection(host) as conn:
                 with conn.sftp().open(self.path) as stream:
                     self.load_scenario_yaml(stream)
-        else:    
+        else:
             with open(self.path, 'r') as stream:
-                    self.load_scenario_yaml(stream)
+                self.load_scenario_yaml(stream)
 
     def write_rendered_scenario(self, scenario, dest):
         """Save the rendered scenario."""
@@ -100,8 +97,9 @@ class Scenario(object):
     def copy(self, path, host='localhost'):
         # Copy the scenario to remote or local path
         transfer(host=host, source=self.path, dest=path)
-        LOG.info("{} {} to {} on {}".format(crayons.yellow("copied"),
-        crayons.cyan(self.path), crayons.cyan(path), crayons.cyan(host)))
+        LOG.info("{} {} to {} on {}".format(
+            crayons.yellow("copied"),
+            crayons.cyan(self.path), crayons.cyan(path), crayons.cyan(host)))
         if self.file_suffix == 'j2':
             self.path = os.path.join(path, self.name + '.ifr.j2')
         else:
@@ -115,4 +113,4 @@ class Scenario(object):
                     os.path.dirname(self.origin_path), file),
                          dest=path)
         LOG.info("copied data from {} to {}".format(
-        crayons.cyan(self.origin_path), crayons.cyan(path)))
+            crayons.cyan(self.origin_path), crayons.cyan(path)))

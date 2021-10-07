@@ -16,9 +16,7 @@ import logging
 import sys
 
 from infraform.utils import process
-from infraform.utils import file as file_utils
 from infraform.workspace import Workspace
-from infraform.scenario import Scenario
 
 LOG = logging.getLogger(__name__)
 
@@ -29,10 +27,8 @@ class Host(object):
                  scenario_fpath=None, platform_name=None):
         self.address = address
         if workspace_dir:
-            self.workspace =  Workspace(host=self.address,
-                                        subdir=workspace_dir)
-        if platform_name:
-            self.platform = create_platform(platform_name)
+            self.workspace = Workspace(host=self.address,
+                                       subdir=workspace_dir)
 
     def check_host_platform_readiness(self, platform):
         LOG.info("{}: {}".format(

@@ -60,7 +60,7 @@ def transfer(host, source, dest):
             conn.run("chmod +x {}".format(dest))
     else:
         cp_command = "cp -r {} {}".format(source, dest)
-        subprocess.run(cp_command,shell=True)
+        subprocess.run(cp_command, shell=True)
 
 
 def remove_remote_dir(host, path, directory):

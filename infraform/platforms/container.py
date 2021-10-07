@@ -40,11 +40,12 @@ class Container(Platform):
 
     def verify_project_exists(self):
         if not os.path.isdir(self.scenario.vars['project']):
-            success_or_exit(2, "Couldn't find project: {}".format(self.scenario.vars[
-                'project']))
+            success_or_exit(2, "Couldn't find project: {}".format(
+                self.scenario.vars['project']))
 
     def pre(self):
-        if self.image_not_exists() or (self.scenario.vars.get('override_image')):
+        if self.image_not_exists() or \
+           (self.scenario.vars.get('override_image')):
             LOG.warning("{}: {}".format(
                 crayons.yellow("building image"),
                 self.scenario.vars['image']))
@@ -70,7 +71,8 @@ class Container(Platform):
                     self.scenario.vars['image'])
 
             if hasattr(self.scenario, 'run_in_container'):
-                cmd += " /bin/bash -c '{}'".format(self.scenario.run_in_container)
+                cmd += " /bin/bash -c '{}'".format(
+                    self.scenario.run_in_container)
         except KeyError as e:
             LOG.error(usage.missing_arg(e.args[0]))
             sys.exit(2)
@@ -83,7 +85,8 @@ class Container(Platform):
         """Returns true if image exists."""
         try:
             res = subprocess.run(
-                "{} inspect {}".format(self.binary, self.scenario.vars['image']),
+                "{} inspect {}".format(self.binary,
+                                       self.scenario.vars['image']),
                 shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         except KeyError as e:
             LOG.error(usage.missing_arg(e.args[0]))
