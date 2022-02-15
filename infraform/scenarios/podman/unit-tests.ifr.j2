@@ -12,9 +12,11 @@ vars:
   bind_target: /{{ vars['project_name'] }}
 dockerfile: |
   FROM {{ image_name|default("ubi8") }}
+  ARG CURL="curl --retry-connrefused --retry-delay 2 --retry-max-time 180 --fail --location"
   RUN dnf install -y python36
   RUN pip3 install tox
-  RUN dnf install -y http://rhos-release.virt.bos.redhat.com/repos/rhos-release/rhos-release-latest.noarch.rpm
+  RUN $CURL --insecure https://url.corp.redhat.com/rhos-release-latest-rpm -o /tmp/rhos-release.rpm 
+  RUN dnf install -y /tmp/rhos-release.rpm
 
   {% if 'release' in vars %}
       RUN rhos-release {{ vars['release'] }}
