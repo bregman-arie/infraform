@@ -28,3 +28,7 @@ dockerfile: |
  
   RUN alternatives --set python /usr/bin/python3
   RUN dnf install -y python3-devel python2-devel git gcc openssl-devel gettext redhat-rpm-config diffutils
+
+  {% if ('project_name' in vars) and (vars['project_name'] == "tempest_neutron_plugin") %}
+      RUN pip3 install pip -U
+  {% endif %}
